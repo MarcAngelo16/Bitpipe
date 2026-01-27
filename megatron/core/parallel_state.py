@@ -1,0 +1,832 @@
+# Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
+
+"""Model and data parallel groups."""
+
+import os
+from typing import Optional
+
+import torch
+
+from .utils import GlobalMemoryBuffer
+from megatron import get_args
+# Intra-layer model parallel group that the current rank belongs to.
+_TENSOR_MODEL_PARALLEL_GROUP = None
+# Inter-layer model parallel group that the current rank belongs to.
+_PIPELINE_MODEL_PARALLEL_GROUP = None
+# Model parallel group (both intra- and pipeline) that the current rank belongs to.
+_MODEL_PARALLEL_GROUP = None
+# Embedding group.
+_EMBEDDING_GROUP = None
+# Position embedding group.
+_POSITION_EMBEDDING_GROUP = None
+# Data parallel group that the current rank belongs to.
+_DATA_PARALLEL_GROUP = None
+_DATA_PARALLEL_GROUP_GLOO = None
+# FP8 amax reduction group.
+_AMAX_REDUCTION_GROUP = None
+
+_BD_PARALLEL_GROUP = None
+_BD_PARALLEL_GLOBAL_RANKS = None
+
+_VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK = None
+_VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE = None
+_PIPELINE_MODEL_PARALLEL_SPLIT_RANK = None
+
+# These values enable us to change the mpu sizes on the fly.
+_MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE = None
+_MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE = None
+_MPU_TENSOR_MODEL_PARALLEL_RANK = None
+_MPU_PIPELINE_MODEL_PARALLEL_RANK = None
+
+# A list of ranks that have a copy of the embedding.
+_EMBEDDING_GLOBAL_RANKS = None
+
+# A list of ranks that have a copy of the position embedding.
+_POSITION_EMBEDDING_GLOBAL_RANKS = None
+
+# A list of global ranks for each pipeline group to ease calculation of the source
+# rank when broadcasting from the first or last pipeline stage.
+_PIPELINE_GLOBAL_RANKS = None
+
+# A list of global ranks for each data parallel group to ease calculation of the source
+# rank when broadcasting weights from src to all other data parallel ranks
+_DATA_PARALLEL_GLOBAL_RANKS = None
+
+# Memory buffers to avoid dynamic memory allocation
+_GLOBAL_MEMORY_BUFFER = None
+
+
+def initialize_model_parallel(
+    tensor_model_parallel_size: int = 1,
+    pipeline_model_parallel_size: int = 1,
+    virtual_pipeline_model_parallel_size: Optional[int] = None,
+    pipeline_model_parallel_split_rank: Optional[int] = None,
+    use_fp8: bool = False,
+    use_sharp: bool = False,
+) -> None:
+    """Initialize model data parallel groups.
+
+    Arguments:
+        tensor_model_parallel_size (int, default = 1):
+            The number of GPUs to split individual tensors across.
+
+        pipeline_model_parallel_size (int, default = 1):
+            The number of tensor parallel GPU groups to split the
+            Transformer layers across. For example, if
+            tensor_model_parallel_size is 4 and
+            pipeline_model_parallel_size is 2, the model will be split
+            into 2 groups of 4 GPUs.
+
+        virtual_pipeline_model_parallel_size (int, optional):
+            The number of stages that each pipeline group will have,
+            interleaving as necessary. If None, no interleaving is
+            performed. For example, if tensor_model_parallel_size is 1,
+            pipeline_model_parallel_size is 4,
+            virtual_pipeline_model_parallel_size is 2, and there are
+            16 transformer layers in the model, the model will be
+            split into 8 stages with two layers each and each GPU
+            would get 2 stages as such (layer number starting with 1):
+
+            GPU 0: [1, 2] [9, 10]
+            GPU 1: [3, 4] [11, 12]
+            GPU 2: [5, 6] [13, 14]
+            GPU 3: [7, 8] [15, 16]
+
+        pipeline_model_parallel_split_rank (int, optional):
+            For models with both an encoder and decoder, the rank in
+            pipeline to switch between encoder and decoder (i.e. the
+            first rank of the decoder). This allows the user to set
+            the pipeline parallel size of the encoder and decoder
+            independently. For example, if
+            pipeline_model_parallel_size is 8 and
+            pipeline_model_parallel_split_rank is 3, then ranks 0-2
+            will be the encoder and ranks 3-7 will be the decoder.
+
+        use_fp8 (bool, default = False):
+            Construct GPU groups needed for FP8 training, namely for
+            amax reduction across the product of the data-parallel and
+            tensor-parallel groups.
+
+        use_sharp (bool, default = False):
+            Set the use of SHARP for the collective communications of
+            data-parallel process groups. When `True`, run barrier
+            within each data-parallel process group, which specifies
+            the SHARP application target groups.
+
+    Let's say we have a total of 16 GPUs denoted by g0 ... g15 and we
+    use 2 GPUs to parallelize the model tensor, and 4 GPUs to parallelize
+    the model pipeline. The present function will
+    create 8 tensor model-parallel groups, 4 pipeline model-parallel groups
+    and 8 data-parallel groups as:
+        8 data_parallel groups:
+            [g0, g2], [g1, g3], [g4, g6], [g5, g7], [g8, g10], [g9, g11], [g12, g14], [g13, g15]
+        8 tensor model-parallel groups:
+            [g0, g1], [g2, g3], [g4, g5], [g6, g7], [g8, g9], [g10, g11], [g12, g13], [g14, g15]
+        4 pipeline model-parallel groups:
+            [g0, g4, g8, g12], [g1, g5, g9, g13], [g2, g6, g10, g14], [g3, g7, g11, g15]
+    Note that for efficiency, the caller should make sure adjacent ranks
+    are on the same DGX box. For example if we are using 2 DGX-1 boxes
+    with a total of 16 GPUs, rank 0 to 7 belong to the first box and
+    ranks 8 to 15 belong to the second box.
+
+    """
+    # Get world size and rank. Ensure some consistencies.
+    assert torch.distributed.is_initialized()
+    world_size: int = torch.distributed.get_world_size()
+
+    if world_size % (tensor_model_parallel_size * pipeline_model_parallel_size) != 0:
+        raise RuntimeError(
+            f"world_size ({world_size}) is not divisible by tensor_model_parallel_size "
+            f"({tensor_model_parallel_size}) x pipeline_model_parallel_size ({pipeline_model_parallel_size})"
+        )
+
+    data_parallel_size: int = world_size // (
+        tensor_model_parallel_size * pipeline_model_parallel_size
+    )
+
+    num_tensor_model_parallel_groups: int = world_size // tensor_model_parallel_size
+    num_pipeline_model_parallel_groups: int = world_size // pipeline_model_parallel_size
+    num_data_parallel_groups: int = world_size // data_parallel_size
+
+    if virtual_pipeline_model_parallel_size is not None:
+        if not pipeline_model_parallel_size > 2:
+            raise RuntimeError(
+                "pipeline-model-parallel size should be greater than 2 with interleaved schedule"
+            )
+        global _VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK
+        global _VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE
+        _VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK = 0
+        _VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE = virtual_pipeline_model_parallel_size
+
+    if pipeline_model_parallel_split_rank is not None:
+        global _PIPELINE_MODEL_PARALLEL_SPLIT_RANK
+        _PIPELINE_MODEL_PARALLEL_SPLIT_RANK = pipeline_model_parallel_split_rank
+
+    rank = torch.distributed.get_rank()
+
+    # Build the data-parallel groups.
+    global _DATA_PARALLEL_GROUP
+    global _DATA_PARALLEL_GROUP_GLOO
+    global _DATA_PARALLEL_GLOBAL_RANKS
+    assert _DATA_PARALLEL_GROUP is None, 'data parallel group is already initialized'
+    all_data_parallel_group_ranks = []
+    for i in range(pipeline_model_parallel_size):
+        start_rank = i * num_pipeline_model_parallel_groups
+        end_rank = (i + 1) * num_pipeline_model_parallel_groups
+        for j in range(tensor_model_parallel_size):
+            ranks = range(start_rank + j, end_rank, tensor_model_parallel_size)
+            all_data_parallel_group_ranks.append(list(ranks))
+            group = torch.distributed.new_group(ranks)
+            group_gloo = torch.distributed.new_group(ranks, backend="gloo")
+            if rank in ranks:
+                _DATA_PARALLEL_GROUP = group
+                _DATA_PARALLEL_GROUP_GLOO = group_gloo
+                _DATA_PARALLEL_GLOBAL_RANKS = ranks
+
+    # Apply SHARP to DP process groups
+    if use_sharp:
+        if rank == 0:
+            print( 
+                "The number of process groups to use SHARP with depends on the type "
+                "of the network switch. Nvidia QM1 switch supports SAHRP up to 8 "
+                "process groups and QM2 supports up to 256 process groups. We apply "
+                "SHARP to the communications of the data-parallel domain. If the "
+                "number of data-parallel process groups is larger than the max "
+                "process groups that the network switch supports, the communication "
+                "will fall back to non-SHARP operators. To enable SHARP, "
+                "`#SBATCH_NETWORK=sharp` should be set in the sbatch script."
+            )
+        torch.distributed.barrier(
+            group=get_data_parallel_group(), device_ids=[torch.cuda.current_device()]
+        )
+        # Set `NCCL_SHARP_DISABLE=1` to restrict SHARP application to DP process groups
+        os.environ["NCCL_SHARP_DISABLE"] = "1"
+
+    # Build the model-parallel groups.
+    global _MODEL_PARALLEL_GROUP
+    assert _MODEL_PARALLEL_GROUP is None, 'model parallel group is already initialized'
+    for i in range(data_parallel_size):
+        ranks = [
+            data_parallel_group_ranks[i]
+            for data_parallel_group_ranks in all_data_parallel_group_ranks
+        ]
+        group = torch.distributed.new_group(ranks)
+        if rank in ranks:
+            _MODEL_PARALLEL_GROUP = group
+
+    # Build the tensor model-parallel groups.
+    global _TENSOR_MODEL_PARALLEL_GROUP
+    assert (
+        _TENSOR_MODEL_PARALLEL_GROUP is None
+    ), 'tensor model parallel group is already initialized'
+    for i in range(num_tensor_model_parallel_groups):
+        ranks = range(i * tensor_model_parallel_size, (i + 1) * tensor_model_parallel_size)
+        group = torch.distributed.new_group(ranks)
+        if rank in ranks:
+            _TENSOR_MODEL_PARALLEL_GROUP = group
+
+    # Build the pipeline model-parallel groups and embedding groups
+    # (first and last rank in each pipeline model-parallel group).
+    global _PIPELINE_MODEL_PARALLEL_GROUP
+    global _PIPELINE_GLOBAL_RANKS
+    assert (
+        _PIPELINE_MODEL_PARALLEL_GROUP is None
+    ), 'pipeline model parallel group is already initialized'
+    global _EMBEDDING_GROUP
+    global _EMBEDDING_GLOBAL_RANKS
+    assert _EMBEDDING_GROUP is None, 'embedding group is already initialized'
+    global _POSITION_EMBEDDING_GROUP
+    global _POSITION_EMBEDDING_GLOBAL_RANKS
+    assert _POSITION_EMBEDDING_GROUP is None, 'position embedding group is already initialized'
+    # Build the bd groups
+    global _BD_PARALLEL_GROUP
+    global _BD_PARALLEL_GLOBAL_RANKS
+    assert _BD_PARALLEL_GROUP is None, "Bd parallel group is already initialized"
+    for i in range(num_pipeline_model_parallel_groups):
+        ranks = range(i, world_size, num_pipeline_model_parallel_groups)
+        group = torch.distributed.new_group(ranks)
+
+        # BitPipe 4-VR: Reorder pipeline ranks into V-shaped pattern
+        # This reordering is ONLY for BitPipe, not for Chimera
+        # Example with 4 devices: [0,1,2,3] -> [0,3,2,1]
+        # This V-shape optimizes layer distribution for 4 VRs per device
+        if get_args().enable_bitpipe_schedule:
+            p_ranks = ranks
+            ranks=[]
+            for k in range(pipeline_model_parallel_size): # >=8
+                if k%2==0:
+                    ranks.append(p_ranks[k])
+                else:
+                    ranks.append(p_ranks[pipeline_model_parallel_size-k])
+        # Note: For Chimera, ranks stays sequential [0,1,2,3,...] (no reordering)
+
+        if rank in ranks:
+            _PIPELINE_MODEL_PARALLEL_GROUP = group
+            _PIPELINE_GLOBAL_RANKS = ranks
+
+        # Setup embedding group (to exchange gradients between
+        # first and last stages).
+
+        # ============================================================================
+        # Bidirectional (BD) Gradient Synchronization Groups
+        # ============================================================================
+        # Both BitPipe and Chimera need BD groups for gradient synchronization because
+        # they use bidirectional pipelines where two devices process the same layers
+        # from opposite pipeline directions.
+        #
+        # The same BD group creation code works for both schedulers because:
+        # - BitPipe uses V-shaped 'ranks' array: [0,3,2,1] -> BD groups [0,1], [3,2]
+        # - Chimera uses sequential 'ranks' array: [0,1,2,3] -> BD groups [0,3], [1,2]
+        #
+        # Example (4 devices, Chimera 2-VR):
+        #   Device 0: VR0[layers 1-12]   VR1[layers 37-48]
+        #   Device 3: VR0[layers 37-48]  VR1[layers 1-12]
+        #   -> BD Group 0: [Device 0, Device 3] sync layers 1-12 and 37-48
+        #
+        # The pairing [ranks[0+j], ranks[-1-j]] automatically creates correct pairs
+        # based on which 'ranks' array is used (V-shaped for BitPipe, sequential for Chimera)
+        # ============================================================================
+        if get_args().enable_bitpipe_schedule or (hasattr(get_args(), 'enable_chimera_schedule') and get_args().enable_chimera_schedule):
+            num_bd_parallel_groups=pipeline_model_parallel_size//2
+            all_bd_groups = []
+            for j in range(num_bd_parallel_groups):
+                # Pair devices: first+j with last-j
+                # BitPipe (V-shaped ranks): ranks=[0,3,2,1] -> pairs [0,1] and [3,2]
+                # Chimera (sequential ranks): ranks=[0,1,2,3] -> pairs [0,3] and [1,2]
+                bd_ranks = [ranks[0+j], ranks[-1-j]]
+                all_bd_groups.append(bd_ranks)
+                group = torch.distributed.new_group(bd_ranks)
+                if rank in bd_ranks:
+                    _BD_PARALLEL_GROUP = group
+                    _BD_PARALLEL_GLOBAL_RANKS = bd_ranks
+                    # Log BD group assignment
+                    schedule_name = "Chimera" if (hasattr(get_args(), 'enable_chimera_schedule') and get_args().enable_chimera_schedule) else "BitPipe"
+                    print(f"[{schedule_name} BD Group] Rank {rank} assigned to BD group {j}: {bd_ranks}", flush=True)
+
+            # Log summary of all BD groups (only from rank 0 to avoid duplication)
+            if rank == 0:
+                schedule_name = "Chimera" if (hasattr(get_args(), 'enable_chimera_schedule') and get_args().enable_chimera_schedule) else "BitPipe"
+                print(f"[{schedule_name} BD Groups Summary] Total {num_bd_parallel_groups} BD groups created:", flush=True)
+                for idx, group_ranks in enumerate(all_bd_groups):
+                    print(f"[{schedule_name} BD Groups Summary]   BD Group {idx}: {group_ranks}", flush=True)
+
+        if len(ranks) > 1:
+            embedding_ranks = [ranks[0], ranks[-1]]
+            position_embedding_ranks = [ranks[0]]
+            if get_args().enable_bitpipe_schedule:
+                position_embedding_ranks = [ranks[0], ranks[-1]]
+            if pipeline_model_parallel_split_rank is not None:
+                if ranks[pipeline_model_parallel_split_rank] not in embedding_ranks:
+                    embedding_ranks = [
+                        ranks[0],
+                        ranks[pipeline_model_parallel_split_rank],
+                        ranks[-1],
+                    ]
+                if ranks[pipeline_model_parallel_split_rank] not in position_embedding_ranks:
+                    position_embedding_ranks = [ranks[0], ranks[pipeline_model_parallel_split_rank]]
+        else:
+            embedding_ranks = ranks
+            position_embedding_ranks = ranks
+
+        group = torch.distributed.new_group(embedding_ranks)
+        if rank in embedding_ranks:
+            _EMBEDDING_GROUP = group
+        if rank in ranks:
+            _EMBEDDING_GLOBAL_RANKS = embedding_ranks
+
+        group = torch.distributed.new_group(position_embedding_ranks)
+        if rank in position_embedding_ranks:
+            _POSITION_EMBEDDING_GROUP = group
+        if rank in ranks:
+            _POSITION_EMBEDDING_GLOBAL_RANKS = position_embedding_ranks
+                    
+    # Build the FP8 groups.
+    global _AMAX_REDUCTION_GROUP
+    assert _AMAX_REDUCTION_GROUP is None, 'FP8 amax reduction group is already initialized'
+    if use_fp8:
+        amax_group_size: int = tensor_model_parallel_size * data_parallel_size
+        num_amax_groups: int = world_size // amax_group_size
+        for i in range(num_amax_groups):
+            start_rank = i * amax_group_size
+            end_rank = (i + 1) * amax_group_size
+            ranks = range(start_rank, end_rank)
+            group = torch.distributed.new_group(ranks)
+            if rank in ranks:
+                _AMAX_REDUCTION_GROUP = group
+
+    # Initialize global memory buffer
+    # This isn't really "parallel state" but there isn't another good place to
+    # put this. If we end up with a more generic initialization of megatron-core
+    # we could stick it there
+    _set_global_memory_buffer()
+
+
+def is_unitialized():
+    """Useful for code segments that may be accessed with or without mpu initialization"""
+    return _DATA_PARALLEL_GROUP is None
+
+
+def model_parallel_is_initialized():
+    """Check if model and data parallel groups are initialized."""
+    if (
+        _TENSOR_MODEL_PARALLEL_GROUP is None
+        or _PIPELINE_MODEL_PARALLEL_GROUP is None
+        or _DATA_PARALLEL_GROUP is None
+    ):
+        return False
+    return True
+
+
+def get_model_parallel_group():
+    """Get the model parallel group the caller rank belongs to."""
+    assert _MODEL_PARALLEL_GROUP is not None, 'model parallel group is not initialized'
+    return _MODEL_PARALLEL_GROUP
+
+
+def get_tensor_model_parallel_group(check_initialized=True):
+    """Get the tensor model parallel group the caller rank belongs to."""
+    if check_initialized:
+        assert (
+            _TENSOR_MODEL_PARALLEL_GROUP is not None
+        ), 'tensor model parallel group is not initialized'
+    return _TENSOR_MODEL_PARALLEL_GROUP
+
+
+def get_pipeline_model_parallel_group():
+    """Get the pipeline model parallel group the caller rank belongs to."""
+    assert (
+        _PIPELINE_MODEL_PARALLEL_GROUP is not None
+    ), 'pipeline_model parallel group is not initialized'
+    return _PIPELINE_MODEL_PARALLEL_GROUP
+
+
+def get_data_parallel_group():
+    """Get the data parallel group the caller rank belongs to."""
+    assert _DATA_PARALLEL_GROUP is not None, 'data parallel group is not initialized'
+    return _DATA_PARALLEL_GROUP
+
+
+def get_data_parallel_group_gloo():
+    """Get the data parallel group-gloo the caller rank belongs to."""
+    assert _DATA_PARALLEL_GROUP_GLOO is not None, 'data parallel group-gloo is not initialized'
+    return _DATA_PARALLEL_GROUP_GLOO
+
+
+def get_embedding_group():
+    """Get the embedding group the caller rank belongs to."""
+    assert _EMBEDDING_GROUP is not None, 'embedding group is not initialized'
+    return _EMBEDDING_GROUP
+
+
+def get_position_embedding_group():
+    """Get the position embedding group the caller rank belongs to."""
+    assert _POSITION_EMBEDDING_GROUP is not None, 'position embedding group is not initialized'
+    return _POSITION_EMBEDDING_GROUP
+
+
+def get_amax_reduction_group():
+    """Get the FP8 amax reduction group the caller rank belongs to."""
+    assert _AMAX_REDUCTION_GROUP is not None, 'FP8 amax reduction group is not initialized'
+    return _AMAX_REDUCTION_GROUP
+
+
+def set_tensor_model_parallel_world_size(world_size):
+    """Set the tensor model parallel size"""
+    global _MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE
+    _MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE = world_size
+
+
+def set_pipeline_model_parallel_world_size(world_size):
+    """Set the pipeline model parallel size"""
+    global _MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE
+    _MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE = world_size
+
+
+def set_virtual_pipeline_model_parallel_world_size(world_size):
+    """Set the pipeline model parallel size"""
+    global _VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE
+    _VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE = world_size
+
+
+def get_tensor_model_parallel_world_size():
+    """Return world size for the tensor model parallel group."""
+    global _MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE
+    if _MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE is not None:
+        return _MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE
+    return torch.distributed.get_world_size(group=get_tensor_model_parallel_group())
+
+
+def get_pipeline_model_parallel_world_size():
+    """Return world size for the pipeline model parallel group."""
+    global _MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE
+    if _MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE is not None:
+        return _MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE
+    return torch.distributed.get_world_size(group=get_pipeline_model_parallel_group())
+
+
+def set_tensor_model_parallel_rank(rank):
+    """Set tensor model parallel rank."""
+    global _MPU_TENSOR_MODEL_PARALLEL_RANK
+    _MPU_TENSOR_MODEL_PARALLEL_RANK = rank
+
+
+def set_pipeline_model_parallel_rank(rank):
+    """Set pipeline model parallel rank."""
+    global _MPU_PIPELINE_MODEL_PARALLEL_RANK
+    _MPU_PIPELINE_MODEL_PARALLEL_RANK = rank
+
+
+def set_pipeline_model_parallel_split_rank(rank):
+    """Set pipeline model parallel split rank."""
+    global _PIPELINE_MODEL_PARALLEL_SPLIT_RANK
+    _PIPELINE_MODEL_PARALLEL_SPLIT_RANK = rank
+
+
+def get_tensor_model_parallel_rank():
+    """Return my rank for the tensor model parallel group."""
+    global _MPU_TENSOR_MODEL_PARALLEL_RANK
+    if _MPU_TENSOR_MODEL_PARALLEL_RANK is not None:
+        return _MPU_TENSOR_MODEL_PARALLEL_RANK
+    return torch.distributed.get_rank(group=get_tensor_model_parallel_group())
+
+
+def get_pipeline_model_parallel_rank():
+    """Return my rank for the pipeline model parallel group."""
+    global _MPU_PIPELINE_MODEL_PARALLEL_RANK
+    if _MPU_PIPELINE_MODEL_PARALLEL_RANK is not None:
+        return _MPU_PIPELINE_MODEL_PARALLEL_RANK
+    # 改变顺序
+    if get_args().enable_bitpipe_schedule:
+        rank_in_group =torch.distributed.get_rank(group=get_pipeline_model_parallel_group())
+        if rank_in_group%2==0:
+            return rank_in_group  
+        else:
+            return (get_pipeline_model_parallel_world_size()-rank_in_group)
+    return torch.distributed.get_rank(group=get_pipeline_model_parallel_group())
+
+
+def get_pipeline_model_parallel_split_rank():
+    """Return pipeline model parallel split rank."""
+    global _PIPELINE_MODEL_PARALLEL_SPLIT_RANK
+    return _PIPELINE_MODEL_PARALLEL_SPLIT_RANK
+
+
+def is_pipeline_first_stage(ignore_virtual=False):
+    """Return True if in the first pipeline model-parallel stage, False otherwise.
+
+    For bidirectional schedules (BitPipe 4-VR and Chimera 2-VR):
+    - Device 0, VR0: First stage of forward pipeline (receives input/embedding)
+    - Device N-1, VR1: First stage of backward pipeline (receives embedding for reverse direction)
+
+    For standard interleaved pipeline:
+    - Only Device 0, VR0 gets pre_process (receives input/embedding)
+    """
+    if not ignore_virtual:
+        if get_args().enable_bitpipe_schedule:
+            # BitPipe 4-VR: Bidirectional with VR0 forward, VR1 backward
+            return (
+                get_pipeline_model_parallel_rank()
+                == (get_pipeline_model_parallel_world_size() - 1)
+                and get_virtual_pipeline_model_parallel_rank()== 1
+            ) or (
+                get_pipeline_model_parallel_rank() == 0
+                and get_virtual_pipeline_model_parallel_rank()== 0
+            )
+
+        # Chimera 2-VR: Bidirectional with VR0 forward, VR1 backward
+        # Uses IDENTICAL condition to BitPipe because the first-stage pattern is the same
+        if hasattr(get_args(), 'enable_chimera_schedule') and get_args().enable_chimera_schedule:
+            return (
+                get_pipeline_model_parallel_rank()
+                == (get_pipeline_model_parallel_world_size() - 1)
+                and get_virtual_pipeline_model_parallel_rank()== 1
+            ) or (
+                get_pipeline_model_parallel_rank() == 0
+                and get_virtual_pipeline_model_parallel_rank()== 0
+            )
+
+        # Standard interleaved pipeline (no bidirectional):
+        # Only VR0 (first chunk) on Device 0 is the first stage
+        if (
+            get_virtual_pipeline_model_parallel_world_size() is not None
+            and get_virtual_pipeline_model_parallel_rank() != 0
+        ):
+            return False
+    return get_pipeline_model_parallel_rank() == 0
+
+
+def is_pipeline_last_stage(ignore_virtual=False):
+    """Return True if in the last pipeline model-parallel stage, False otherwise.
+
+    For BitPipe 4-VR (bidirectional):
+    - Device 0, VR2 (vp_rank=2): Last stage of backward pipeline (sends output/logits)
+    - Device N-1, VR3 (vp_rank=3): Last stage of forward pipeline (sends output/logits)
+
+    For Chimera 2-VR (bidirectional):
+    - Device 0, VR1 (vp_rank=1): Last stage of backward pipeline (sends output/logits)
+    - Device N-1, VR0 (vp_rank=0): Last stage of forward pipeline (sends output/logits)
+
+    For standard interleaved pipeline:
+    - Only Device N-1, VR(size-1) gets post_process (creates output layer)
+    """
+    if not ignore_virtual:
+        virtual_pipeline_model_parallel_world_size = get_virtual_pipeline_model_parallel_world_size()
+        if get_args().enable_bitpipe_schedule:
+            # BitPipe 4-VR: VR2 on Device 0 and VR3 on Device N-1 are last stages
+            return (
+                get_pipeline_model_parallel_rank() == 0
+                and get_virtual_pipeline_model_parallel_rank()
+                == virtual_pipeline_model_parallel_world_size - 2
+            ) or (
+                get_pipeline_model_parallel_rank()
+                == (get_pipeline_model_parallel_world_size() - 1)
+                and get_virtual_pipeline_model_parallel_rank()
+                == virtual_pipeline_model_parallel_world_size - 1
+            )
+
+        # Chimera 2-VR: Requires DIFFERENT logic than BitPipe
+        # VR1 on Device 0 and VR0 on Device N-1 are last stages
+        if hasattr(get_args(), 'enable_chimera_schedule') and get_args().enable_chimera_schedule:
+            chimera_world_size = get_pipeline_model_parallel_world_size()
+            chimera_vr_size = get_virtual_pipeline_model_parallel_world_size()  # Should be 2
+            return (
+                get_pipeline_model_parallel_rank() == 0
+                and get_virtual_pipeline_model_parallel_rank() == chimera_vr_size - 1  # VR1 on Device 0
+            ) or (
+                get_pipeline_model_parallel_rank() == (chimera_world_size - 1)
+                and get_virtual_pipeline_model_parallel_rank() == 0  # VR0 on Device N-1
+            )
+
+        # Standard interleaved pipeline (no bidirectional):
+        # Only the last VR on the last device is the last stage
+        if virtual_pipeline_model_parallel_world_size is not None and get_virtual_pipeline_model_parallel_rank() != (
+            virtual_pipeline_model_parallel_world_size - 1
+        ):
+            return False
+    return get_pipeline_model_parallel_rank() == (get_pipeline_model_parallel_world_size() - 1)
+
+
+def is_rank_in_embedding_group(ignore_virtual=False):
+    """Return true if current rank is in embedding group, False otherwise."""
+    rank = torch.distributed.get_rank()
+    global _EMBEDDING_GLOBAL_RANKS
+    if ignore_virtual:
+        return rank in _EMBEDDING_GLOBAL_RANKS
+    if get_args().enable_bitpipe_schedule:
+        return is_pipeline_first_stage(ignore_virtual=False) or is_pipeline_last_stage(
+            ignore_virtual=False
+        )
+    if rank in _EMBEDDING_GLOBAL_RANKS:
+        if rank == _EMBEDDING_GLOBAL_RANKS[0]:
+            return is_pipeline_first_stage(ignore_virtual=False)
+        elif rank == _EMBEDDING_GLOBAL_RANKS[-1]:
+            return is_pipeline_last_stage(ignore_virtual=False)
+        else:
+            return True
+    return False
+
+
+def is_rank_in_position_embedding_group():
+    """Return true if current rank is in position embedding group, False otherwise."""
+    rank = torch.distributed.get_rank()
+    global _POSITION_EMBEDDING_GLOBAL_RANKS
+    return rank in _POSITION_EMBEDDING_GLOBAL_RANKS
+
+
+def is_rank_in_bd_group():
+    rank = torch.distributed.get_rank()
+    global _BD_PARALLEL_GLOBAL_RANKS
+    return rank in _BD_PARALLEL_GLOBAL_RANKS
+
+
+def is_pipeline_stage_before_split(rank=None):
+    """Return True if pipeline stage executes encoder block for a model
+    with both encoder and decoder."""
+    if get_pipeline_model_parallel_world_size() == 1:
+        return True
+    if rank is None:
+        rank = get_pipeline_model_parallel_rank()
+    global _PIPELINE_MODEL_PARALLEL_SPLIT_RANK
+    if _PIPELINE_MODEL_PARALLEL_SPLIT_RANK is None:
+        return True
+    if rank < _PIPELINE_MODEL_PARALLEL_SPLIT_RANK:
+        return True
+    return False
+
+
+def is_pipeline_stage_after_split(rank=None):
+    """Return True if pipeline stage executes decoder block for a model
+    with both encoder and decoder."""
+    if get_pipeline_model_parallel_world_size() == 1:
+        return True
+    if rank is None:
+        rank = get_pipeline_model_parallel_rank()
+    global _PIPELINE_MODEL_PARALLEL_SPLIT_RANK
+    if _PIPELINE_MODEL_PARALLEL_SPLIT_RANK is None:
+        return True
+    if rank >= _PIPELINE_MODEL_PARALLEL_SPLIT_RANK:
+        return True
+    return False
+
+
+def is_pipeline_stage_at_split():
+    """Return true if pipeline stage executes decoder block and next
+    stage executes encoder block for a model with both encoder and
+    decoder."""
+    rank = get_pipeline_model_parallel_rank()
+    return is_pipeline_stage_before_split(rank) and is_pipeline_stage_after_split(rank + 1)
+
+
+def get_virtual_pipeline_model_parallel_rank():
+    """Return the virtual pipeline-parallel rank."""
+    global _VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK
+    return _VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK
+
+
+def set_virtual_pipeline_model_parallel_rank(rank):
+    """Set the virtual pipeline-parallel rank."""
+    global _VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK
+    _VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK = rank
+
+
+def get_virtual_pipeline_model_parallel_world_size():
+    """Return the virtual pipeline-parallel world size."""
+    global _VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE
+    return _VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE
+
+
+def get_tensor_model_parallel_src_rank():
+    """Calculate the global rank corresponding to the first local rank
+    in the tensor model parallel group."""
+    global_rank = torch.distributed.get_rank()
+    local_world_size = get_tensor_model_parallel_world_size()
+    return (global_rank // local_world_size) * local_world_size
+
+
+def get_data_parallel_src_rank():
+    """Calculate the global rank corresponding to the first local rank
+    in the data parallel group."""
+    assert _DATA_PARALLEL_GLOBAL_RANKS is not None, "Data parallel group is not initialized"
+    return _DATA_PARALLEL_GLOBAL_RANKS[0]
+
+
+def get_bd_parallel_src_rank():
+    """Calculate the global rank corresponding to the first local rank
+    in the data parallel group."""
+    assert _BD_PARALLEL_GLOBAL_RANKS is not None, "Bd parallel group is not initialized"
+    return _BD_PARALLEL_GLOBAL_RANKS[0]
+
+
+def get_bd_parallel_group():
+    """Get the data parallel group the caller rank belongs to."""
+    assert _BD_PARALLEL_GROUP is not None, 'Bd parallel group is not initialized'
+    return _BD_PARALLEL_GROUP
+
+
+def get_pipeline_model_parallel_first_rank():
+    """Return the global rank of the first process in the pipeline for the
+    current tensor parallel group"""
+    assert _PIPELINE_GLOBAL_RANKS is not None, "Pipeline parallel group is not initialized"
+    last_rank_local = get_pipeline_model_parallel_world_size() - 1
+    if get_args().enable_bitpipe_schedule and (get_virtual_pipeline_model_parallel_rank() == 1):
+        return _PIPELINE_GLOBAL_RANKS[last_rank_local]
+    return _PIPELINE_GLOBAL_RANKS[0]
+
+
+def get_pipeline_model_parallel_last_rank():
+    """Return the global rank of the last process in the pipeline for the
+    current tensor parallel group"""
+    assert _PIPELINE_GLOBAL_RANKS is not None, "Pipeline parallel group is not initialized"
+    last_rank_local = get_pipeline_model_parallel_world_size() - 1
+    if get_args().enable_bitpipe_schedule and (get_virtual_pipeline_model_parallel_rank() == get_virtual_pipeline_model_parallel_world_size()-2):
+        return _PIPELINE_GLOBAL_RANKS[0]
+    return _PIPELINE_GLOBAL_RANKS[last_rank_local]
+
+
+def get_pipeline_model_parallel_next_rank():
+    """Return the global rank that follows the caller in the pipeline"""
+    assert _PIPELINE_GLOBAL_RANKS is not None, "Pipeline parallel group is not initialized"
+    rank_in_pipeline = get_pipeline_model_parallel_rank()
+    world_size = get_pipeline_model_parallel_world_size()
+    v_rank = get_virtual_pipeline_model_parallel_rank()
+    if get_args().enable_bitpipe_schedule and (v_rank == 1 or v_rank == 2):
+        return _PIPELINE_GLOBAL_RANKS[(rank_in_pipeline - 1) % world_size]
+    return _PIPELINE_GLOBAL_RANKS[(rank_in_pipeline + 1) % world_size]
+
+
+def get_pipeline_model_parallel_prev_rank():
+    """Return the global rank that preceeds the caller in the pipeline"""
+    assert _PIPELINE_GLOBAL_RANKS is not None, "Pipeline parallel group is not initialized"
+    rank_in_pipeline = get_pipeline_model_parallel_rank()
+    world_size = get_pipeline_model_parallel_world_size()
+    v_rank = get_virtual_pipeline_model_parallel_rank()
+    if get_args().enable_bitpipe_schedule and (v_rank == 1 or v_rank == 2):
+        return _PIPELINE_GLOBAL_RANKS[(rank_in_pipeline + 1) % world_size]
+    return _PIPELINE_GLOBAL_RANKS[(rank_in_pipeline - 1) % world_size]
+
+
+def get_data_parallel_world_size():
+    """Return world size for the data parallel group."""
+    if torch.distributed.is_available() and torch.distributed.is_initialized():
+        return torch.distributed.get_world_size(group=get_data_parallel_group())
+    else:
+        return 0
+
+
+def get_data_parallel_rank():
+    """Return my rank for the data parallel group."""
+    if torch.distributed.is_available() and torch.distributed.is_initialized():
+        return torch.distributed.get_rank(group=get_data_parallel_group())
+    else:
+        return 0
+
+
+def _set_global_memory_buffer():
+    """Initialize global buffer"""
+    global _GLOBAL_MEMORY_BUFFER
+    assert _GLOBAL_MEMORY_BUFFER is None, 'global memory buffer is already initialized'
+    _GLOBAL_MEMORY_BUFFER = GlobalMemoryBuffer()
+
+
+def get_global_memory_buffer():
+    """Return the global GlobalMemoryBuffer object"""
+    assert _GLOBAL_MEMORY_BUFFER is not None, 'global memory buffer is not initialized'
+    return _GLOBAL_MEMORY_BUFFER
+
+
+def destroy_global_memory_buffer():
+    """Sets the global memory buffer to None"""
+    global _GLOBAL_MEMORY_BUFFER
+    _GLOBAL_MEMORY_BUFFER = None
+
+
+def destroy_model_parallel():
+    """Set the groups to none."""
+    global _MODEL_PARALLEL_GROUP
+    _MODEL_PARALLEL_GROUP = None
+    global _TENSOR_MODEL_PARALLEL_GROUP
+    _TENSOR_MODEL_PARALLEL_GROUP = None
+    global _PIPELINE_MODEL_PARALLEL_GROUP
+    _PIPELINE_MODEL_PARALLEL_GROUP = None
+    global _DATA_PARALLEL_GROUP
+    _DATA_PARALLEL_GROUP = None
+    global _EMBEDDING_GROUP
+    _EMBEDDING_GROUP = None
+    global _POSITION_EMBEDDING_GROUP
+    _POSITION_EMBEDDING_GROUP = None
+    global _AMAX_REDUCTION_GROUP
+    _AMAX_REDUCTION_GROUP = None
+    global _VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK
+    _VIRTUAL_PIPELINE_MODEL_PARALLEL_RANK = None
+    global _VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE
+    _VIRTUAL_PIPELINE_MODEL_PARALLEL_WORLD_SIZE = None
+    global _MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE
+    _MPU_TENSOR_MODEL_PARALLEL_WORLD_SIZE = None
+    global _MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE
+    _MPU_PIPELINE_MODEL_PARALLEL_WORLD_SIZE = None
+    global _MPU_TENSOR_MODEL_PARALLEL_RANK
+    _MPU_TENSOR_MODEL_PARALLEL_RANK = None
+    global _MPU_PIPELINE_MODEL_PARALLEL_RANK
+    _MPU_PIPELINE_MODEL_PARALLEL_RANK = None
+    global _GLOBAL_MEMORY_BUFFER
+    _GLOBAL_MEMORY_BUFFER = None

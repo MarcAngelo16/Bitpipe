@@ -1,0 +1,1890 @@
+root@C.23757995:/workspace/Bitipipe$ tmux clear-history
+root@C.23757995:/workspace/Bitipipe$ ./singlenode_gpt_asym.sh
+Running Single-node BitPipe Pipeline Parallelism...
+==================================
+Total GPUs: 8 (1 node x 8 GPUs/node)
+Pipeline stages: 8 (BitPipe enabled)
+Node rank: 0
+Master addr: 172.17.0.2
+BitPipe: ENABLED
+==================================
+Micro batch size: 4
+Global batch size: 32
+Estimated microbatches: 8
+[2025-07-22 02:53:25,731] torch.distributed.run: [WARNING]
+[2025-07-22 02:53:25,731] torch.distributed.run: [WARNING] *****************************************
+[2025-07-22 02:53:25,731] torch.distributed.run: [WARNING] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your applicati
+on as needed.
+[2025-07-22 02:53:25,731] torch.distributed.run: [WARNING] *****************************************
+Zarr-based strategies will not be registered because of missing packages
+Zarr-based strategies will not be registered because of missing packages
+Zarr-based strategies will not be registered because of missing packages
+Zarr-based strategies will not be registered because of missing packages
+Zarr-based strategies will not be registered because of missing packages
+Zarr-based strategies will not be registered because of missing packages
+Zarr-based strategies will not be registered because of missing packages
+Zarr-based strategies will not be registered because of missing packages
+✓ BitPipe Asymmetric Configuration Loaded:
+  Config file: asymmetric_8devices_96layers.json
+  Pipeline size: 8
+  Total layers: 96
+  Device 0: [6, 5, 5, 6] (pairs with Device 7)
+  Device 1: [5, 8, 8, 5] (pairs with Device 6)
+  Device 2: [5, 8, 8, 5] (pairs with Device 5)
+  Device 3: [6, 5, 5, 6] (pairs with Device 4)
+  Device 4: [5, 6, 6, 5] (paired from Device 3)
+  Device 5: [8, 5, 5, 8] (paired from Device 2)
+  Device 6: [8, 5, 5, 8] (paired from Device 1)
+  Device 7: [5, 6, 6, 5] (paired from Device 0)
+BitPipe asymmetric mode enabled - bypassing symmetric layer requirements
+using world size: 8, data-parallel-size: 1, tensor-model-parallel size: 1, pipeline-model-parallel size: 8
+WARNING: overriding default arguments for train_synthetic:True                        with train_synthetic:True
+WARNING: overriding default arguments for seq_length:128                        with seq_length:512
+WARNING: overriding default arguments for max_position_embeddings:128                        with max_position_embeddings:1024
+WARNING: overriding default arguments for hidden_size:512                        with hidden_size:768
+WARNING: overriding default arguments for num_layers:16                        with num_layers:96
+WARNING: overriding default arguments for num_attention_heads:8                        with num_attention_heads:16
+WARNING: overriding default arguments for vocab_size:1000                        with vocab_size:40478
+WARNING: overriding default arguments for micro_batch_size:2                        with micro_batch_size:4
+WARNING: overriding default arguments for global_batch_size:16                        with global_batch_size:32
+WARNING: overriding default arguments for enable_bitpipe_schedule:True                        with enable_bitpipe_schedule:True
+✓ BitPipe Asymmetric Configuration Loaded:
+  Config file: asymmetric_8devices_96layers.json
+  Pipeline size: 8
+  Total layers: 96
+  Device 0: [6, 5, 5, 6] (pairs with Device 7)
+  Device 1: [5, 8, 8, 5] (pairs with Device 6)
+  Device 2: [5, 8, 8, 5] (pairs with Device 5)
+  Device 3: [6, 5, 5, 6] (pairs with Device 4)
+  Device 4: [5, 6, 6, 5] (paired from Device 3)
+  Device 5: [8, 5, 5, 8] (paired from Device 2)
+  Device 6: [8, 5, 5, 8] (paired from Device 1)
+  Device 7: [5, 6, 6, 5] (paired from Device 0)
+BitPipe asymmetric mode enabled - bypassing symmetric layer requirements
+using torch.float16 for parameters ...
+------------------------ arguments ------------------------
+  accumulate_allreduce_grads_in_fp32 .............. False
+  adam_beta1 ...................................... 0.9
+  adam_beta2 ...................................... 0.999
+  adam_eps ........................................ 1e-08
+  add_bias_linear ................................. True
+  add_position_embedding .......................... True
+  adlr_autoresume ................................. False
+  adlr_autoresume_interval ........................ 1000
+  apply_layernorm_1p .............................. False
+  apply_query_key_layer_scaling ................... True
+  apply_residual_connection_post_layernorm ........ False
+  asymmetric_layers_full_config ................... [[6, 5, 5, 6], [5, 8, 8, 5], [5, 8, 8, 5], [6, 5, 5, 6], [5, 6, 6, 5], [8, 5, 5, 8], [8, 5, 5, 8], [5, 6, 6, 5]]
+  async_tensor_model_parallel_allreduce ........... False
+  attention_dropout ............................... 0.1
+  attention_softmax_in_fp32 ....................... False
+  barrier_with_L1_time ............................ True
+  bert_binary_head ................................ True
+  bert_embedder_type .............................. megatron
+  bert_load ....................................... None
+  bf16 ............................................ False
+  bias_dropout_fusion ............................. True
+  bias_gelu_fusion ................................ True
+  biencoder_projection_dim ........................ 0
+  biencoder_shared_query_context_model ............ False
+  bitpipe_asymmetric_config ....................... asymmetric_8devices_96layers.json
+  bitpipe_profile_eval_iters ...................... []
+  bitpipe_profile_train_iters ..................... [3]
+  block_data_path ................................. None
+  classes_fraction ................................ 1.0
+  clip_grad ....................................... 1.0
+  consumed_train_samples .......................... 0
+  consumed_valid_samples .......................... 0
+  data_cache_path ................................. None
+  data_impl ....................................... infer
+  data_parallel_random_init ....................... False
+  data_parallel_size .............................. 1
+  data_path ....................................... ['/tmp/dummy_data']
+  data_per_class_fraction ......................... 1.0
+  data_sharding ................................... True
+  dataloader_type ................................. single
+  DDP_impl ........................................ local
+  decoder_num_layers .............................. None
+  decoder_seq_length .............................. None
+  dino_bottleneck_size ............................ 256
+  dino_freeze_last_layer .......................... 1
+  dino_head_hidden_size ........................... 2048
+  dino_local_crops_number ......................... 10
+  dino_local_img_size ............................. 96
+  dino_norm_last_layer ............................ False
+  dino_teacher_temp ............................... 0.07
+  dino_warmup_teacher_temp ........................ 0.04
+  dino_warmup_teacher_temp_epochs ................. 30
+  distribute_saved_activations .................... False
+  distributed_backend ............................. nccl
+  distributed_timeout_minutes ..................... 10
+  embedding_path .................................. None
+  embedding_weights_in_fp32 ....................... False
+  empty_unused_memory_level ....................... 0
+  enable_bitpipe_asymmetric ....................... True
+  enable_bitpipe_profiling ........................ True
+  enable_bitpipe_schedule ......................... True
+  encoder_num_layers .............................. 96
+  encoder_seq_length .............................. 512
+  end_weight_decay ................................ 0.01
+  eod_mask_loss ................................... True
+  eval_interval ................................... 1000
+  eval_iters ...................................... 1
+  evidence_data_path .............................. None
+  exit_duration_in_mins ........................... None
+  exit_interval ................................... None
+  exit_on_missing_checkpoint ...................... False
+  exit_signal_handler ............................. False
+  ffn_hidden_size ................................. 3072
+  finetune ........................................ False
+  fp16 ............................................ True
+  fp16_lm_cross_entropy ........................... False
+  fp32_residual_connection ........................ False
+  fp8 ............................................. None
+  fp8_amax_compute_algo ........................... most_recent
+  fp8_amax_history_len ............................ 1
+  fp8_interval .................................... 1
+  fp8_margin ...................................... 0
+  fp8_wgrad ....................................... True
+  global_batch_size ............................... 32
+  gradient_accumulation_fusion .................... True
+  group_query_attention ........................... False
+  head_lr_mult .................................... 1.0
+  hidden_dropout .................................. 0.1
+  hidden_size ..................................... 768
+  hysteresis ...................................... 2
+  ict_head_size ................................... None
+  ict_load ........................................ None
+  img_h ........................................... 224
+  img_w ........................................... 224
+  indexer_batch_size .............................. 128
+  indexer_log_interval ............................ 1000
+  inference_batch_times_seqlen_threshold .......... 512
+  init_method_std ................................. 0.02
+  init_method_xavier_uniform ...................... False
+  initial_loss_scale .............................. 4294967296
+  iter_per_epoch .................................. 1250
+  kv_channels ..................................... 48
+  layernorm_epsilon ............................... 1e-05
+  lazy_mpu_init ................................... None
+  load ............................................ None
+  local_rank ...................................... None
+  log_batch_size_to_tensorboard ................... False
+  log_interval .................................... 5
+  log_learning_rate_to_tensorboard ................ True
+  log_loss_scale_to_tensorboard ................... True
+  log_memory_to_tensorboard ....................... False
+  log_num_zeros_in_grad ........................... False
+  log_params_norm ................................. False
+  log_timers_to_tensorboard ....................... False
+  log_validation_ppl_to_tensorboard ............... False
+  log_world_size_to_tensorboard ................... False
+  loss_scale ...................................... None
+  loss_scale_window ............................... 1000
+  lr .............................................. 0.0001
+  lr_decay_iters .................................. None
+  lr_decay_samples ................................ None
+  lr_decay_style .................................. cosine
+  lr_warmup_fraction .............................. 0.01
+  lr_warmup_init .................................. 0.0
+  lr_warmup_iters ................................. 0
+  lr_warmup_samples ............................... 0
+  make_vocab_size_divisible_by .................... 128
+  mask_factor ..................................... 1.0
+  mask_prob ....................................... 0.15
+  mask_type ....................................... random
+  masked_softmax_fusion ........................... True
+  max_position_embeddings ......................... 1024
+  max_tokens_to_oom ............................... 12000
+  merge_file ...................................... None
+  micro_batch_size ................................ 4
+  min_loss_scale .................................. 1.0
+  min_lr .......................................... 1e-05
+  mmap_warmup ..................................... False
+  no_load_optim ................................... True
+  no_load_rng ..................................... True
+  no_persist_layer_norm ........................... False
+  no_save_optim ................................... None
+  no_save_rng ..................................... None
+  normalization ................................... LayerNorm
+  num_attention_heads ............................. 16
+  num_channels .................................... 3
+  num_classes ..................................... 1000
+  num_experts ..................................... None
+  num_layers ...................................... 96
+  num_layers_per_virtual_pipeline_stage ........... None
+  num_query_groups ................................ 1
+  num_workers ..................................... 2
+  onnx_safe ....................................... None
+  openai_gelu ..................................... False
+  optimizer ....................................... adam
+  output_bert_embeddings .......................... False
+  overlap_p2p_comm ................................ False
+  override_opt_param_scheduler .................... False
+  params_dtype .................................... torch.float16
+  patch_dim ....................................... 16
+  perform_initialization .......................... True
+  pipeline_model_parallel_size .................... 8
+  pipeline_model_parallel_split_rank .............. None
+  position_embedding_type ......................... learned_absolute
+  profile ......................................... False
+  profile_ranks ................................... [0]
+  profile_step_end ................................ 12
+  profile_step_start .............................. 10
+  query_in_block_prob ............................. 0.1
+  rampup_batch_size ............................... None
+  rank ............................................ 0
+  recompute_granularity ........................... None
+  recompute_method ................................ None
+  recompute_num_layers ............................ None
+  reset_attention_mask ............................ True
+  reset_position_ids .............................. True
+  retriever_report_topk_accuracies ................ []
+  retriever_score_scaling ......................... False
+  retriever_seq_length ............................ 256
+  retro_add_retriever ............................. False
+  retro_cyclic_train_iters ........................ None
+  retro_encoder_attention_dropout ................. 0.1
+  retro_encoder_hidden_dropout .................... 0.1
+  retro_encoder_layers ............................ 2
+  retro_num_neighbors ............................. 2
+  retro_num_retrieved_chunks ...................... 2
+  retro_return_doc_ids ............................ False
+  retro_workdir ................................... None
+  rotary_percent .................................. 1.0
+  rotary_seq_len_interpolation_factor ............. None
+  sample_rate ..................................... 1.0
+  save ............................................ /tmp/bitpipe_8gpu_test
+  save_interval ................................... 25
+  scatter_gather_tensors_in_pipeline .............. True
+  seed ............................................ 1234
+  seq_length ...................................... 512
+  sequence_parallel ............................... False
+  sgd_momentum .................................... 0.9
+  short_seq_prob .................................. 0.1
+  skip_train ...................................... False
+  split ........................................... 100,0,0
+  squared_relu .................................... False
+  standalone_embedding_stage ...................... False
+  start_weight_decay .............................. 0.01
+  swiglu .......................................... False
+  swin_backbone_type .............................. tiny
+  tensor_model_parallel_size ...................... 1
+  tensorboard_dir ................................. None
+  tensorboard_log_interval ........................ 1
+  tensorboard_queue_size .......................... 1000
+  test_data_path .................................. None
+  timing_log_level ................................ 0
+  timing_log_option ............................... minmax
+  titles_data_path ................................ None
+  tokenizer_model ................................. None
+  tokenizer_type .................................. NullTokenizer
+  train_data_path ................................. None
+  train_iters ..................................... 3
+  train_samples ................................... None
+  train_synthetic ................................. True
+  transformer_impl ................................ local
+  transformer_pipeline_model_parallel_size ........ 8
+  untie_embeddings_and_output_weights ............. False
+  use_checkpoint_args ............................. False
+  use_checkpoint_opt_param_scheduler .............. False
+  use_contiguous_buffers_in_local_ddp ............. True
+  use_cpu_initialization .......................... None
+  use_distributed_optimizer ....................... False
+  use_flash_attn .................................. False
+  use_one_sent_docs ............................... False
+  use_ring_exchange_p2p ........................... False
+  use_rotary_position_embeddings .................. False
+  valid_data_path ................................. None
+  variable_seq_lengths ............................ False
+  virtual_pipeline_model_parallel_size ............ 4
+  vision_backbone_type ............................ vit
+  vision_pretraining .............................. False
+  vision_pretraining_type ......................... classify
+  vocab_extra_ids ................................. 0
+  vocab_file ...................................... None
+  vocab_size ...................................... 40478
+  weight_decay .................................... 0.01
+  weight_decay_incr_style ......................... constant
+  world_size ...................................... 8
+-------------------- end of arguments ---------------------
+setting number of micro-batches to constant 8
+> building NullTokenizer tokenizer ...
+ > padded vocab (size: 40479) with 97 dummy tokens (new size: 40576)
+✓ BitPipe Asymmetric Configuration Loaded:
+  Config file: asymmetric_8devices_96layers.json
+  Pipeline size: 8
+  Total layers: 96
+  Device 0: [6, 5, 5, 6] (pairs with Device 7)
+  Device 1: [5, 8, 8, 5] (pairs with Device 6)
+  Device 2: [5, 8, 8, 5] (pairs with Device 5)
+  Device 3: [6, 5, 5, 6] (pairs with Device 4)
+  Device 4: [5, 6, 6, 5] (paired from Device 3)
+  Device 5: [8, 5, 5, 8] (paired from Device 2)
+  Device 6: [8, 5, 5, 8] (paired from Device 1)
+  Device 7: [5, 6, 6, 5] (paired from Device 0)
+BitPipe asymmetric mode enabled - bypassing symmetric layer requirements
+✓ BitPipe Asymmetric Configuration Loaded:
+  Config file: asymmetric_8devices_96layers.json
+  Pipeline size: 8
+  Total layers: 96
+  Device 0: [6, 5, 5, 6] (pairs with Device 7)
+  Device 1: [5, 8, 8, 5] (pairs with Device 6)
+  Device 2: [5, 8, 8, 5] (pairs with Device 5)
+  Device 3: [6, 5, 5, 6] (pairs with Device 4)
+  Device 4: [5, 6, 6, 5] (paired from Device 3)
+  Device 5: [8, 5, 5, 8] (paired from Device 2)
+  Device 6: [8, 5, 5, 8] (paired from Device 1)
+  Device 7: [5, 6, 6, 5] (paired from Device 0)
+BitPipe asymmetric mode enabled - bypassing symmetric layer requirements
+✓ BitPipe Asymmetric Configuration Loaded:
+  Config file: asymmetric_8devices_96layers.json
+  Pipeline size: 8
+  Total layers: 96
+  Device 0: [6, 5, 5, 6] (pairs with Device 7)
+  Device 1: [5, 8, 8, 5] (pairs with Device 6)
+  Device 2: [5, 8, 8, 5] (pairs with Device 5)
+  Device 3: [6, 5, 5, 6] (pairs with Device 4)
+  Device 4: [5, 6, 6, 5] (paired from Device 3)
+  Device 5: [8, 5, 5, 8] (paired from Device 2)
+  Device 6: [8, 5, 5, 8] (paired from Device 1)
+  Device 7: [5, 6, 6, 5] (paired from Device 0)
+BitPipe asymmetric mode enabled - bypassing symmetric layer requirements
+✓ BitPipe Asymmetric Configuration Loaded:
+  Config file: asymmetric_8devices_96layers.json
+  Pipeline size: 8
+  Total layers: 96
+  Device 0: [6, 5, 5, 6] (pairs with Device 7)
+  Device 1: [5, 8, 8, 5] (pairs with Device 6)
+  Device 2: [5, 8, 8, 5] (pairs with Device 5)
+  Device 3: [6, 5, 5, 6] (pairs with Device 4)
+  Device 4: [5, 6, 6, 5] (paired from Device 3)
+  Device 5: [8, 5, 5, 8] (paired from Device 2)
+  Device 6: [8, 5, 5, 8] (paired from Device 1)
+  Device 7: [5, 6, 6, 5] (paired from Device 0)
+BitPipe asymmetric mode enabled - bypassing symmetric layer requirements
+✓ BitPipe Asymmetric Configuration Loaded:
+  Config file: asymmetric_8devices_96layers.json
+  Pipeline size: 8
+  Total layers: 96
+  Device 0: [6, 5, 5, 6] (pairs with Device 7)
+  Device 1: [5, 8, 8, 5] (pairs with Device 6)
+  Device 2: [5, 8, 8, 5] (pairs with Device 5)
+  Device 3: [6, 5, 5, 6] (pairs with Device 4)
+  Device 4: [5, 6, 6, 5] (paired from Device 3)
+  Device 5: [8, 5, 5, 8] (paired from Device 2)
+  Device 6: [8, 5, 5, 8] (paired from Device 1)
+  Device 7: [5, 6, 6, 5] (paired from Device 0)
+BitPipe asymmetric mode enabled - bypassing symmetric layer requirements
+[BitPipe BD Group] Rank 6 assigned to BD group 1: [7, 6]
+> initializing torch distributed ...
+✓ BitPipe Asymmetric Configuration Loaded:
+  Config file: asymmetric_8devices_96layers.json
+  Pipeline size: 8
+  Total layers: 96
+  Device 0: [6, 5, 5, 6] (pairs with Device 7)
+  Device 1: [5, 8, 8, 5] (pairs with Device 6)
+  Device 2: [5, 8, 8, 5] (pairs with Device 5)
+  Device 3: [6, 5, 5, 6] (pairs with Device 4)
+  Device 4: [5, 6, 6, 5] (paired from Device 3)
+  Device 5: [8, 5, 5, 8] (paired from Device 2)
+  Device 6: [8, 5, 5, 8] (paired from Device 1)
+  Device 7: [5, 6, 6, 5] (paired from Device 0)
+BitPipe asymmetric mode enabled - bypassing symmetric layer requirements
+[BitPipe BD Group] Rank 0 assigned to BD group 0: [0, 1]
+[BitPipe BD Groups Summary] Total 4 BD groups created:
+[BitPipe BD Groups Summary]   BD Group 0: [0, 1]
+[BitPipe BD Groups Summary]   BD Group 1: [7, 6]
+[BitPipe BD Groups Summary]   BD Group 2: [2, 3]
+[BitPipe BD Groups Summary]   BD Group 3: [5, 4]
+> initialized tensor model parallel with size 1
+> initialized pipeline model parallel with size 8
+> setting random seeds to 1234 ...
+> compiling dataset index builder ...
+make: Entering directory '/workspace/Bitipipe/megatron/data'
+make: Nothing to be done for 'default'.
+make: Leaving directory '/workspace/Bitipipe/megatron/data'
+>>> done with dataset index builder. Compilation time: 0.064 seconds
+> compiling and loading fused kernels ...
+[BitPipe BD Group] Rank 2 assigned to BD group 2: [2, 3]
+[BitPipe BD Group] Rank 3 assigned to BD group 2: [2, 3]
+[BitPipe BD Group] Rank 7 assigned to BD group 1: [7, 6]
+[BitPipe BD Group] Rank 1 assigned to BD group 0: [0, 1]
+[BitPipe BD Group] Rank 5 assigned to BD group 3: [5, 4]
+[BitPipe BD Group] Rank 4 assigned to BD group 3: [5, 4]
+>>> done with compiling and loading fused kernels. Compilation time: 0.980 seconds
+/workspace/Bitipipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
+  output = bias_gelu(bias, input)
+/workspace/Bitipipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
+  output = bias_gelu(bias, input)
+/workspace/Bitipipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
+  output = bias_gelu(bias, input)
+/workspace/Bitipipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
+  output = bias_gelu(bias, input)
+/workspace/Bitipipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
+  output = bias_gelu(bias, input)
+/workspace/Bitipipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
+  output = bias_gelu(bias, input)
+/workspace/Bitipipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
+  output = bias_gelu(bias, input)
+/workspace/Bitipipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
+  output = bias_gelu(bias, input)
+/workspace/Bitipipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/co
+nda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
+  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
+/workspace/Bitipipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/co
+nda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
+  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
+/workspace/Bitipipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/co
+nda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
+  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
+/workspace/Bitipipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/co
+nda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
+  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
+/workspace/Bitipipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/co
+nda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
+  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
+/workspace/Bitipipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/co
+nda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
+  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
+/workspace/Bitipipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/co
+nda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
+  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
+/workspace/Bitipipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/co
+nda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
+  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
+time to initialize megatron (seconds): 3.443
+[after megatron is initialized] datetime: 2025-07-22 02:53:32
+Building BitPipe GPT model ...
+[BITPIPE LOG] Device 1 | Virtual Rank 0 | Created layers: [7, 8, 9, 10, 11]
+[BITPIPE LOG] Device 2 | Virtual Rank 0 | Created layers: [12, 13, 14, 15, 16]
+[BITPIPE LOG] Device 7 | Virtual Rank 0 | Created layers: [44, 45, 46, 47, 48]
+[BITPIPE LOG] Device 4 | Virtual Rank 0 | Created layers: [23, 24, 25, 26, 27]
+[BITPIPE LOG] Device 3 | Virtual Rank 0 | Created layers: [17, 18, 19, 20, 21, 22]
+[BITPIPE LOG] Device 5 | Virtual Rank 0 | Created layers: [28, 29, 30, 31, 32, 33, 34, 35]
+[BITPIPE LOG] Device 3 | Virtual Rank 1 | Created layers: [23, 24, 25, 26, 27]
+[BITPIPE LOG] Device 4 | Virtual Rank 1 | Created layers: [17, 18, 19, 20, 21, 22]
+[BITPIPE LOG] Device 1 | Virtual Rank 1 | Created layers: [36, 37, 38, 39, 40, 41, 42, 43]
+[BITPIPE LOG] Device 0 | Virtual Rank 0 | Created layers: [1, 2, 3, 4, 5, 6]
+[BITPIPE LOG] Device 2 | Virtual Rank 1 | Created layers: [28, 29, 30, 31, 32, 33, 34, 35]
+[BITPIPE LOG] Device 5 | Virtual Rank 1 | Created layers: [12, 13, 14, 15, 16]
+[BITPIPE LOG] Device 3 | Virtual Rank 2 | Created layers: [71, 72, 73, 74, 75]
+[BITPIPE LOG] Device 4 | Virtual Rank 2 | Created layers: [65, 66, 67, 68, 69, 70]
+[BITPIPE LOG] Device 5 | Virtual Rank 2 | Created layers: [60, 61, 62, 63, 64]
+[BITPIPE LOG] Device 7 | Virtual Rank 1 | Created layers: [1, 2, 3, 4, 5, 6]
+[BITPIPE LOG] Device 1 | Virtual Rank 2 | Created layers: [84, 85, 86, 87, 88, 89, 90, 91]
+[BITPIPE LOG] Device 2 | Virtual Rank 2 | Created layers: [76, 77, 78, 79, 80, 81, 82, 83]
+[BITPIPE LOG] Device 3 | Virtual Rank 3 | Created layers: [65, 66, 67, 68, 69, 70]
+[BITPIPE LOG] Device 4 | Virtual Rank 3 | Created layers: [71, 72, 73, 74, 75]
+[BITPIPE LOG] Device 6 | Virtual Rank 0 | Created layers: [36, 37, 38, 39, 40, 41, 42, 43]
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 3): 155933184
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 4): 155933184
+[BITPIPE LOG] Device 1 | Virtual Rank 3 | Created layers: [55, 56, 57, 58, 59]
+[BITPIPE LOG] Device 2 | Virtual Rank 3 | Created layers: [60, 61, 62, 63, 64]
+[BITPIPE LOG] Device 5 | Virtual Rank 3 | Created layers: [76, 77, 78, 79, 80, 81, 82, 83]
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 1): 184284672
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 2): 184284672
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 5): 184284672
+[BITPIPE LOG] Device 6 | Virtual Rank 1 | Created layers: [7, 8, 9, 10, 11]
+[BITPIPE LOG] Device 6 | Virtual Rank 2 | Created layers: [55, 56, 57, 58, 59]
+[BITPIPE LOG] Device 6 | Virtual Rank 3 | Created layers: [84, 85, 86, 87, 88, 89, 90, 91]
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 6): 184284672
+Building BitPipe GPT model ...
+[BITPIPE LOG] Device 0 | Virtual Rank 1 | Created layers: [44, 45, 46, 47, 48]
+Building BitPipe GPT model ...
+[BITPIPE LOG] Device 7 | Virtual Rank 2 | Created layers: [49, 50, 51, 52, 53, 54]
+[BITPIPE LOG] Device 0 | Virtual Rank 2 | Created layers: [92, 93, 94, 95, 96]
+Building BitPipe GPT model ...
+[BITPIPE LOG] Device 0 | Virtual Rank 3 | Created layers: [49, 50, 51, 52, 53, 54]
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 0): 219045888
+[BITPIPE LOG] Device 7 | Virtual Rank 3 | Created layers: [92, 93, 94, 95, 96]
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 7): 219045888
+> learning rate decay style: cosine
+[after model, optimizer, and learning rate scheduler are built] datetime: 2025-07-22 02:53:32
+> building train, validation, and test datasets ...
+ > datasets target sizes (minimum size):
+    train:      96
+    validation: 32
+    test:       32
+> building dummy datasets for BitPipe...
+> created dummy datasets: train=96, valid=32, test=32
+> building train, validation, and test datasets ...
+ > datasets target sizes (minimum size):
+    train:      96
+    validation: 32
+    test:       32
+> building dummy datasets for BitPipe...
+> created dummy datasets: train=96, valid=32, test=32
+> building train, validation, and test datasets ...
+ > datasets target sizes (minimum size):
+    train:      96
+    validation: 32
+    test:       32
+> building dummy datasets for BitPipe...
+> created dummy datasets: train=96, valid=32, test=32
+> building train, validation, and test datasets ...
+ > datasets target sizes (minimum size):
+    train:      96
+    validation: 32
+    test:       32
+> building dummy datasets for BitPipe...
+> created dummy datasets: train=96, valid=32, test=32
+[after dataloaders are built] datetime: 2025-07-22 02:53:33
+done with setup ...
+(min, max) time across ranks (ms):
+    model-and-optimizer-setup ......................: (353.82, 545.86)
+    train/valid/test-data-iterators-setup ..........: (772.86, 849.36)
+training ...
+[before the start of training step] datetime: 2025-07-22 02:53:33
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+
+
+[BitPipe Rank 6/World 6] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[BitPipe Rank 6/World 6]
+========== BitPipe Schedule Configuration ==========
+[BitPipe Rank 1/World 1] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[BitPipe Rank 6/World 6] Pipeline parallel size: 8
+[BitPipe Rank 6/World 6] Pipeline parallel rank: 6[BitPipe Rank 7/World 7] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+
+[BitPipe Rank 6/World 6] Number of microbatches (base): 8
+[BitPipe Rank 6/World 6] Number of model chunks: 4[BitPipe Rank 5/World 5] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+
+[BitPipe Rank 6/World 6] Total microbatches (doubled): 16
+[BitPipe Rank 6/World 6] n_loop: 0
+[BitPipe Rank 6/World 6] Phase breakdown:
+[BitPipe Rank 6/World 6]   - Warmup microbatches: 13
+[BitPipe Rank 0/World 0] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===[BitPipe Rank 3/World 3] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===[BitPipe Rank 6/World 6]   - Mid-phase microbatches: 0
+
+
+[BitPipe Rank 1/World 1]
+========== BitPipe Schedule Configuration ==========
+[BitPipe Rank 6/World 6]   - Remaining microbatches: 3
+[BitPipe Rank 1/World 1] Pipeline parallel size: 8[BitPipe Rank 6/World 6]   - Unit remaining: 3
+[BitPipe Rank 7/World 7]
+========== BitPipe Schedule Configuration ==========
+
+[BitPipe Rank 1/World 1] Pipeline parallel rank: 7[BitPipe Rank 6/World 6] ==================================================
+
+[BitPipe Rank 5/World 5]
+========== BitPipe Schedule Configuration ==========[BitPipe Rank 7/World 7] Pipeline parallel size: 8
+[BitPipe Rank 1/World 1] Number of microbatches (base): 8
+
+
+[BitPipe Rank 5/World 5] Pipeline parallel size: 8[BitPipe Rank 1/World 1] Number of model chunks: 4[BitPipe Rank 7/World 7] Pipeline parallel rank: 1
+
+
+[BitPipe Rank 5/World 5] Pipeline parallel rank: 3[BitPipe Rank 7/World 7] Number of microbatches (base): 8
+
+[BitPipe Rank 5/World 5] Number of microbatches (base): 8[BitPipe Rank 7/World 7] Number of model chunks: 4
+
+[BitPipe Rank 1/World 1] Total microbatches (doubled): 16[BitPipe Rank 3/World 3]
+========== BitPipe Schedule Configuration ==========[BitPipe Rank 5/World 5] Number of model chunks: 4
+
+
+[BitPipe Rank 1/World 1] n_loop: 0[BitPipe Rank 3/World 3] Pipeline parallel size: 8
+
+[BitPipe Rank 7/World 7] Total microbatches (doubled): 16[BitPipe Rank 1/World 1] Phase breakdown:
+
+[BitPipe Rank 3/World 3] Pipeline parallel rank: 5[BitPipe Rank 7/World 7] n_loop: 0
+[BitPipe Rank 1/World 1]   - Warmup microbatches: 12
+[BitPipe Rank 5/World 5] Total microbatches (doubled): 16[BitPipe Rank 7/World 7] Phase breakdown:[BitPipe Rank 3/World 3] Number of microbatches (base): 8
+
+
+
+[BitPipe Rank 1/World 1]   - Mid-phase microbatches: 0[BitPipe Rank 5/World 5] n_loop: 0[BitPipe Rank 7/World 7]   - Warmup microbatches: 13
+[BitPipe Rank 3/World 3] Number of model chunks: 4
+
+
+[BitPipe Rank 1/World 1]   - Remaining microbatches: 4[BitPipe Rank 5/World 5] Phase breakdown:[BitPipe Rank 7/World 7]   - Mid-phase microbatches: 0
+
+
+[BitPipe Rank 1/World 1]   - Unit remaining: 4[BitPipe Rank 5/World 5]   - Warmup microbatches: 15
+
+[BitPipe Rank 7/World 7]   - Remaining microbatches: 3[BitPipe Rank 1/World 1] ==================================================
+[BitPipe Rank 5/World 5]   - Mid-phase microbatches: 0
+[BitPipe Rank 3/World 3] Total microbatches (doubled): 16
+
+[BitPipe Rank 7/World 7]   - Unit remaining: 3
+[BitPipe Rank 5/World 5]   - Remaining microbatches: 1
+[BitPipe Rank 3/World 3] n_loop: 0
+
+[BitPipe Rank 7/World 7] ==================================================
+[BitPipe Rank 5/World 5]   - Unit remaining: 1
+[BitPipe Rank 3/World 3] Phase breakdown:
+
+[BitPipe Rank 5/World 5] ==================================================
+[BitPipe Rank 3/World 3]   - Warmup microbatches: 14
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+
+[BitPipe Rank 1/World 1] Forward schedule (length=16): [4, 5, 6, 7, 0, 8, 1, 9, 2, 10, 3, 11, 12, 13, 14, 15][BitPipe Rank 3/World 3]   - Mid-phase microbatches: 0
+
+[BitPipe Rank 1/World 1] Forward pass execution order:[BitPipe Rank 3/World 3]   - Remaining microbatches: 2
+
+[BitPipe Rank 1/World 1]   Time 0: Process microbatch 4 using model chunk 1[BitPipe Rank 3/World 3]   - Unit remaining: 2
+
+[BitPipe Rank 1/World 1]   Time 1: Process microbatch 5 using model chunk 1[BitPipe Rank 3/World 3] ==================================================
+
+
+[BitPipe Rank 1/World 1]   Time 2: Process microbatch 6 using model chunk 1
+[BitPipe Rank 1/World 1]   Time 3: Process microbatch 7 using model chunk 1
+[BitPipe Rank 1/World 1]   Time 4: Process microbatch 0 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 5: Process microbatch 8 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 6: Process microbatch 1 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 7: Process microbatch 9 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 8: Process microbatch 2 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 9: Process microbatch 10 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 10: Process microbatch 3 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 11: Process microbatch 11 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 12: Process microbatch 12 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 13: Process microbatch 13 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 14: Process microbatch 14 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 15: Process microbatch 15 using model chunk 3
+[BitPipe Rank 1/World 1] Backward schedule (length=18): [12, 13, 14, 15, 8, 0, 9, 1, 10, 2, 11, 3, 4, 5, 6, -1, 7, -1]
+[BitPipe Rank 1/World 1] Backward pass execution order:
+[BitPipe Rank 1/World 1]   Time 0: Process microbatch 12 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 1: Process microbatch 13 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 2: Process microbatch 14 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 3: Process microbatch 15 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 4: Process microbatch 8 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 5: Process microbatch 0 using model chunk 0
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[BitPipe Rank 1/World 1]   Time 6: Process microbatch 9 using model chunk 2
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[BitPipe Rank 1/World 1]   Time 7: Process microbatch 1 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 8: Process microbatch 10 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 9: Process microbatch 2 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 10: Process microbatch 11 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 11: Process microbatch 3 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 12: Process microbatch 4 using model chunk 1
+[BitPipe Rank 1/World 1]   Time 13: Process microbatch 5 using model chunk 1
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[BitPipe Rank 1/World 1]   Time 14: Process microbatch 6 using model chunk 1
+[BitPipe Rank 1/World 1]   Time 15: GRADIENT SYNC
+[BitPipe Rank 1/World 1]   Time 16: Process microbatch 7 using model chunk 1
+[BitPipe Rank 1/World 1]   Time 17: GRADIENT SYNC
+[BitPipe Rank 2/World 2] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[BitPipe Rank 2/World 2]
+========== BitPipe Schedule Configuration ==========
+[BitPipe Rank 2/World 2] Pipeline parallel size: 8
+[BitPipe Rank 2/World 2] Pipeline parallel rank: 2
+[BitPipe Rank 2/World 2] Number of microbatches (base): 8
+[BitPipe Rank 2/World 2] Number of model chunks: 4
+[BitPipe Rank 2/World 2] Total microbatches (doubled): 16
+[BitPipe Rank 2/World 2] n_loop: 0
+[BitPipe Rank 2/World 2] Phase breakdown:
+[BitPipe Rank 2/World 2]   - Warmup microbatches: 14
+[BitPipe Rank 2/World 2]   - Mid-phase microbatches: 0
+[BitPipe Rank 2/World 2]   - Remaining microbatches: 2
+[BitPipe Rank 2/World 2]   - Unit remaining: 2
+[BitPipe Rank 2/World 2] ==================================================
+
+[BitPipe Rank 4/World 4] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[BitPipe Rank 0/World 0]
+========== BitPipe Schedule Configuration ==========
+[BitPipe Rank 0/World 0] Pipeline parallel size: 8
+[BitPipe Rank 0/World 0] Pipeline parallel rank: 0
+[BitPipe Rank 0/World 0] Number of microbatches (base): 8
+[BitPipe Rank 0/World 0] Number of model chunks: 4
+[BitPipe Rank 4/World 4]
+========== BitPipe Schedule Configuration ==========[BitPipe Rank 0/World 0] Total microbatches (doubled): 16
+
+[BitPipe Rank 4/World 4] Pipeline parallel size: 8[BitPipe Rank 0/World 0] n_loop: 0
+
+[BitPipe Rank 4/World 4] Pipeline parallel rank: 4[BitPipe Rank 0/World 0] Phase breakdown:
+
+[BitPipe Rank 4/World 4] Number of microbatches (base): 8[BitPipe Rank 0/World 0]   - Warmup microbatches: 12
+
+[BitPipe Rank 4/World 4] Number of model chunks: 4[BitPipe Rank 0/World 0]   - Mid-phase microbatches: 0
+
+[BitPipe Rank 0/World 0]   - Remaining microbatches: 4
+[BitPipe Rank 0/World 0]   - Unit remaining: 4
+[BitPipe Rank 0/World 0] ==================================================
+
+[BitPipe Rank 4/World 4] Total microbatches (doubled): 16
+[BitPipe Rank 4/World 4] n_loop: 0
+[BitPipe Rank 4/World 4] Phase breakdown:
+[BitPipe Rank 4/World 4]   - Warmup microbatches: 15
+[BitPipe Rank 4/World 4]   - Mid-phase microbatches: 0
+[BitPipe Rank 4/World 4]   - Remaining microbatches: 1
+[BitPipe Rank 4/World 4]   - Unit remaining: 1
+[BitPipe Rank 0/World 0] Forward schedule (length=16): [0, 1, 2, 3, 4, 12, 5, 13, 6, 14, 7, 15, 8, 9, 10, 11][BitPipe Rank 4/World 4] ==================================================
+
+
+[BitPipe Rank 0/World 0] Forward pass execution order:
+[BitPipe Rank 0/World 0]   Time 0: Process microbatch 0 using model chunk 0
+[BitPipe Rank 0/World 0]   Time 1: Process microbatch 1 using model chunk 0[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+
+[BitPipe Rank 0/World 0]   Time 2: Process microbatch 2 using model chunk 0
+[BitPipe Rank 0/World 0]   Time 3: Process microbatch 3 using model chunk 0
+[BitPipe Rank 0/World 0]   Time 4: Process microbatch 4 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 5: Process microbatch 12 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 6: Process microbatch 5 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 7: Process microbatch 13 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 8: Process microbatch 6 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 9: Process microbatch 14 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 10: Process microbatch 7 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 11: Process microbatch 15 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 12: Process microbatch 8 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 13: Process microbatch 9 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 14: Process microbatch 10 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 15: Process microbatch 11 using model chunk 2
+[BitPipe Rank 0/World 0] Backward schedule (length=18): [8, 9, 10, 11, 12, 4, 13, 5, 14, 6, 15, 7, 0, 1, 2, -1, 3, -1]
+[BitPipe Rank 0/World 0] Backward pass execution order:
+[BitPipe Rank 0/World 0]   Time 0: Process microbatch 8 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 1: Process microbatch 9 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 2: Process microbatch 10 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 3: Process microbatch 11 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 4: Process microbatch 12 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 5: Process microbatch 4 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 6: Process microbatch 13 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 7: Process microbatch 5 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 8: Process microbatch 14 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 9: Process microbatch 6 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 10: Process microbatch 15 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 11: Process microbatch 7 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 12: Process microbatch 0 using model chunk 0
+[BitPipe Rank 0/World 0]   Time 13: Process microbatch 1 using model chunk 0
+[BitPipe Rank 0/World 0]   Time 14: Process microbatch 2 using model chunk 0
+[BitPipe Rank 0/World 0]   Time 15: GRADIENT SYNC
+[BitPipe Rank 0/World 0]   Time 16: Process microbatch 3 using model chunk 0
+[BitPipe Rank 0/World 0]   Time 17: GRADIENT SYNC
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[BitPipe Rank 7/World 7] Forward schedule (length=16): [0, 1, 2, 4, 3, 5, 12, 6, 13, 7, 14, 8, 15, 9, 10, 11]
+[BitPipe Rank 7/World 7] Forward pass execution order:
+[BitPipe Rank 7/World 7]   Time 0: Process microbatch 0 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 1: Process microbatch 1 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 2: Process microbatch 2 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 3: Process microbatch 4 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 4: Process microbatch 3 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 5: Process microbatch 5 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 6: Process microbatch 12 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 7: Process microbatch 6 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 8: Process microbatch 13 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 9: Process microbatch 7 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 10: Process microbatch 14 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 11: Process microbatch 8 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 12: Process microbatch 15 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 13: Process microbatch 9 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 14: Process microbatch 10 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 15: Process microbatch 11 using model chunk 2
+[BitPipe Rank 7/World 7] Backward schedule (length=18): [8, 9, 10, 12, 11, 13, 4, 14, 5, 15, 6, 0, 7, 1, 2, -1, 3, -1]
+[BitPipe Rank 7/World 7] Backward pass execution order:
+[BitPipe Rank 7/World 7]   Time 0: Process microbatch 8 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 1: Process microbatch 9 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 2: Process microbatch 10 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 3: Process microbatch 12 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 4: Process microbatch 11 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 5: Process microbatch 13 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 6: Process microbatch 4 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 7: Process microbatch 14 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 8: Process microbatch 5 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 9: Process microbatch 15 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 10: Process microbatch 6 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 11: Process microbatch 0 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 12: Process microbatch 7 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 13: Process microbatch 1 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 14: Process microbatch 2 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 15: GRADIENT SYNC
+[BitPipe Rank 7/World 7]   Time 16: Process microbatch 3 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 17: GRADIENT SYNC
+[BitPipe Rank 6/World 6] Forward schedule (length=16): [4, 5, 6, 0, 7, 1, 8, 2, 9, 3, 10, 12, 11, 13, 14, 15]
+[BitPipe Rank 6/World 6] Forward pass execution order:
+[BitPipe Rank 6/World 6]   Time 0: Process microbatch 4 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 1: Process microbatch 5 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 2: Process microbatch 6 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 3: Process microbatch 0 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 4: Process microbatch 7 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 5: Process microbatch 1 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 6: Process microbatch 8 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 7: Process microbatch 2 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 8: Process microbatch 9 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 9: Process microbatch 3 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 10: Process microbatch 10 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 11: Process microbatch 12 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 12: Process microbatch 11 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 13: Process microbatch 13 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 14: Process microbatch 14 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 15: Process microbatch 15 using model chunk 3
+[BitPipe Rank 6/World 6] Backward schedule (length=18): [12, 13, 14, 8, 15, 9, 0, 10, 1, 11, 2, 4, 3, 5, 6, -1, 7, -1]
+[BitPipe Rank 6/World 6] Backward pass execution order:
+[BitPipe Rank 6/World 6]   Time 0: Process microbatch 12 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 1: Process microbatch 13 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 2: Process microbatch 14 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 3: Process microbatch 8 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 4: Process microbatch 15 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 5: Process microbatch 9 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 6: Process microbatch 0 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 7: Process microbatch 10 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 8: Process microbatch 1 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 9: Process microbatch 11 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 10: Process microbatch 2 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 11: Process microbatch 4 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 12: Process microbatch 3 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 13: Process microbatch 5 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 14: Process microbatch 6 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 15: GRADIENT SYNC
+[BitPipe Rank 6/World 6]   Time 16: Process microbatch 7 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 17: GRADIENT SYNC
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[BitPipe Rank 2/World 2] Forward schedule (length=16): [0, 1, 4, 2, 5, 3, 6, 12, 7, 13, 8, 14, 9, 15, 10, 11]
+[BitPipe Rank 2/World 2] Forward pass execution order:
+[BitPipe Rank 2/World 2]   Time 0: Process microbatch 0 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 1: Process microbatch 1 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 2: Process microbatch 4 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 3: Process microbatch 2 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 4: Process microbatch 5 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 5: Process microbatch 3 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 6: Process microbatch 6 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 7: Process microbatch 12 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 8: Process microbatch 7 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 9: Process microbatch 13 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 10: Process microbatch 8 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 11: Process microbatch 14 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 12: Process microbatch 9 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 13: Process microbatch 15 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 14: Process microbatch 10 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 15: Process microbatch 11 using model chunk 2
+[BitPipe Rank 2/World 2] Backward schedule (length=18): [8, 9, 12, 10, 13, 11, 14, 4, 15, 5, 0, 6, 1, 7, 2, -1, 3, -1]
+[BitPipe Rank 2/World 2] Backward pass execution order:
+[BitPipe Rank 2/World 2]   Time 0: Process microbatch 8 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 1: Process microbatch 9 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 2: Process microbatch 12 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 3: Process microbatch 10 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 4: Process microbatch 13 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 5: Process microbatch 11 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 6: Process microbatch 14 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 7: Process microbatch 4 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 8: Process microbatch 15 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 9: Process microbatch 5 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 10: Process microbatch 0 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 11: Process microbatch 6 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 12: Process microbatch 1 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 13: Process microbatch 7 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 14: Process microbatch 2 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 15: GRADIENT SYNC
+[BitPipe Rank 2/World 2]   Time 16: Process microbatch 3 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 17: GRADIENT SYNC
+[BitPipe Rank 3/World 3] Forward schedule (length=16): [4, 5, 0, 6, 1, 7, 2, 8, 3, 9, 12, 10, 13, 11, 14, 15]
+[BitPipe Rank 3/World 3] Forward pass execution order:
+[BitPipe Rank 3/World 3]   Time 0: Process microbatch 4 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 1: Process microbatch 5 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 2: Process microbatch 0 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 3: Process microbatch 6 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 4: Process microbatch 1 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 5: Process microbatch 7 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 6: Process microbatch 2 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 7: Process microbatch 8 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 8: Process microbatch 3 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 9: Process microbatch 9 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 10: Process microbatch 12 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 11: Process microbatch 10 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 12: Process microbatch 13 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 13: Process microbatch 11 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 14: Process microbatch 14 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 15: Process microbatch 15 using model chunk 3
+[BitPipe Rank 3/World 3] Backward schedule (length=18): [12, 13, 8, 14, 9, 15, 10, 0, 11, 1, 4, 2, 5, 3, 6, -1, 7, -1]
+[BitPipe Rank 3/World 3] Backward pass execution order:
+[BitPipe Rank 3/World 3]   Time 0: Process microbatch 12 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 1: Process microbatch 13 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 2: Process microbatch 8 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 3: Process microbatch 14 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 4: Process microbatch 9 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 5: Process microbatch 15 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 6: Process microbatch 10 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 7: Process microbatch 0 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 8: Process microbatch 11 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 9: Process microbatch 1 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 10: Process microbatch 4 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 11: Process microbatch 2 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 12: Process microbatch 5 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 13: Process microbatch 3 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 14: Process microbatch 6 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 15: GRADIENT SYNC
+[BitPipe Rank 3/World 3]   Time 16: Process microbatch 7 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 17: GRADIENT SYNC
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[BitPipe Rank 5/World 5] Forward schedule (length=16): [0, 4, 1, 5, 2, 6, 3, 7, 12, 8, 13, 9, 14, 10, 15, 11]
+[BitPipe Rank 5/World 5] Forward pass execution order:
+[BitPipe Rank 5/World 5]   Time 0: Process microbatch 0 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 1: Process microbatch 4 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 2: Process microbatch 1 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 3: Process microbatch 5 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 4: Process microbatch 2 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 5: Process microbatch 6 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 6: Process microbatch 3 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 7: Process microbatch 7 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 8: Process microbatch 12 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 9: Process microbatch 8 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 10: Process microbatch 13 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 11: Process microbatch 9 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 12: Process microbatch 14 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 13: Process microbatch 10 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 14: Process microbatch 15 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 15: Process microbatch 11 using model chunk 2
+[BitPipe Rank 5/World 5] Backward schedule (length=18): [8, 12, 9, 13, 10, 14, 11, 15, 4, 0, 5, 1, 6, 2, 7, 3, -1, -1]
+[BitPipe Rank 5/World 5] Backward pass execution order:
+[BitPipe Rank 5/World 5]   Time 0: Process microbatch 8 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 1: Process microbatch 12 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 2: Process microbatch 9 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 3: Process microbatch 13 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 4: Process microbatch 10 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 5: Process microbatch 14 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 6: Process microbatch 11 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 7: Process microbatch 15 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 8: Process microbatch 4 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 9: Process microbatch 0 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 10: Process microbatch 5 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 11: Process microbatch 1 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 12: Process microbatch 6 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 13: Process microbatch 2 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 14: Process microbatch 7 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 15: Process microbatch 3 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 16: GRADIENT SYNC
+[BitPipe Rank 5/World 5]   Time 17: GRADIENT SYNC
+[BitPipe Rank 4/World 4] Forward schedule (length=16): [4, 0, 5, 1, 6, 2, 7, 3, 8, 12, 9, 13, 10, 14, 11, 15]
+[BitPipe Rank 4/World 4] Forward pass execution order:
+[BitPipe Rank 4/World 4]   Time 0: Process microbatch 4 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 1: Process microbatch 0 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 2: Process microbatch 5 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 3: Process microbatch 1 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 4: Process microbatch 6 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 5: Process microbatch 2 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 6: Process microbatch 7 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 7: Process microbatch 3 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 8: Process microbatch 8 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 9: Process microbatch 12 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 10: Process microbatch 9 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 11: Process microbatch 13 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 12: Process microbatch 10 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 13: Process microbatch 14 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 14: Process microbatch 11 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 15: Process microbatch 15 using model chunk 3
+[BitPipe Rank 4/World 4] Backward schedule (length=18): [12, 8, 13, 9, 14, 10, 15, 11, 0, 4, 1, 5, 2, 6, 3, 7, -1, -1]
+[BitPipe Rank 4/World 4] Backward pass execution order:
+[BitPipe Rank 4/World 4]   Time 0: Process microbatch 12 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 1: Process microbatch 8 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 2: Process microbatch 13 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 3: Process microbatch 9 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 4: Process microbatch 14 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 5: Process microbatch 10 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 6: Process microbatch 15 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 7: Process microbatch 11 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 8: Process microbatch 0 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 9: Process microbatch 4 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 10: Process microbatch 1 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 11: Process microbatch 5 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 12: Process microbatch 2 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 13: Process microbatch 6 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 14: Process microbatch 3 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 15: Process microbatch 7 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 16: GRADIENT SYNC
+[BitPipe Rank 4/World 4]   Time 17: GRADIENT SYNC
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+[BitPipe Rank 4/World 4] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[BitPipe Rank 4/World 4]
+========== BitPipe Schedule Configuration ==========
+[BitPipe Rank 4/World 4] Pipeline parallel size: 8
+[BitPipe Rank 4/World 4] Pipeline parallel rank: 4
+[BitPipe Rank 4/World 4] Number of microbatches (base): 8
+[BitPipe Rank 4/World 4] Number of model chunks: 4
+[BitPipe Rank 4/World 4] Total microbatches (doubled): 16
+[BitPipe Rank 4/World 4] n_loop: 0
+[BitPipe Rank 4/World 4] Phase breakdown:
+[BitPipe Rank 4/World 4]   - Warmup microbatches: 15
+[BitPipe Rank 4/World 4]   - Mid-phase microbatches: 0
+[BitPipe Rank 4/World 4]   - Remaining microbatches: 1
+[BitPipe Rank 4/World 4]   - Unit remaining: 1
+[BitPipe Rank 4/World 4] ==================================================
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+[BitPipe Rank 1/World 1] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[BitPipe Rank 5/World 5] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[BitPipe Rank 1/World 1]
+========== BitPipe Schedule Configuration ==========
+[BitPipe Rank 1/World 1] Pipeline parallel size: 8
+[BitPipe Rank 1/World 1] Pipeline parallel rank: 7
+[BitPipe Rank 1/World 1] Number of microbatches (base): 8
+[BitPipe Rank 1/World 1] Number of model chunks: 4
+[BitPipe Rank 1/World 1] Total microbatches (doubled): 16
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe[BitPipe Rank 1/World 1] n_loop: 0
+
+[BitPipe Rank 1/World 1] Phase breakdown:
+[BitPipe Rank 5/World 5]
+========== BitPipe Schedule Configuration ==========[BitPipe Rank 1/World 1]   - Warmup microbatches: 12
+
+[BitPipe Rank 5/World 5] Pipeline parallel size: 8[BitPipe Rank 1/World 1]   - Mid-phase microbatches: 0
+
+[BitPipe Rank 5/World 5] Pipeline parallel rank: 3[BitPipe Rank 1/World 1]   - Remaining microbatches: 4
+
+[BitPipe Rank 3/World 3] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===[BitPipe Rank 5/World 5] Number of microbatches (base): 8
+[BitPipe Rank 1/World 1]   - Unit remaining: 4
+
+[BitPipe Rank 5/World 5] Number of model chunks: 4[BitPipe Rank 1/World 1] ==================================================
+
+
+[BitPipe Rank 5/World 5] Total microbatches (doubled): 16
+[BitPipe Rank 5/World 5] n_loop: 0
+[BitPipe Rank 1/World 1] Forward schedule (length=16): [4, 5, 6, 7, 0, 8, 1, 9, 2, 10, 3, 11, 12, 13, 14, 15][BitPipe Rank 5/World 5] Phase breakdown:
+
+[BitPipe Rank 1/World 1] Forward pass execution order:[BitPipe Rank 5/World 5]   - Warmup microbatches: 15
+
+[BitPipe Rank 5/World 5]   - Mid-phase microbatches: 0[BitPipe Rank 1/World 1]   Time 0: Process microbatch 4 using model chunk 1
+
+[BitPipe Rank 5/World 5]   - Remaining microbatches: 1
+[BitPipe Rank 1/World 1]   Time 1: Process microbatch 5 using model chunk 1
+[BitPipe Rank 5/World 5]   - Unit remaining: 1[BitPipe Rank 3/World 3]
+========== BitPipe Schedule Configuration ==========
+[BitPipe Rank 1/World 1]   Time 2: Process microbatch 6 using model chunk 1
+
+[BitPipe Rank 5/World 5] ==================================================
+
+[BitPipe Rank 1/World 1]   Time 3: Process microbatch 7 using model chunk 1[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe[BitPipe Rank 3/World 3] Pipeline parallel size: 8
+
+
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe[BitPipe Rank 1/World 1]   Time 4: Process microbatch 0 using model chunk 0[BitPipe Rank 3/World 3] Pipeline parallel rank: 5
+
+
+[BitPipe Rank 1/World 1]   Time 5: Process microbatch 8 using model chunk 2
+[BitPipe Rank 3/World 3] Number of microbatches (base): 8[BitPipe Rank 1/World 1]   Time 6: Process microbatch 1 using model chunk 0
+
+[BitPipe Rank 3/World 3] Number of model chunks: 4[BitPipe Rank 1/World 1]   Time 7: Process microbatch 9 using model chunk 2
+
+[BitPipe Rank 6/World 6] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===[BitPipe Rank 1/World 1]   Time 8: Process microbatch 2 using model chunk 0
+
+[BitPipe Rank 7/World 7] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===[BitPipe Rank 1/World 1]   Time 9: Process microbatch 10 using model chunk 2
+
+[BitPipe Rank 3/World 3] Total microbatches (doubled): 16[BitPipe Rank 1/World 1]   Time 10: Process microbatch 3 using model chunk 0
+
+[BitPipe Rank 1/World 1]   Time 11: Process microbatch 11 using model chunk 2[BitPipe Rank 3/World 3] n_loop: 0
+
+[BitPipe Rank 1/World 1]   Time 12: Process microbatch 12 using model chunk 3
+[BitPipe Rank 3/World 3] Phase breakdown:[BitPipe Rank 1/World 1]   Time 13: Process microbatch 13 using model chunk 3
+
+[BitPipe Rank 1/World 1]   Time 14: Process microbatch 14 using model chunk 3[BitPipe Rank 3/World 3]   - Warmup microbatches: 14
+
+[BitPipe Rank 1/World 1]   Time 15: Process microbatch 15 using model chunk 3
+[BitPipe Rank 3/World 3]   - Mid-phase microbatches: 0
+[BitPipe Rank 3/World 3]   - Remaining microbatches: 2[BitPipe Rank 1/World 1] Backward schedule (length=18): [12, 13, 14, 15, 8, 0, 9, 1, 10, 2, 11, 3, 4, 5, 6, -1, 7, -1]
+
+[BitPipe Rank 3/World 3]   - Unit remaining: 2[BitPipe Rank 1/World 1] Backward pass execution order:
+
+[BitPipe Rank 6/World 6]
+========== BitPipe Schedule Configuration ==========[BitPipe Rank 7/World 7]
+========== BitPipe Schedule Configuration ==========[BitPipe Rank 3/World 3] ==================================================
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe[BitPipe Rank 1/World 1]   Time 0: Process microbatch 12 using model chunk 3
+
+
+
+
+[BitPipe Rank 1/World 1]   Time 1: Process microbatch 13 using model chunk 3[BitPipe Rank 6/World 6] Pipeline parallel size: 8[BitPipe Rank 7/World 7] Pipeline parallel size: 8
+
+
+[BitPipe Rank 1/World 1]   Time 2: Process microbatch 14 using model chunk 3
+[BitPipe Rank 6/World 6] Pipeline parallel rank: 6[BitPipe Rank 1/World 1]   Time 3: Process microbatch 15 using model chunk 3[BitPipe Rank 7/World 7] Pipeline parallel rank: 1
+
+
+[BitPipe Rank 0/World 0] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===[BitPipe Rank 1/World 1]   Time 4: Process microbatch 8 using model chunk 2[BitPipe Rank 6/World 6] Number of microbatches (base): 8
+
+
+[BitPipe Rank 7/World 7] Number of microbatches (base): 8[BitPipe Rank 1/World 1]   Time 5: Process microbatch 0 using model chunk 0
+
+[BitPipe Rank 6/World 6] Number of model chunks: 4[BitPipe Rank 1/World 1]   Time 6: Process microbatch 9 using model chunk 2
+[BitPipe Rank 7/World 7] Number of model chunks: 4
+
+[BitPipe Rank 1/World 1]   Time 7: Process microbatch 1 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 8: Process microbatch 10 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 9: Process microbatch 2 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 10: Process microbatch 11 using model chunk 2[BitPipe Rank 6/World 6] Total microbatches (doubled): 16
+
+[BitPipe Rank 7/World 7] Total microbatches (doubled): 16[BitPipe Rank 1/World 1]   Time 11: Process microbatch 3 using model chunk 0
+
+[BitPipe Rank 6/World 6] n_loop: 0[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe[BitPipe Rank 1/World 1]   Time 12: Process microbatch 4 using model chunk 1
+[BitPipe Rank 7/World 7] n_loop: 0[BitPipe Rank 0/World 0]
+========== BitPipe Schedule Configuration ==========
+
+
+[BitPipe Rank 6/World 6] Phase breakdown:
+[BitPipe Rank 1/World 1]   Time 13: Process microbatch 5 using model chunk 1
+[BitPipe Rank 7/World 7] Phase breakdown:
+[BitPipe Rank 0/World 0] Pipeline parallel size: 8
+
+[BitPipe Rank 6/World 6]   - Warmup microbatches: 13[BitPipe Rank 1/World 1]   Time 14: Process microbatch 6 using model chunk 1
+[BitPipe Rank 7/World 7]   - Warmup microbatches: 13
+
+[BitPipe Rank 0/World 0] Pipeline parallel rank: 0[BitPipe Rank 6/World 6]   - Mid-phase microbatches: 0[BitPipe Rank 1/World 1]   Time 15: GRADIENT SYNC[BitPipe Rank 2/World 2] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[BitPipe Rank 7/World 7]   - Mid-phase microbatches: 0
+
+[BitPipe Rank 0/World 0] Number of microbatches (base): 8
+
+
+[BitPipe Rank 6/World 6]   - Remaining microbatches: 3[BitPipe Rank 7/World 7]   - Remaining microbatches: 3[BitPipe Rank 1/World 1]   Time 16: Process microbatch 7 using model chunk 1
+
+[BitPipe Rank 0/World 0] Number of model chunks: 4
+[BitPipe Rank 7/World 7]   - Unit remaining: 3
+[BitPipe Rank 6/World 6]   - Unit remaining: 3[BitPipe Rank 1/World 1]   Time 17: GRADIENT SYNC
+
+
+[BitPipe Rank 7/World 7] ==================================================
+[BitPipe Rank 6/World 6] ==================================================
+
+
+[BitPipe Rank 0/World 0] Total microbatches (doubled): 16
+[BitPipe Rank 0/World 0] n_loop: 0
+[BitPipe Rank 0/World 0] Phase breakdown:
+[BitPipe Rank 0/World 0]   - Warmup microbatches: 12
+[BitPipe Rank 0/World 0]   - Mid-phase microbatches: 0
+[BitPipe Rank 2/World 2]
+========== BitPipe Schedule Configuration ==========
+[BitPipe Rank 0/World 0]   - Remaining microbatches: 4
+[BitPipe Rank 2/World 2] Pipeline parallel size: 8[BitPipe Rank 0/World 0]   - Unit remaining: 4
+
+[BitPipe Rank 2/World 2] Pipeline parallel rank: 2[BitPipe Rank 0/World 0] ==================================================
+
+
+[BitPipe Rank 2/World 2] Number of microbatches (base): 8
+[BitPipe Rank 2/World 2] Number of model chunks: 4
+[BitPipe Rank 0/World 0] Forward schedule (length=16): [0, 1, 2, 3, 4, 12, 5, 13, 6, 14, 7, 15, 8, 9, 10, 11][BitPipe Rank 2/World 2] Total microbatches (doubled): 16
+
+[BitPipe Rank 0/World 0] Forward pass execution order:[BitPipe Rank 2/World 2] n_loop: 0
+
+[BitPipe Rank 2/World 2] Phase breakdown:[BitPipe Rank 0/World 0]   Time 0: Process microbatch 0 using model chunk 0
+
+[BitPipe Rank 2/World 2]   - Warmup microbatches: 14
+[BitPipe Rank 0/World 0]   Time 1: Process microbatch 1 using model chunk 0
+[BitPipe Rank 2/World 2]   - Mid-phase microbatches: 0
+[BitPipe Rank 0/World 0]   Time 2: Process microbatch 2 using model chunk 0[BitPipe Rank 2/World 2]   - Remaining microbatches: 2
+
+[BitPipe Rank 0/World 0]   Time 3: Process microbatch 3 using model chunk 0[BitPipe Rank 2/World 2]   - Unit remaining: 2
+
+[BitPipe Rank 0/World 0]   Time 4: Process microbatch 4 using model chunk 1[BitPipe Rank 2/World 2] ==================================================
+
+
+[BitPipe Rank 0/World 0]   Time 5: Process microbatch 12 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 6: Process microbatch 5 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 7: Process microbatch 13 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 8: Process microbatch 6 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 9: Process microbatch 14 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 10: Process microbatch 7 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 11: Process microbatch 15 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 12: Process microbatch 8 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 13: Process microbatch 9 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 14: Process microbatch 10 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 15: Process microbatch 11 using model chunk 2
+[BitPipe Rank 0/World 0] Backward schedule (length=18): [8, 9, 10, 11, 12, 4, 13, 5, 14, 6, 15, 7, 0, 1, 2, -1, 3, -1]
+[BitPipe Rank 0/World 0] Backward pass execution order:
+[BitPipe Rank 0/World 0]   Time 0: Process microbatch 8 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 1: Process microbatch 9 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 2: Process microbatch 10 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 3: Process microbatch 11 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 4: Process microbatch 12 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 5: Process microbatch 4 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 6: Process microbatch 13 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 7: Process microbatch 5 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 8: Process microbatch 14 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 9: Process microbatch 6 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 10: Process microbatch 15 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 11: Process microbatch 7 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 12: Process microbatch 0 using model chunk 0
+[BitPipe Rank 0/World 0]   Time 13: Process microbatch 1 using model chunk 0
+[BitPipe Rank 0/World 0]   Time 14: Process microbatch 2 using model chunk 0
+[BitPipe Rank 0/World 0]   Time 15: GRADIENT SYNC
+[BitPipe Rank 0/World 0]   Time 16: Process microbatch 3 using model chunk 0
+[BitPipe Rank 0/World 0]   Time 17: GRADIENT SYNC
+[BitPipe Rank 6/World 6] Forward schedule (length=16): [4, 5, 6, 0, 7, 1, 8, 2, 9, 3, 10, 12, 11, 13, 14, 15]
+[BitPipe Rank 6/World 6] Forward pass execution order:
+[BitPipe Rank 6/World 6]   Time 0: Process microbatch 4 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 1: Process microbatch 5 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 2: Process microbatch 6 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 3: Process microbatch 0 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 4: Process microbatch 7 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 5: Process microbatch 1 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 6: Process microbatch 8 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 7: Process microbatch 2 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 8: Process microbatch 9 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 9: Process microbatch 3 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 10: Process microbatch 10 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 11: Process microbatch 12 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 12: Process microbatch 11 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 13: Process microbatch 13 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 14: Process microbatch 14 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 15: Process microbatch 15 using model chunk 3
+[BitPipe Rank 6/World 6] Backward schedule (length=18): [12, 13, 14, 8, 15, 9, 0, 10, 1, 11, 2, 4, 3, 5, 6, -1, 7, -1]
+[BitPipe Rank 6/World 6] Backward pass execution order:
+[BitPipe Rank 6/World 6]   Time 0: Process microbatch 12 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 1: Process microbatch 13 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 2: Process microbatch 14 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 3: Process microbatch 8 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 4: Process microbatch 15 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 5: Process microbatch 9 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 6: Process microbatch 0 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 7: Process microbatch 10 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 8: Process microbatch 1 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 9: Process microbatch 11 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 10: Process microbatch 2 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 11: Process microbatch 4 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 12: Process microbatch 3 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 13: Process microbatch 5 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 14: Process microbatch 6 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 15: GRADIENT SYNC
+[BitPipe Rank 6/World 6]   Time 16: Process microbatch 7 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 17: GRADIENT SYNC
+[BitPipe Rank 7/World 7] Forward schedule (length=16): [0, 1, 2, 4, 3, 5, 12, 6, 13, 7, 14, 8, 15, 9, 10, 11]
+[BitPipe Rank 7/World 7] Forward pass execution order:
+[BitPipe Rank 7/World 7]   Time 0: Process microbatch 0 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 1: Process microbatch 1 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 2: Process microbatch 2 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 3: Process microbatch 4 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 4: Process microbatch 3 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 5: Process microbatch 5 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 6: Process microbatch 12 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 7: Process microbatch 6 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 8: Process microbatch 13 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 9: Process microbatch 7 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 10: Process microbatch 14 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 11: Process microbatch 8 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 12: Process microbatch 15 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 13: Process microbatch 9 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 14: Process microbatch 10 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 15: Process microbatch 11 using model chunk 2
+[BitPipe Rank 7/World 7] Backward schedule (length=18): [8, 9, 10, 12, 11, 13, 4, 14, 5, 15, 6, 0, 7, 1, 2, -1, 3, -1]
+[BitPipe Rank 7/World 7] Backward pass execution order:
+[BitPipe Rank 7/World 7]   Time 0: Process microbatch 8 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 1: Process microbatch 9 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 2: Process microbatch 10 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 3: Process microbatch 12 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 4: Process microbatch 11 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 5: Process microbatch 13 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 6: Process microbatch 4 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 7: Process microbatch 14 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 8: Process microbatch 5 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 9: Process microbatch 15 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 10: Process microbatch 6 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 11: Process microbatch 0 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 12: Process microbatch 7 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 13: Process microbatch 1 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 14: Process microbatch 2 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 15: GRADIENT SYNC
+[BitPipe Rank 7/World 7]   Time 16: Process microbatch 3 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 17: GRADIENT SYNC
+[BitPipe Rank 3/World 3] Forward schedule (length=16): [4, 5, 0, 6, 1, 7, 2, 8, 3, 9, 12, 10, 13, 11, 14, 15]
+[BitPipe Rank 3/World 3] Forward pass execution order:
+[BitPipe Rank 3/World 3]   Time 0: Process microbatch 4 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 1: Process microbatch 5 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 2: Process microbatch 0 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 3: Process microbatch 6 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 4: Process microbatch 1 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 5: Process microbatch 7 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 6: Process microbatch 2 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 7: Process microbatch 8 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 8: Process microbatch 3 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 9: Process microbatch 9 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 10: Process microbatch 12 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 11: Process microbatch 10 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 12: Process microbatch 13 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 13: Process microbatch 11 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 14: Process microbatch 14 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 15: Process microbatch 15 using model chunk 3
+[BitPipe Rank 3/World 3] Backward schedule (length=18): [12, 13, 8, 14, 9, 15, 10, 0, 11, 1, 4, 2, 5, 3, 6, -1, 7, -1]
+[BitPipe Rank 3/World 3] Backward pass execution order:
+[BitPipe Rank 3/World 3]   Time 0: Process microbatch 12 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 1: Process microbatch 13 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 2: Process microbatch 8 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 3: Process microbatch 14 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 4: Process microbatch 9 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 5: Process microbatch 15 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 6: Process microbatch 10 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 7: Process microbatch 0 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 8: Process microbatch 11 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 9: Process microbatch 1 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 10: Process microbatch 4 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 11: Process microbatch 2 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 12: Process microbatch 5 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 13: Process microbatch 3 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 14: Process microbatch 6 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 15: GRADIENT SYNC
+[BitPipe Rank 3/World 3]   Time 16: Process microbatch 7 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 17: GRADIENT SYNC
+[BitPipe Rank 2/World 2] Forward schedule (length=16): [0, 1, 4, 2, 5, 3, 6, 12, 7, 13, 8, 14, 9, 15, 10, 11]
+[BitPipe Rank 2/World 2] Forward pass execution order:
+[BitPipe Rank 2/World 2]   Time 0: Process microbatch 0 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 1: Process microbatch 1 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 2: Process microbatch 4 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 3: Process microbatch 2 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 4: Process microbatch 5 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 5: Process microbatch 3 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 6: Process microbatch 6 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 7: Process microbatch 12 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 8: Process microbatch 7 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 9: Process microbatch 13 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 10: Process microbatch 8 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 11: Process microbatch 14 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 12: Process microbatch 9 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 13: Process microbatch 15 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 14: Process microbatch 10 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 15: Process microbatch 11 using model chunk 2
+[BitPipe Rank 2/World 2] Backward schedule (length=18): [8, 9, 12, 10, 13, 11, 14, 4, 15, 5, 0, 6, 1, 7, 2, -1, 3, -1]
+[BitPipe Rank 2/World 2] Backward pass execution order:
+[BitPipe Rank 2/World 2]   Time 0: Process microbatch 8 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 1: Process microbatch 9 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 2: Process microbatch 12 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 3: Process microbatch 10 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 4: Process microbatch 13 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 5: Process microbatch 11 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 6: Process microbatch 14 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 7: Process microbatch 4 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 8: Process microbatch 15 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 9: Process microbatch 5 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 10: Process microbatch 0 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 11: Process microbatch 6 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 12: Process microbatch 1 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 13: Process microbatch 7 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 14: Process microbatch 2 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 15: GRADIENT SYNC
+[BitPipe Rank 2/World 2]   Time 16: Process microbatch 3 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 17: GRADIENT SYNC
+[BitPipe Rank 4/World 4] Forward schedule (length=16): [4, 0, 5, 1, 6, 2, 7, 3, 8, 12, 9, 13, 10, 14, 11, 15]
+[BitPipe Rank 4/World 4] Forward pass execution order:
+[BitPipe Rank 4/World 4]   Time 0: Process microbatch 4 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 1: Process microbatch 0 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 2: Process microbatch 5 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 3: Process microbatch 1 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 4: Process microbatch 6 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 5: Process microbatch 2 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 6: Process microbatch 7 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 7: Process microbatch 3 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 8: Process microbatch 8 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 9: Process microbatch 12 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 10: Process microbatch 9 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 11: Process microbatch 13 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 12: Process microbatch 10 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 13: Process microbatch 14 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 14: Process microbatch 11 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 15: Process microbatch 15 using model chunk 3
+[BitPipe Rank 4/World 4] Backward schedule (length=18): [12, 8, 13, 9, 14, 10, 15, 11, 0, 4, 1, 5, 2, 6, 3, 7, -1, -1]
+[BitPipe Rank 4/World 4] Backward pass execution order:
+[BitPipe Rank 4/World 4]   Time 0: Process microbatch 12 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 1: Process microbatch 8 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 2: Process microbatch 13 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 3: Process microbatch 9 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 4: Process microbatch 14 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 5: Process microbatch 10 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 6: Process microbatch 15 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 7: Process microbatch 11 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 8: Process microbatch 0 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 9: Process microbatch 4 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 10: Process microbatch 1 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 11: Process microbatch 5 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 12: Process microbatch 2 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 13: Process microbatch 6 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 14: Process microbatch 3 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 15: Process microbatch 7 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 16: GRADIENT SYNC
+[BitPipe Rank 4/World 4]   Time 17: GRADIENT SYNC
+[BitPipe Rank 5/World 5] Forward schedule (length=16): [0, 4, 1, 5, 2, 6, 3, 7, 12, 8, 13, 9, 14, 10, 15, 11]
+[BitPipe Rank 5/World 5] Forward pass execution order:
+[BitPipe Rank 5/World 5]   Time 0: Process microbatch 0 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 1: Process microbatch 4 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 2: Process microbatch 1 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 3: Process microbatch 5 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 4: Process microbatch 2 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 5: Process microbatch 6 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 6: Process microbatch 3 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 7: Process microbatch 7 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 8: Process microbatch 12 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 9: Process microbatch 8 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 10: Process microbatch 13 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 11: Process microbatch 9 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 12: Process microbatch 14 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 13: Process microbatch 10 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 14: Process microbatch 15 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 15: Process microbatch 11 using model chunk 2
+[BitPipe Rank 5/World 5] Backward schedule (length=18): [8, 12, 9, 13, 10, 14, 11, 15, 4, 0, 5, 1, 6, 2, 7, 3, -1, -1]
+[BitPipe Rank 5/World 5] Backward pass execution order:
+[BitPipe Rank 5/World 5]   Time 0: Process microbatch 8 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 1: Process microbatch 12 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 2: Process microbatch 9 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 3: Process microbatch 13 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 4: Process microbatch 10 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 5: Process microbatch 14 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 6: Process microbatch 11 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 7: Process microbatch 15 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 8: Process microbatch 4 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 9: Process microbatch 0 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 10: Process microbatch 5 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 11: Process microbatch 1 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 12: Process microbatch 6 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 13: Process microbatch 2 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 14: Process microbatch 7 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 15: Process microbatch 3 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 16: GRADIENT SYNC
+[BitPipe Rank 5/World 5]   Time 17: GRADIENT SYNC
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+[BitPipe Rank 0/World 0] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+BitPipe profiling ENABLED for train iteration 3
+[BitPipe Rank 4/World 4] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+[BitPipe Rank 5/World 5] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+[BitPipe Rank 0/World 0]
+========== BitPipe Schedule Configuration ==========[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+
+
+[BitPipe Rank 0/World 0] Pipeline parallel size: 8
+[BitPipe Rank 0/World 0] Pipeline parallel rank: 0
+[BitPipe Rank 0/World 0] Number of microbatches (base): 8
+[BitPipe Rank 0/World 0] Number of model chunks: 4[BitPipe Rank 6/World 6] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+
+[BitPipe Rank 2/World 2] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===[BitPipe Rank 3/World 3] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[BitPipe Rank 0/World 0] Total microbatches (doubled): 16
+
+[BitPipe Rank 0/World 0] n_loop: 0
+[BitPipe Rank 0/World 0] Phase breakdown:
+[BitPipe Rank 0/World 0]   - Warmup microbatches: 12
+[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe[BitPipe Rank 0/World 0]   - Mid-phase microbatches: 0
+
+[BitPipe Rank 0/World 0]   - Remaining microbatches: 4[DEBUG] BitPipe schedule ENABLED - returning forward_backward_pipelining_with_BitPipe
+
+[BitPipe Rank 0/World 0]   - Unit remaining: 4
+[BitPipe Rank 0/World 0] ==================================================
+
+[BitPipe Rank 1/World 1] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[BitPipe Rank 4/World 4]
+========== BitPipe Schedule Configuration ==========
+[BitPipe Rank 7/World 7] === ENTERING BitPipe forward_backward_pipelining_with_BitPipe ===
+[BitPipe Rank 4/World 4] Pipeline parallel size: 8
+[BitPipe Rank 4/World 4] Pipeline parallel rank: 4[BitPipe Rank 0/World 0] Forward schedule (length=16): [0, 1, 2, 3, 4, 12, 5, 13, 6, 14, 7, 15, 8, 9, 10, 11]
+
+[BitPipe Rank 4/World 4] Number of microbatches (base): 8[BitPipe Rank 0/World 0] Forward pass execution order:
+
+[BitPipe Rank 4/World 4] Number of model chunks: 4[BitPipe Rank 0/World 0]   Time 0: Process microbatch 0 using model chunk 0
+
+[BitPipe Rank 0/World 0]   Time 1: Process microbatch 1 using model chunk 0
+[BitPipe Rank 0/World 0]   Time 2: Process microbatch 2 using model chunk 0
+[BitPipe Rank 4/World 4] Total microbatches (doubled): 16[BitPipe Rank 0/World 0]   Time 3: Process microbatch 3 using model chunk 0
+
+[BitPipe Rank 4/World 4] n_loop: 0
+[BitPipe Rank 0/World 0]   Time 4: Process microbatch 4 using model chunk 1[BitPipe Rank 4/World 4] Phase breakdown:
+
+[BitPipe Rank 0/World 0]   Time 5: Process microbatch 12 using model chunk 3[BitPipe Rank 4/World 4]   - Warmup microbatches: 15
+
+[BitPipe Rank 0/World 0]   Time 6: Process microbatch 5 using model chunk 1[BitPipe Rank 4/World 4]   - Mid-phase microbatches: 0
+
+[BitPipe Rank 0/World 0]   Time 7: Process microbatch 13 using model chunk 3[BitPipe Rank 4/World 4]   - Remaining microbatches: 1
+
+[BitPipe Rank 0/World 0]   Time 8: Process microbatch 6 using model chunk 1
+[BitPipe Rank 4/World 4]   - Unit remaining: 1
+[BitPipe Rank 0/World 0]   Time 9: Process microbatch 14 using model chunk 3
+[BitPipe Rank 4/World 4] ==================================================
+[BitPipe Rank 0/World 0]   Time 10: Process microbatch 7 using model chunk 1
+
+[BitPipe Rank 0/World 0]   Time 11: Process microbatch 15 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 12: Process microbatch 8 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 13: Process microbatch 9 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 14: Process microbatch 10 using model chunk 2
+[BitPipe Rank 0/World 0]   Time 15: Process microbatch 11 using model chunk 2
+[BitPipe Rank 0/World 0] Backward schedule (length=18): [8, 9, 10, 11, 12, 4, 13, 5, 14, 6, 15, 7, 0, 1, 2, -1, 3, -1]
+[BitPipe Rank 0/World 0] Backward pass execution order:
+[BitPipe Rank 5/World 5]
+========== BitPipe Schedule Configuration ==========[BitPipe Rank 0/World 0]   Time 0: Process microbatch 8 using model chunk 2
+
+[BitPipe Rank 5/World 5] Pipeline parallel size: 8[BitPipe Rank 0/World 0]   Time 1: Process microbatch 9 using model chunk 2
+
+[BitPipe Rank 5/World 5] Pipeline parallel rank: 3[BitPipe Rank 0/World 0]   Time 2: Process microbatch 10 using model chunk 2
+
+[BitPipe Rank 5/World 5] Number of microbatches (base): 8[BitPipe Rank 0/World 0]   Time 3: Process microbatch 11 using model chunk 2
+
+[BitPipe Rank 5/World 5] Number of model chunks: 4[BitPipe Rank 0/World 0]   Time 4: Process microbatch 12 using model chunk 3
+
+[BitPipe Rank 0/World 0]   Time 5: Process microbatch 4 using model chunk 1
+[BitPipe Rank 0/World 0]   Time 6: Process microbatch 13 using model chunk 3
+[BitPipe Rank 0/World 0]   Time 7: Process microbatch 5 using model chunk 1[BitPipe Rank 5/World 5] Total microbatches (doubled): 16
+
+[BitPipe Rank 0/World 0]   Time 8: Process microbatch 14 using model chunk 3
+[BitPipe Rank 5/World 5] n_loop: 0
+[BitPipe Rank 0/World 0]   Time 9: Process microbatch 6 using model chunk 1
+[BitPipe Rank 5/World 5] Phase breakdown:
+[BitPipe Rank 0/World 0]   Time 10: Process microbatch 15 using model chunk 3
+[BitPipe Rank 5/World 5]   - Warmup microbatches: 15[BitPipe Rank 6/World 6]
+========== BitPipe Schedule Configuration ==========[BitPipe Rank 0/World 0]   Time 11: Process microbatch 7 using model chunk 1
+
+
+[BitPipe Rank 5/World 5]   - Mid-phase microbatches: 0[BitPipe Rank 6/World 6] Pipeline parallel size: 8[BitPipe Rank 0/World 0]   Time 12: Process microbatch 0 using model chunk 0
+
+
+[BitPipe Rank 6/World 6] Pipeline parallel rank: 6[BitPipe Rank 3/World 3]
+========== BitPipe Schedule Configuration ==========[BitPipe Rank 2/World 2]
+========== BitPipe Schedule Configuration ==========[BitPipe Rank 0/World 0]   Time 13: Process microbatch 1 using model chunk 0
+[BitPipe Rank 5/World 5]   - Remaining microbatches: 1
+
+
+[BitPipe Rank 3/World 3] Pipeline parallel size: 8[BitPipe Rank 6/World 6] Number of microbatches (base): 8
+[BitPipe Rank 2/World 2] Pipeline parallel size: 8
+[BitPipe Rank 0/World 0]   Time 14: Process microbatch 2 using model chunk 0
+
+[BitPipe Rank 5/World 5]   - Unit remaining: 1
+[BitPipe Rank 3/World 3] Pipeline parallel rank: 5[BitPipe Rank 6/World 6] Number of model chunks: 4
+[BitPipe Rank 2/World 2] Pipeline parallel rank: 2[BitPipe Rank 0/World 0]   Time 15: GRADIENT SYNC
+
+[BitPipe Rank 3/World 3] Number of microbatches (base): 8[BitPipe Rank 5/World 5] ==================================================
+
+
+
+
+[BitPipe Rank 7/World 7]
+========== BitPipe Schedule Configuration ==========[BitPipe Rank 2/World 2] Number of microbatches (base): 8[BitPipe Rank 1/World 1]
+========== BitPipe Schedule Configuration ==========[BitPipe Rank 0/World 0]   Time 16: Process microbatch 3 using model chunk 0
+[BitPipe Rank 3/World 3] Number of model chunks: 4[BitPipe Rank 6/World 6] Total microbatches (doubled): 16
+
+
+
+[BitPipe Rank 6/World 6] n_loop: 0
+
+[BitPipe Rank 1/World 1] Pipeline parallel size: 8[BitPipe Rank 7/World 7] Pipeline parallel size: 8[BitPipe Rank 2/World 2] Number of model chunks: 4[BitPipe Rank 0/World 0]   Time 17: GRADIENT SYNC[BitPipe Rank 6/World 6] Phase breakdown:
+
+
+[BitPipe Rank 7/World 7] Pipeline parallel rank: 1
+
+[BitPipe Rank 3/World 3] Total microbatches (doubled): 16[BitPipe Rank 1/World 1] Pipeline parallel rank: 7
+
+[BitPipe Rank 6/World 6]   - Warmup microbatches: 13
+[BitPipe Rank 2/World 2] Total microbatches (doubled): 16[BitPipe Rank 7/World 7] Number of microbatches (base): 8
+[BitPipe Rank 3/World 3] n_loop: 0[BitPipe Rank 1/World 1] Number of microbatches (base): 8
+
+
+[BitPipe Rank 6/World 6]   - Mid-phase microbatches: 0
+[BitPipe Rank 2/World 2] n_loop: 0[BitPipe Rank 7/World 7] Number of model chunks: 4[BitPipe Rank 3/World 3] Phase breakdown:
+[BitPipe Rank 1/World 1] Number of model chunks: 4
+
+
+
+[BitPipe Rank 6/World 6]   - Remaining microbatches: 3[BitPipe Rank 2/World 2] Phase breakdown:[BitPipe Rank 3/World 3]   - Warmup microbatches: 14
+
+
+[BitPipe Rank 7/World 7] Total microbatches (doubled): 16[BitPipe Rank 6/World 6]   - Unit remaining: 3[BitPipe Rank 2/World 2]   - Warmup microbatches: 14[BitPipe Rank 3/World 3]   - Mid-phase microbatches: 0[BitPipe Rank 1/World 1] Total microbatches (
+doubled): 16
+
+
+[BitPipe Rank 7/World 7] n_loop: 0
+[BitPipe Rank 2/World 2]   - Mid-phase microbatches: 0[BitPipe Rank 3/World 3]   - Remaining microbatches: 2
+[BitPipe Rank 6/World 6] ==================================================
+
+
+
+
+[BitPipe Rank 1/World 1] n_loop: 0[BitPipe Rank 2/World 2]   - Remaining microbatches: 2[BitPipe Rank 7/World 7] Phase breakdown:[BitPipe Rank 3/World 3]   - Unit remaining: 2
+
+
+
+[BitPipe Rank 1/World 1] Phase breakdown:[BitPipe Rank 2/World 2]   - Unit remaining: 2[BitPipe Rank 7/World 7]   - Warmup microbatches: 13
+[BitPipe Rank 3/World 3] ==================================================
+
+
+[BitPipe Rank 1/World 1]   - Warmup microbatches: 12
+[BitPipe Rank 2/World 2] ==================================================
+[BitPipe Rank 7/World 7]   - Mid-phase microbatches: 0
+
+
+[BitPipe Rank 1/World 1]   - Mid-phase microbatches: 0
+[BitPipe Rank 7/World 7]   - Remaining microbatches: 3[BitPipe Rank 1/World 1]   - Remaining microbatches: 4
+
+[BitPipe Rank 7/World 7]   - Unit remaining: 3[BitPipe Rank 1/World 1]   - Unit remaining: 4
+
+[BitPipe Rank 7/World 7] ==================================================
+[BitPipe Rank 1/World 1] ==================================================
+
+
+[BitPipe Rank 1/World 1] Forward schedule (length=16): [4, 5, 6, 7, 0, 8, 1, 9, 2, 10, 3, 11, 12, 13, 14, 15]
+[BitPipe Rank 1/World 1] Forward pass execution order:
+[BitPipe Rank 1/World 1]   Time 0: Process microbatch 4 using model chunk 1
+[BitPipe Rank 1/World 1]   Time 1: Process microbatch 5 using model chunk 1
+[BitPipe Rank 1/World 1]   Time 2: Process microbatch 6 using model chunk 1
+[BitPipe Rank 1/World 1]   Time 3: Process microbatch 7 using model chunk 1
+[BitPipe Rank 1/World 1]   Time 4: Process microbatch 0 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 5: Process microbatch 8 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 6: Process microbatch 1 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 7: Process microbatch 9 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 8: Process microbatch 2 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 9: Process microbatch 10 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 10: Process microbatch 3 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 11: Process microbatch 11 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 12: Process microbatch 12 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 13: Process microbatch 13 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 14: Process microbatch 14 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 15: Process microbatch 15 using model chunk 3
+[BitPipe Rank 1/World 1] Backward schedule (length=18): [12, 13, 14, 15, 8, 0, 9, 1, 10, 2, 11, 3, 4, 5, 6, -1, 7, -1]
+[BitPipe Rank 1/World 1] Backward pass execution order:
+[BitPipe Rank 1/World 1]   Time 0: Process microbatch 12 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 1: Process microbatch 13 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 2: Process microbatch 14 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 3: Process microbatch 15 using model chunk 3
+[BitPipe Rank 1/World 1]   Time 4: Process microbatch 8 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 5: Process microbatch 0 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 6: Process microbatch 9 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 7: Process microbatch 1 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 8: Process microbatch 10 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 9: Process microbatch 2 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 10: Process microbatch 11 using model chunk 2
+[BitPipe Rank 1/World 1]   Time 11: Process microbatch 3 using model chunk 0
+[BitPipe Rank 1/World 1]   Time 12: Process microbatch 4 using model chunk 1
+[BitPipe Rank 1/World 1]   Time 13: Process microbatch 5 using model chunk 1
+[BitPipe Rank 1/World 1]   Time 14: Process microbatch 6 using model chunk 1
+[BitPipe Rank 1/World 1]   Time 15: GRADIENT SYNC
+[BitPipe Rank 1/World 1]   Time 16: Process microbatch 7 using model chunk 1
+[BitPipe Rank 1/World 1]   Time 17: GRADIENT SYNC
+[BitPipe Rank 7/World 7] Forward schedule (length=16): [0, 1, 2, 4, 3, 5, 12, 6, 13, 7, 14, 8, 15, 9, 10, 11]
+[BitPipe Rank 7/World 7] Forward pass execution order:
+[BitPipe Rank 7/World 7]   Time 0: Process microbatch 0 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 1: Process microbatch 1 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 2: Process microbatch 2 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 3: Process microbatch 4 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 4: Process microbatch 3 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 5: Process microbatch 5 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 6: Process microbatch 12 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 7: Process microbatch 6 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 8: Process microbatch 13 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 9: Process microbatch 7 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 10: Process microbatch 14 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 11: Process microbatch 8 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 12: Process microbatch 15 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 13: Process microbatch 9 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 14: Process microbatch 10 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 15: Process microbatch 11 using model chunk 2
+[BitPipe Rank 7/World 7] Backward schedule (length=18): [8, 9, 10, 12, 11, 13, 4, 14, 5, 15, 6, 0, 7, 1, 2, -1, 3, -1]
+[BitPipe Rank 7/World 7] Backward pass execution order:
+[BitPipe Rank 7/World 7]   Time 0: Process microbatch 8 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 1: Process microbatch 9 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 2: Process microbatch 10 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 3: Process microbatch 12 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 4: Process microbatch 11 using model chunk 2
+[BitPipe Rank 7/World 7]   Time 5: Process microbatch 13 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 6: Process microbatch 4 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 7: Process microbatch 14 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 8: Process microbatch 5 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 9: Process microbatch 15 using model chunk 3
+[BitPipe Rank 7/World 7]   Time 10: Process microbatch 6 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 11: Process microbatch 0 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 12: Process microbatch 7 using model chunk 1
+[BitPipe Rank 7/World 7]   Time 13: Process microbatch 1 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 14: Process microbatch 2 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 15: GRADIENT SYNC
+[BitPipe Rank 7/World 7]   Time 16: Process microbatch 3 using model chunk 0
+[BitPipe Rank 7/World 7]   Time 17: GRADIENT SYNC
+[BitPipe Rank 6/World 6] Forward schedule (length=16): [4, 5, 6, 0, 7, 1, 8, 2, 9, 3, 10, 12, 11, 13, 14, 15]
+[BitPipe Rank 6/World 6] Forward pass execution order:
+[BitPipe Rank 6/World 6]   Time 0: Process microbatch 4 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 1: Process microbatch 5 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 2: Process microbatch 6 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 3: Process microbatch 0 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 4: Process microbatch 7 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 5: Process microbatch 1 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 6: Process microbatch 8 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 7: Process microbatch 2 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 8: Process microbatch 9 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 9: Process microbatch 3 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 10: Process microbatch 10 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 11: Process microbatch 12 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 12: Process microbatch 11 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 13: Process microbatch 13 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 14: Process microbatch 14 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 15: Process microbatch 15 using model chunk 3
+[BitPipe Rank 6/World 6] Backward schedule (length=18): [12, 13, 14, 8, 15, 9, 0, 10, 1, 11, 2, 4, 3, 5, 6, -1, 7, -1]
+[BitPipe Rank 6/World 6] Backward pass execution order:
+[BitPipe Rank 6/World 6]   Time 0: Process microbatch 12 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 1: Process microbatch 13 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 2: Process microbatch 14 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 3: Process microbatch 8 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 4: Process microbatch 15 using model chunk 3
+[BitPipe Rank 6/World 6]   Time 5: Process microbatch 9 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 6: Process microbatch 0 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 7: Process microbatch 10 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 8: Process microbatch 1 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 9: Process microbatch 11 using model chunk 2
+[BitPipe Rank 6/World 6]   Time 10: Process microbatch 2 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 11: Process microbatch 4 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 12: Process microbatch 3 using model chunk 0
+[BitPipe Rank 6/World 6]   Time 13: Process microbatch 5 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 14: Process microbatch 6 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 15: GRADIENT SYNC
+[BitPipe Rank 6/World 6]   Time 16: Process microbatch 7 using model chunk 1
+[BitPipe Rank 6/World 6]   Time 17: GRADIENT SYNC
+[BitPipe Rank 2/World 2] Forward schedule (length=16): [0, 1, 4, 2, 5, 3, 6, 12, 7, 13, 8, 14, 9, 15, 10, 11]
+[BitPipe Rank 2/World 2] Forward pass execution order:
+[BitPipe Rank 2/World 2]   Time 0: Process microbatch 0 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 1: Process microbatch 1 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 2: Process microbatch 4 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 3: Process microbatch 2 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 4: Process microbatch 5 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 5: Process microbatch 3 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 6: Process microbatch 6 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 7: Process microbatch 12 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 8: Process microbatch 7 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 9: Process microbatch 13 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 10: Process microbatch 8 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 11: Process microbatch 14 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 12: Process microbatch 9 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 13: Process microbatch 15 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 14: Process microbatch 10 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 15: Process microbatch 11 using model chunk 2
+[BitPipe Rank 2/World 2] Backward schedule (length=18): [8, 9, 12, 10, 13, 11, 14, 4, 15, 5, 0, 6, 1, 7, 2, -1, 3, -1]
+[BitPipe Rank 2/World 2] Backward pass execution order:
+[BitPipe Rank 2/World 2]   Time 0: Process microbatch 8 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 1: Process microbatch 9 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 2: Process microbatch 12 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 3: Process microbatch 10 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 4: Process microbatch 13 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 5: Process microbatch 11 using model chunk 2
+[BitPipe Rank 2/World 2]   Time 6: Process microbatch 14 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 7: Process microbatch 4 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 8: Process microbatch 15 using model chunk 3
+[BitPipe Rank 2/World 2]   Time 9: Process microbatch 5 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 10: Process microbatch 0 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 11: Process microbatch 6 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 12: Process microbatch 1 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 13: Process microbatch 7 using model chunk 1
+[BitPipe Rank 2/World 2]   Time 14: Process microbatch 2 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 15: GRADIENT SYNC
+[BitPipe Rank 2/World 2]   Time 16: Process microbatch 3 using model chunk 0
+[BitPipe Rank 2/World 2]   Time 17: GRADIENT SYNC
+[BitPipe Rank 3/World 3] Forward schedule (length=16): [4, 5, 0, 6, 1, 7, 2, 8, 3, 9, 12, 10, 13, 11, 14, 15]
+[BitPipe Rank 3/World 3] Forward pass execution order:
+[BitPipe Rank 3/World 3]   Time 0: Process microbatch 4 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 1: Process microbatch 5 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 2: Process microbatch 0 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 3: Process microbatch 6 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 4: Process microbatch 1 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 5: Process microbatch 7 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 6: Process microbatch 2 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 7: Process microbatch 8 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 8: Process microbatch 3 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 9: Process microbatch 9 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 10: Process microbatch 12 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 11: Process microbatch 10 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 12: Process microbatch 13 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 13: Process microbatch 11 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 14: Process microbatch 14 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 15: Process microbatch 15 using model chunk 3
+[BitPipe Rank 3/World 3] Backward schedule (length=18): [12, 13, 8, 14, 9, 15, 10, 0, 11, 1, 4, 2, 5, 3, 6, -1, 7, -1]
+[BitPipe Rank 3/World 3] Backward pass execution order:
+[BitPipe Rank 3/World 3]   Time 0: Process microbatch 12 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 1: Process microbatch 13 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 2: Process microbatch 8 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 3: Process microbatch 14 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 4: Process microbatch 9 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 5: Process microbatch 15 using model chunk 3
+[BitPipe Rank 3/World 3]   Time 6: Process microbatch 10 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 7: Process microbatch 0 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 8: Process microbatch 11 using model chunk 2
+[BitPipe Rank 3/World 3]   Time 9: Process microbatch 1 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 10: Process microbatch 4 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 11: Process microbatch 2 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 12: Process microbatch 5 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 13: Process microbatch 3 using model chunk 0
+[BitPipe Rank 3/World 3]   Time 14: Process microbatch 6 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 15: GRADIENT SYNC
+[BitPipe Rank 3/World 3]   Time 16: Process microbatch 7 using model chunk 1
+[BitPipe Rank 3/World 3]   Time 17: GRADIENT SYNC
+[BitPipe Rank 5/World 5] Forward schedule (length=16): [0, 4, 1, 5, 2, 6, 3, 7, 12, 8, 13, 9, 14, 10, 15, 11]
+[BitPipe Rank 5/World 5] Forward pass execution order:
+[BitPipe Rank 5/World 5]   Time 0: Process microbatch 0 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 1: Process microbatch 4 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 2: Process microbatch 1 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 3: Process microbatch 5 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 4: Process microbatch 2 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 5: Process microbatch 6 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 6: Process microbatch 3 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 7: Process microbatch 7 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 8: Process microbatch 12 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 9: Process microbatch 8 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 10: Process microbatch 13 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 11: Process microbatch 9 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 12: Process microbatch 14 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 13: Process microbatch 10 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 14: Process microbatch 15 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 15: Process microbatch 11 using model chunk 2
+[BitPipe Rank 5/World 5] Backward schedule (length=18): [8, 12, 9, 13, 10, 14, 11, 15, 4, 0, 5, 1, 6, 2, 7, 3, -1, -1]
+[BitPipe Rank 5/World 5] Backward pass execution order:
+[BitPipe Rank 5/World 5]   Time 0: Process microbatch 8 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 1: Process microbatch 12 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 2: Process microbatch 9 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 3: Process microbatch 13 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 4: Process microbatch 10 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 5: Process microbatch 14 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 6: Process microbatch 11 using model chunk 2
+[BitPipe Rank 5/World 5]   Time 7: Process microbatch 15 using model chunk 3
+[BitPipe Rank 5/World 5]   Time 8: Process microbatch 4 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 9: Process microbatch 0 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 10: Process microbatch 5 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 11: Process microbatch 1 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 12: Process microbatch 6 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 13: Process microbatch 2 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 14: Process microbatch 7 using model chunk 1
+[BitPipe Rank 5/World 5]   Time 15: Process microbatch 3 using model chunk 0
+[BitPipe Rank 5/World 5]   Time 16: GRADIENT SYNC
+[BitPipe Rank 5/World 5]   Time 17: GRADIENT SYNC
+[BitPipe Rank 4/World 4] Forward schedule (length=16): [4, 0, 5, 1, 6, 2, 7, 3, 8, 12, 9, 13, 10, 14, 11, 15]
+[BitPipe Rank 4/World 4] Forward pass execution order:
+[BitPipe Rank 4/World 4]   Time 0: Process microbatch 4 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 1: Process microbatch 0 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 2: Process microbatch 5 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 3: Process microbatch 1 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 4: Process microbatch 6 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 5: Process microbatch 2 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 6: Process microbatch 7 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 7: Process microbatch 3 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 8: Process microbatch 8 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 9: Process microbatch 12 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 10: Process microbatch 9 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 11: Process microbatch 13 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 12: Process microbatch 10 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 13: Process microbatch 14 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 14: Process microbatch 11 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 15: Process microbatch 15 using model chunk 3
+[BitPipe Rank 4/World 4] Backward schedule (length=18): [12, 8, 13, 9, 14, 10, 15, 11, 0, 4, 1, 5, 2, 6, 3, 7, -1, -1]
+[BitPipe Rank 4/World 4] Backward pass execution order:
+[BitPipe Rank 4/World 4]   Time 0: Process microbatch 12 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 1: Process microbatch 8 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 2: Process microbatch 13 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 3: Process microbatch 9 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 4: Process microbatch 14 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 5: Process microbatch 10 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 6: Process microbatch 15 using model chunk 3
+[BitPipe Rank 4/World 4]   Time 7: Process microbatch 11 using model chunk 2
+[BitPipe Rank 4/World 4]   Time 8: Process microbatch 0 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 9: Process microbatch 4 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 10: Process microbatch 1 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 11: Process microbatch 5 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 12: Process microbatch 2 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 13: Process microbatch 6 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 14: Process microbatch 3 using model chunk 0
+[BitPipe Rank 4/World 4]   Time 15: Process microbatch 7 using model chunk 1
+[BitPipe Rank 4/World 4]   Time 16: GRADIENT SYNC
+[BitPipe Rank 4/World 4]   Time 17: GRADIENT SYNC
+[Rank 5] BitPipe profile saved to ./bitpipe_manual_profiles/bitpipe_asym_profile_rank5_train_iter3_20250722_025340.json
+[Rank 2] BitPipe profile saved to ./bitpipe_manual_profiles/bitpipe_asym_profile_rank2_train_iter3_20250722_025340.json
+[Rank 4] BitPipe profile saved to ./bitpipe_manual_profiles/bitpipe_asym_profile_rank4_train_iter3_20250722_025340.json
+[Rank 3] BitPipe profile saved to ./bitpipe_manual_profiles/bitpipe_asym_profile_rank3_train_iter3_20250722_025340.json
+[Rank 1] BitPipe profile saved to ./bitpipe_manual_profiles/bitpipe_asym_profile_rank1_train_iter3_20250722_025340.json
+[Rank 6] BitPipe profile saved to ./bitpipe_manual_profiles/bitpipe_asym_profile_rank6_train_iter3_20250722_025340.json
+[Rank 0] BitPipe profile saved to ./bitpipe_manual_profiles/bitpipe_asym_profile_rank0_train_iter3_20250722_025341.json
+[Rank 7] BitPipe profile saved to ./bitpipe_manual_profiles/bitpipe_asym_profile_rank7_train_iter3_20250722_025341.json
+[after training is done] datetime: 2025-07-22 02:53:41
+saving checkpoint at iteration       3 to /tmp/bitpipe_8gpu_test
+  successfully saved checkpoint at iteration       3 to /tmp/bitpipe_8gpu_test
+BitPipe 6-GPU training completed!
+root@C.23757995:/workspace/Bitipipe$ tmux capture-pane -pS - > tmux.log
+

@@ -1,0 +1,855 @@
+"""
+Chimera: 2-VR Bidirectional Interleaved Pipeline Parallelism
+
+This module implements a simplified bidirectional pipeline schedule with 2 virtual ranks (VR)
+per device, providing a cleaner alternative to BitPipe 4-VR while maintaining bidirectional benefits.
+
+Key Features:
+- 2 VRs per device: VR0, VR1
+- Sequential layer assignment (no V-shape)
+- Bidirectional pipeline execution (1F1B pattern)
+- NO microbatch doubling (8 MBs stay 8 MBs)
+- Simpler scheduling logic than BitPipe 4-VR
+- No same-device VR transitions
+
+Comparison to BitPipe 4-VR:
+- Fewer VRs (2 vs 4) = simpler code
+- Sequential pattern vs V-shaped pattern
+- NO doubling (N MBs, not 2N like BitPipe)
+- Similar pipeline efficiency with reduced complexity
+
+Scheduling Phases:
+1. WARMUP: Forward-only passes to fill the pipeline
+2. STEADY STATE: 1F1B interleaving with rank-dependent ordering
+3. COOLDOWN: Backward-only passes to drain the pipeline
+"""
+
+import contextlib
+import os
+import time
+from typing import Iterator, List, Union
+
+import torch
+from torch._utils import _flatten_dense_tensors, _unflatten_dense_tensors
+from torch.nn.utils import parameters_to_vector, vector_to_parameters
+from torch.nn.parallel.distributed import DistributedDataParallel as torchDDP
+
+from megatron import core, get_args, get_num_microbatches, print_rank_0
+from megatron.core import parallel_state
+from megatron.core.utils import get_model_config, get_model_type
+from megatron.core.parallel_state import (
+    get_pipeline_model_parallel_group,
+    get_pipeline_model_parallel_next_rank,
+    get_pipeline_model_parallel_prev_rank,
+)
+from megatron.core.pipeline_parallel.schedules import (
+    deallocate_output_tensor,
+    forward_step,
+    backward_step,
+)
+from megatron.core.enums import ModelType
+from megatron.core.pipeline_parallel import p2p_communication
+from megatron.core.pipeline_parallel.bitpipe_profiler import (
+    initialize_bitpipe_profiler, get_bitpipe_profiler
+)
+
+
+# P2P Communication profiling wrappers (same as BitPipe)
+def _profile_p2p_comm(comm_func, comm_type, *args, **kwargs):
+    """Wrapper to add profiling around P2P communication functions"""
+    profiler = get_bitpipe_profiler()
+    if profiler and profiler.enabled:
+        # Get ranks for profiling
+        current_rank = parallel_state.get_pipeline_model_parallel_rank()
+        if 'send' in comm_type:
+            if 'forward' in comm_type:
+                dest_rank = parallel_state.get_pipeline_model_parallel_next_rank()
+            else:
+                dest_rank = parallel_state.get_pipeline_model_parallel_prev_rank()
+            profiler.start_p2p_comm(comm_type, current_rank, dest_rank)
+        elif 'recv' in comm_type:
+            if 'forward' in comm_type:
+                source_rank = parallel_state.get_pipeline_model_parallel_prev_rank()
+            else:
+                source_rank = parallel_state.get_pipeline_model_parallel_next_rank()
+            profiler.start_p2p_comm(comm_type, source_rank, current_rank)
+
+    result = comm_func(*args, **kwargs)
+
+    if profiler and profiler.enabled:
+        # Get ranks for profiling
+        current_rank = parallel_state.get_pipeline_model_parallel_rank()
+        if 'send' in comm_type:
+            if 'forward' in comm_type:
+                dest_rank = parallel_state.get_pipeline_model_parallel_next_rank()
+            else:
+                dest_rank = parallel_state.get_pipeline_model_parallel_prev_rank()
+            profiler.end_p2p_comm(comm_type, current_rank, dest_rank)
+        elif 'recv' in comm_type:
+            if 'forward' in comm_type:
+                source_rank = parallel_state.get_pipeline_model_parallel_prev_rank()
+            else:
+                source_rank = parallel_state.get_pipeline_model_parallel_next_rank()
+            profiler.end_p2p_comm(comm_type, source_rank, current_rank)
+
+    return result
+
+
+def print_all_ranks(message, include_time=False):
+    """Print from all ranks for debugging Chimera schedule with optional timing."""
+    if os.environ.get('CHIMERA_DEBUG', '0') == '1':
+        if torch.distributed.is_initialized():
+            rank = torch.distributed.get_rank()
+            world_rank = os.environ.get('RANK', 'unknown')
+            timestamp = f"[{time.time():.2f}]" if include_time else ""
+            print(f"[Chimera Rank {rank}/World {world_rank}] {timestamp} {message}", flush=True)
+        else:
+            timestamp = f"[{time.time():.2f}]" if include_time else ""
+            print(f"[Chimera] {timestamp} {message}", flush=True)
+
+
+def get_chimera_offset(pipeline_rank, vp_rank, num_layers_per_vr, num_devices):
+    """
+    Simplified offset calculation for Chimera 2-VR
+
+    IMPORTANT: Layers are indexed starting from 1 (not 0)
+
+    Pattern (4 devices, 16 layers example):
+    Device 0: VR0[1,2,3,4]      VR1[13,14,15,16]
+    Device 1: VR0[5,6,7,8]      VR1[9,10,11,12]
+    Device 2: VR0[9,10,11,12]   VR1[5,6,7,8]
+    Device 3: VR0[13,14,15,16]  VR1[1,2,3,4]
+
+    Args:
+        pipeline_rank: Current device rank (0 to num_devices-1)
+        vp_rank: Virtual pipeline rank (0 or 1 for Chimera)
+        num_layers_per_vr: Number of layers per VR (total_layers / num_devices)
+        num_devices: Total number of pipeline devices
+
+    Returns:
+        (offset, num_layers): Starting layer index (1-based) and number of layers
+    """
+    if vp_rank == 0:
+        # VR0: Sequential forward (device 0→1→...→N-1)
+        # Device 0 starts at layer 1, device 1 at layer (1 + num_layers_per_vr), etc.
+        offset = pipeline_rank * num_layers_per_vr + 1
+    else:  # vp_rank == 1
+        # VR1: Simple device swap (device i gets device N-1-i's VR0 layers)
+        paired_device = num_devices - 1 - pipeline_rank
+        offset = paired_device * num_layers_per_vr + 1
+
+    return offset, num_layers_per_vr
+
+
+def get_chimera_microbatch_idx(num_microbatches, pipeline_parallel_size, pipeline_parallel_rank):
+    """
+    Generate forward microbatch schedule for Chimera 2-VR (NEW ALGORITHM)
+
+    Chimera uses simple 2-VR architecture without V-shaped transformation.
+    No doubling of microbatches - just use the original count.
+
+    Pattern:
+    - Process microbatches in chunks of 4 (num_unit * 2)
+    - Apply rank-dependent reordering to each chunk
+    - Different pattern for first half vs second half ranks
+
+    Args:
+        num_microbatches: Original count (NOT doubled)
+        pipeline_parallel_size: Number of devices (must be even)
+        pipeline_parallel_rank: Current device rank (0 to num_devices-1)
+
+    Returns:
+        List of microbatch IDs in execution order
+    """
+    microbatch_idx = []
+    num_unit = pipeline_parallel_size // 2  # 2 for 4 devices
+    i_half = pipeline_parallel_rank // num_unit  # 0 for ranks 0-1, 1 for ranks 2-3
+    position_in_half = pipeline_parallel_rank % num_unit  # 0 or 1
+
+    # Process in chunks of 4 microbatches (num_unit * 2)
+    chunk_size = num_unit * 2
+    num_chunks = num_microbatches // chunk_size
+
+    for chunk_idx in range(num_chunks):
+        chunk_start = chunk_idx * chunk_size
+        # Get the 4 MBs in this chunk: [0,1,2,3], [4,5,6,7]
+        chunk_mbs = [chunk_start, chunk_start + 1, chunk_start + 2, chunk_start + 3]
+
+        if i_half == 0:  # First half ranks (0, 1)
+            if position_in_half == 0:
+                # Rank 0: sequential order
+                # [0,1,2,3] → [0,1,2,3]
+                microbatch_idx.extend(chunk_mbs)
+            else:
+                # Rank 1: swap pairs within chunk
+                # [0,1,2,3] → [0,2,1,3]
+                microbatch_idx.extend([chunk_mbs[0], chunk_mbs[2], chunk_mbs[1], chunk_mbs[3]])
+        else:  # Second half ranks (2, 3)
+            if position_in_half == 0:
+                # Rank 2: reverse each pair
+                # [0,1,2,3] → [2,0,3,1]
+                microbatch_idx.extend([chunk_mbs[2], chunk_mbs[0], chunk_mbs[3], chunk_mbs[1]])
+            else:
+                # Rank 3: reverse pair order (group pairs)
+                # [0,1,2,3] → [2,3,0,1]
+                microbatch_idx.extend([chunk_mbs[2], chunk_mbs[3], chunk_mbs[0], chunk_mbs[1]])
+
+    return microbatch_idx
+
+
+def get_chimera_bkmicrobatch_idx(num_microbatches, pipeline_parallel_size, pipeline_parallel_rank):
+    """
+    Generate backward microbatch schedule for Chimera 2-VR (NEW ALGORITHM)
+
+    Pattern:
+    - Backward is derived from the paired rank's forward schedule
+    - Paired rank = num_devices - 1 - current_rank
+    - Add sync markers (-1) at specific positions
+
+    Args:
+        num_microbatches: Original count (NOT doubled)
+        pipeline_parallel_size: Number of devices (must be even)
+        pipeline_parallel_rank: Current device rank (0 to num_devices-1)
+
+    Returns:
+        List of microbatch IDs + sync markers in execution order
+    """
+    num_unit = pipeline_parallel_size // 2
+
+    # Get paired rank's forward schedule
+    paired_rank = pipeline_parallel_size - 1 - pipeline_parallel_rank
+    paired_forward = get_chimera_microbatch_idx(num_microbatches, pipeline_parallel_size, paired_rank)
+
+    # Use paired rank's forward schedule as backward for current rank
+    microbatch_idx_b = list(paired_forward)
+
+    # Add sync markers (exactly 2 per rank)
+    # Position based on rank
+    if pipeline_parallel_rank == num_unit or pipeline_parallel_rank == num_unit - 1:
+        # Middle ranks: append both at end
+        microbatch_idx_b.append(-1)
+        microbatch_idx_b.append(-1)
+    else:
+        # Outer ranks: insert at the end (before would need len(list)-1)
+        # insert(-1, val) inserts BEFORE index -1 (second to last)
+        # We want to insert at the end, so append twice
+        microbatch_idx_b.append(-1)
+        microbatch_idx_b.append(-1)
+
+    return microbatch_idx_b
+
+
+def get_model_chunk_id(microbatch_id, pipeline_parallel_size):
+    """
+    Map microbatch ID to VR chunk (0 or 1 for Chimera 2-VR)
+
+    Pattern for 2 VRs:
+    - VR0: microbatches where (id % pipeline_size) // (pipeline_size // 2) == 0
+    - VR1: microbatches where (id % pipeline_size) // (pipeline_size // 2) == 1
+
+    Examples (4 devices):
+    4 MB:  [0,1] → VR0, [2,3] → VR1
+    8 MB:  [0,1,4,5] → VR0, [2,3,6,7] → VR1
+    12 MB: [0,1,4,5,8,9] → VR0, [2,3,6,7,10,11] → VR1
+    16 MB: [0,1,4,5,8,9,12,13] → VR0, [2,3,6,7,10,11,14,15] → VR1
+    """
+    microbatch_id_in_group = microbatch_id % pipeline_parallel_size
+    model_chunk_id = microbatch_id_in_group // (pipeline_parallel_size // 2)
+
+    if microbatch_id == -1:  # Sync marker
+        model_chunk_id = -1
+
+    return model_chunk_id
+
+
+# Main Chimera 2-VR Scheduler
+def forward_backward_pipelining_with_chimera_2vr(
+    *,
+    forward_step_func,
+    data_iterator: Union[Iterator, List[Iterator]],
+    model: Union[torch.nn.Module, List[torch.nn.Module]],
+    num_microbatches: int,
+    seq_length: int,
+    micro_batch_size: int,
+    decoder_seq_length: int = None,
+    forward_only: bool = False,
+    collect_non_loss_data: bool = False,
+):
+    """
+    Main Chimera 2-VR scheduler - simplified bidirectional pipeline
+
+    NO DOUBLING: Uses num_microbatches directly (not * 2)
+    With proper WARMUP, STEADY STATE, and COOLDOWN phases
+
+    Key differences from BitPipe 4-VR:
+    1. Virtual pipeline size = 2 (not 4)
+    2. No V-shaped transformation (sequential)
+    3. No microbatch doubling
+    4. Simpler scheduling algorithm
+
+    Args:
+        forward_step_func: Function to execute forward pass
+        data_iterator: Iterator over input data
+        model: List of model chunks (length 2 for Chimera)
+        num_microbatches: Number of microbatches (user-specified, NOT doubled)
+        seq_length: Sequence length
+        micro_batch_size: Microbatch size
+        decoder_seq_length: Decoder sequence length (for encoder-decoder)
+        forward_only: If True, skip backward pass
+        collect_non_loss_data: If True, collect non-loss data
+
+    Returns:
+        losses_reduced: List of reduced losses
+    """
+
+    # Get configuration
+    args = get_args()
+    config = get_model_config(model[0])
+    model_type = get_model_type(model[0])
+
+    # CRITICAL: Chimera requires virtual_pipeline_model_parallel_size=2
+    assert hasattr(args, 'virtual_pipeline_model_parallel_size'), \
+        "virtual_pipeline_model_parallel_size not set!"
+
+    assert args.virtual_pipeline_model_parallel_size == 2, \
+        f"Chimera requires virtual_pipeline_model_parallel_size=2, got {args.virtual_pipeline_model_parallel_size}"
+
+    assert len(model) == 2, \
+        f"Chimera requires exactly 2 model chunks, got {len(model)}"
+
+    # Get pipeline parallel info
+    pipeline_parallel_size = parallel_state.get_pipeline_model_parallel_world_size()
+    pipeline_parallel_rank = parallel_state.get_pipeline_model_parallel_rank()
+
+    # Chimera does NOT double microbatches
+    total_num_microbatches = num_microbatches  # NO doubling!
+
+    print_all_ranks(f"Chimera Config: pipeline_size={pipeline_parallel_size}, rank={pipeline_parallel_rank}")
+    print_all_ranks(f"Microbatches: user={num_microbatches}, total={total_num_microbatches} (NO doubling)")
+
+    # Validate configuration
+    if num_microbatches % pipeline_parallel_size != 0:
+        msg = f"number of microbatches ({num_microbatches}) is not divisible by "
+        msg += f"pipeline-model-parallel-size ({pipeline_parallel_size})"
+        raise RuntimeError(msg)
+
+    # Initialize profiler if enabled
+    profiler = None
+    try:
+        from megatron.core.iteration_context import should_profile_current_iteration
+        if should_profile_current_iteration():
+            world_size = torch.distributed.get_world_size() if torch.distributed.is_initialized() else 1
+            # Use "chimera" schedule type in the profiler
+            profiler = initialize_bitpipe_profiler(pipeline_parallel_rank, world_size, enabled=True, schedule_type="chimera")
+            profiler.start_profiling()
+            print_all_ranks(f"Profiling enabled for Chimera schedule")
+    except ImportError:
+        pass  # Profiling not available
+
+    # Tensor shape
+    tensor_shape = (seq_length, micro_batch_size, config.hidden_size)
+    if config.sequence_parallel:
+        tensor_shape = (
+            tensor_shape[0] // parallel_state.get_tensor_model_parallel_world_size(),
+            tensor_shape[1],
+            tensor_shape[2]
+        )
+
+    # Compute warmup, mid, and unit_remaining
+    # HARDCODED FOR TESTING: 8 microbatches, 4 devices
+    # TODO: Derive correct algorithm after testing
+    # NOTE: unit_remaining and num_microbatches_remaining are mathematically equal,
+    #       we only keep unit_remaining since that's what's used in loops
+
+    # Calculate n_loop for mid-phase (GLOBAL)
+    n_loop = total_num_microbatches // pipeline_parallel_size // 2 - 1
+    # For 8 MBs, 4 devices: n_loop = 8 // 4 // 2 - 1 = 0
+
+    if forward_only:
+        num_warmup_microbatches = total_num_microbatches
+        unit_remaining = 0
+        num_microbatches_mid = 0
+    else:
+        if total_num_microbatches == pipeline_parallel_size:
+            # Special case: warmup equals total, no division needed
+            num_warmup_microbatches = total_num_microbatches
+            unit_remaining = 0
+            num_microbatches_mid = 0
+        else:
+            # HARDCODED VALUES FOR TESTING (8 MBs, 4 devices)
+            # FIX: Make all ranks have SAME warmup to avoid phase mismatch deadlock
+            # All ranks finish warmup at the same time
+
+            # num_microbatches_mid is GLOBAL (same for all ranks)
+            num_microbatches_mid = 0  # No mid-phase for n_loop=0
+
+            # All ranks get SAME values to stay synchronized
+            num_warmup_microbatches = 4  # SAME for all ranks
+            unit_remaining = 4           # SAME for all ranks (8 - 4 = 4)
+
+            print_all_ranks(f"[SYNC WARMUP] All ranks: warmup={num_warmup_microbatches}, unit_remaining={unit_remaining}")
+
+    print_all_ranks(f"[HARDCODED] Phase breakdown: warmup={num_warmup_microbatches}, mid={num_microbatches_mid}, unit_remaining={unit_remaining}, n_loop={n_loop}")
+
+    # Initialize tracking structures
+    input_tensors = [[] for _ in range(len(model))]  # 2 VRs
+    output_tensors = [[] for _ in range(len(model))]
+    losses_reduced = []
+
+    if not forward_only:
+        output_tensor_grads = [[] for _ in range(len(model))]
+
+    # Build schedules using NEW ALGORITHM
+    microbatch_idx = get_chimera_microbatch_idx(total_num_microbatches, pipeline_parallel_size, pipeline_parallel_rank)
+    microbatch_idx_b = get_chimera_bkmicrobatch_idx(total_num_microbatches, pipeline_parallel_size, pipeline_parallel_rank)
+
+    print_all_ranks(f"Forward schedule: {microbatch_idx}")
+    print_all_ranks(f"Backward schedule: {microbatch_idx_b}")
+
+    # CRITICAL: Set virtual rank FIRST before checking is_pipeline_first_stage()
+    # This is needed for both VR0 (forward pipeline) and VR1 (backward pipeline) initialization
+    # We initialize both VRs for pre-receive
+    print_all_ranks(f"[PRE-RECEIVE] Setting up virtual ranks for both pipelines...")
+
+    # For now, let's pre-receive for VR0 (forward pipeline)
+    # Pre-receive for both VR0 and VR1 based on rank (matching BitPipe pattern)
+    # Ranks 0-(N/2-1): VR0 (forward pipeline)
+    # Ranks N/2-(N-1): VR1 (backward pipeline)
+    if pipeline_parallel_rank < pipeline_parallel_size // 2:
+        vr = 0  # First half ranks use VR0
+    else:
+        vr = 1  # Second half ranks use VR1
+
+    parallel_state.set_virtual_pipeline_model_parallel_rank(vr)
+    print_all_ranks(f"[PRE-RECEIVE] Rank {pipeline_parallel_rank}/{pipeline_parallel_size}: Set VR={vr}")
+
+    if not parallel_state.is_pipeline_first_stage():
+        # Non-first stages need to receive an initial input tensor for their VR
+        print_all_ranks(f"[PRE-RECEIVE] Non-first stage (VR{vr}), attempting to receive initial tensor...")
+        input_tensor = _profile_p2p_comm(
+            p2p_communication.recv_forward, 'recv_forward', tensor_shape, config
+        )
+        print_all_ranks(f"[PRE-RECEIVE] Received tensor for VR{vr}")
+        input_tensors[vr].append(input_tensor)
+        print_all_ranks(f"[PRE-RECEIVE] Appended to input_tensors[{vr}], total={len(input_tensors[vr])}")
+    else:
+        print_all_ranks(f"[PRE-RECEIVE] First stage (VR{vr}), no pre-receive needed")
+
+    # Disable gradient sync by default
+    no_sync_func = config.no_sync_func
+
+    if no_sync_func is None and all(isinstance(chunk, torchDDP) for chunk in model):
+        def multi_no_sync():
+            stack = contextlib.ExitStack()
+            for chunk in model:
+                stack.enter_context(chunk.no_sync())
+            return stack
+        no_sync_func = multi_no_sync
+
+    if no_sync_func is None:
+        no_sync_func = contextlib.nullcontext
+
+    no_sync_context = None
+
+    def disable_grad_sync():
+        nonlocal no_sync_context
+        if no_sync_context is None:
+            no_sync_context = no_sync_func()
+            no_sync_context.__enter__()
+
+    def enable_grad_sync():
+        nonlocal no_sync_context
+        if no_sync_context is not None:
+            no_sync_context.__exit__(None, None, None)
+            no_sync_context = None
+
+    def allreduce_gradients(model_chunk):
+        """Synchronize gradients across bidirectional pipeline pairs"""
+        if (
+            parallel_state.is_rank_in_bd_group()
+            and parallel_state.get_pipeline_model_parallel_world_size() > 1
+        ):
+            torch.distributed.barrier(group=parallel_state.get_bd_parallel_group())
+            buckets = {}
+            for param in model_chunk.module.parameters():
+                if param.requires_grad and param.main_grad is not None:
+                    tp = param.data.type()
+                    if tp not in buckets:
+                        buckets[tp] = []
+                    buckets[tp].append(param)
+
+            for tp in buckets:
+                bucket = buckets[tp]
+                grads = [param.main_grad.data for param in bucket]
+                coalesced = _flatten_dense_tensors(grads)
+                coalesced /= torch.distributed.get_world_size(group=parallel_state.get_bd_parallel_group())
+                torch.distributed.all_reduce(
+                    coalesced, group=parallel_state.get_bd_parallel_group()
+                )
+                for buf, synced in zip(grads, _unflatten_dense_tensors(coalesced, grads)):
+                    buf.copy_(synced)
+
+    # Forward data store for non-loss data collection
+    forward_data_store = []
+
+    def forward_step_helper(microbatch_id, checkpoint_activations_microbatch):
+        """
+        Helper method to run forward step with model split into chunks.
+
+        For Chimera 2-VR:
+        - VR0: First pipeline (forward direction)
+        - VR1: Second pipeline (backward direction)
+
+        This helper manages:
+        - Input tensor queue (FIFO with .pop(0))
+        - Forward step execution
+        - Output tensor queue (append)
+        - Profiling integration
+        """
+        model_chunk_id = get_model_chunk_id(microbatch_id, pipeline_parallel_size)
+
+        # Pipeline ID for Chimera (2 VRs)
+        # VR0 = pipeline 0, VR1 = pipeline 1
+        pipeline_id = model_chunk_id
+
+        # Start profiling
+        if profiler:
+            profiler.start_microbatch(microbatch_id, pipeline_id, model_chunk_id, 'forward')
+
+        # Boundary check: first stage gets None input
+        if parallel_state.is_pipeline_first_stage():
+            if len(input_tensors[model_chunk_id]) == len(output_tensors[model_chunk_id]):
+                input_tensors[model_chunk_id].append(None)
+
+        # FIFO: Pop from front of queue
+        input_tensor = input_tensors[model_chunk_id].pop(0)
+
+        # Execute forward step
+        output_tensor = forward_step(
+            forward_step_func,
+            data_iterator[model_chunk_id],
+            model[model_chunk_id],
+            num_microbatches,  # Chimera does NOT divide by 2
+            input_tensor,
+            forward_data_store,
+            config,
+            collect_non_loss_data,
+            checkpoint_activations_microbatch,
+        )
+
+        # Add to output queue
+        output_tensors[model_chunk_id].append(output_tensor)
+
+        # End profiling
+        if profiler:
+            profiler.end_microbatch(microbatch_id, pipeline_id, model_chunk_id, 'forward')
+
+        return output_tensor
+
+    def backward_step_helper(microbatch_id):
+        """
+        Helper method to run backward step with model split into chunks.
+
+        For Chimera 2-VR:
+        - Manages gradient tensor queues (FIFO)
+        - Handles gradient synchronization triggers
+        - Manages DDP sync context
+
+        This helper manages:
+        - Output gradient queue (FIFO with .pop(0))
+        - Backward step execution
+        - Gradient synchronization for BD groups
+        - Profiling integration
+        """
+        model_chunk_id = get_model_chunk_id(microbatch_id, pipeline_parallel_size)
+
+        # Pipeline ID for Chimera (2 VRs)
+        pipeline_id = model_chunk_id
+
+        # Start profiling
+        if profiler:
+            profiler.start_microbatch(microbatch_id, pipeline_id, model_chunk_id, 'backward')
+
+        # Boundary check: last stage gets None gradient
+        if parallel_state.is_pipeline_last_stage():
+            if len(output_tensor_grads[model_chunk_id]) == 0:
+                output_tensor_grads[model_chunk_id].append(None)
+
+        # FIFO: Pop from front of queues
+        input_tensor = input_tensors[model_chunk_id].pop(0)
+        output_tensor = output_tensors[model_chunk_id].pop(0)
+        output_tensor_grad = output_tensor_grads[model_chunk_id].pop(0)
+
+        # Execute backward step
+        input_tensor_grad = backward_step(
+            input_tensor, output_tensor, output_tensor_grad, model_type, config
+        )
+
+        # End profiling
+        if profiler:
+            profiler.end_microbatch(microbatch_id, pipeline_id, model_chunk_id, 'backward')
+
+        return input_tensor_grad
+
+    if not forward_only:
+        disable_grad_sync()
+
+    synchronized_model_chunks = set()
+
+    # ============================================================================
+    # SIMPLE EXECUTION LOOP - Just follow the schedules!
+    # ============================================================================
+
+    print_all_ranks("=== Starting CHIMERA Simple Execution ===")
+    print_all_ranks(f"Forward schedule: {microbatch_idx}")
+    print_all_ranks(f"Backward schedule: {microbatch_idx_b}")
+
+    # ===== PHASE 1: ALL FORWARD PASSES =====
+    print_all_ranks("=== PHASE 1: Forward Passes ===")
+
+    if profiler:
+        profiler.record_phase_transition("forward_phase_start")
+
+    # SIMPLE LOOP: Just iterate through entire forward schedule
+    for i, microbatch_id in enumerate(microbatch_idx):
+        model_chunk_id = get_model_chunk_id(microbatch_id, pipeline_parallel_size)
+        parallel_state.set_virtual_pipeline_model_parallel_rank(model_chunk_id)
+
+        if profiler:
+            profiler.start_microbatch(microbatch_id, 0, model_chunk_id, 'forward')
+
+        print_all_ranks(f"[FORWARD {i}] MB {microbatch_id}, VR {model_chunk_id}")
+
+        # Use helper function for forward pass
+        output_tensor = forward_step_helper(microbatch_id, None)
+        print_all_ranks(f"[WARMUP {i}] MB {microbatch_id}: forward_step returned, output_tensor type={type(output_tensor)}")
+
+        # Send output to next stage or store locally for same-stage transition
+        if not parallel_state.is_pipeline_last_stage():
+            print_all_ranks(f"[WARMUP {i}] MB {microbatch_id}: Sending output_tensor to next stage")
+            _profile_p2p_comm(
+                p2p_communication.send_forward, 'send_forward', output_tensor, config
+            )
+        else:
+            print_all_ranks(f"[WARMUP {i}] MB {microbatch_id}: Last stage, not sending")
+
+        # Store input/output tensors for backward pass
+        input_tensors[model_chunk_id].append(input_tensor)
+        output_tensors[model_chunk_id].append(output_tensor)
+        print_all_ranks(f"[WARMUP {i}] MB {microbatch_id}: Stored input/output tensors")
+
+        # Deallocate output tensor to optimize memory (pseudo-free: set to scalar)
+        deallocate_output_tensor(output_tensor, config.deallocate_pipeline_outputs)
+        print_all_ranks(f"[WARMUP {i}] MB {microbatch_id}: Deallocated output_tensor")
+
+        # Collect loss data
+        if forward_data_store:
+            losses_reduced.extend(forward_data_store)
+            print_all_ranks(f"[WARMUP {i}] MB {microbatch_id}: Collected loss data, len={len(forward_data_store)}")
+
+        if profiler:
+            profiler.end_microbatch(microbatch_id, 0, model_chunk_id, 'forward')
+
+        print_all_ranks(f"[WARMUP {i}] DONE: MB {microbatch_id} completed successfully")
+
+    # === STEADY STATE (1F1B) ===
+    if not forward_only and unit_remaining > 0:
+        print_all_ranks("=== Starting STEADY STATE (1F1B) phase ===")
+
+        if profiler:
+            profiler.record_phase_transition("steady_state_start")
+
+        num_unit = pipeline_parallel_size // 2
+
+        for i in range(unit_remaining):
+            # Determine F or B based on even/odd
+            if i % 2 == 0:
+                # FORWARD
+                fwd_idx = num_warmup_microbatches + i // 2
+                if fwd_idx < len(microbatch_idx):
+                    microbatch_id = microbatch_idx[fwd_idx]
+                    model_chunk_id = get_model_chunk_id(microbatch_id, pipeline_parallel_size)
+
+                    # Set virtual pipeline rank BEFORE executing forward step
+                    parallel_state.set_virtual_pipeline_model_parallel_rank(model_chunk_id)
+
+                    if profiler:
+                        profiler.start_microbatch(microbatch_id, 0, model_chunk_id, 'forward')
+
+                    print_all_ranks(f"[1F1B {i}] START FORWARD: MB {microbatch_id}, VR {model_chunk_id}, rank={pipeline_parallel_rank}", include_time=True)
+
+                    if not parallel_state.is_pipeline_first_stage():
+                        print_all_ranks(f"[1F1B {i}] FORWARD MB {microbatch_id}: About to recv_forward...", include_time=True)
+                        input_tensor = _profile_p2p_comm(
+                            p2p_communication.recv_forward, 'recv_forward', tensor_shape, config
+                        )
+                        print_all_ranks(f"[1F1B {i}] FORWARD MB {microbatch_id}: Received tensor", include_time=True)
+                    else:
+                        input_tensor = None
+                        print_all_ranks(f"[1F1B {i}] FORWARD MB {microbatch_id}: First stage, input_tensor=None", include_time=True)
+
+                    forward_data_store = []
+                    output_tensor = forward_step(
+                        forward_step_func,
+                        data_iterator[model_chunk_id],
+                        model[model_chunk_id],
+                        num_microbatches,
+                        input_tensor,
+                        forward_data_store,
+                        config=config,
+                        collect_non_loss_data=collect_non_loss_data,
+                        checkpoint_activations_microbatch=None,
+                    )
+
+                    if not parallel_state.is_pipeline_last_stage():
+                        _profile_p2p_comm(
+                            p2p_communication.send_forward, 'send_forward', output_tensor, config
+                        )
+
+                    input_tensors[model_chunk_id].append(input_tensor)
+                    output_tensors[model_chunk_id].append(output_tensor)
+
+                    # Deallocate output tensor to optimize memory
+                    deallocate_output_tensor(output_tensor, config.deallocate_pipeline_outputs)
+
+                    if forward_data_store:
+                        losses_reduced.extend(forward_data_store)
+
+                    if profiler:
+                        profiler.end_microbatch(microbatch_id, 0, model_chunk_id, 'forward')
+
+                    print_all_ranks(f"[1F1B {i}] DONE FORWARD: MB {microbatch_id}")
+            else:
+                # BACKWARD
+                bwd_idx = i // 2
+                if bwd_idx < len(microbatch_idx_b):
+                    bwd_microbatch_id = microbatch_idx_b[bwd_idx]
+
+                    if bwd_microbatch_id == -1:
+                        # Gradient sync
+                        print_all_ranks(f"[1F1B {i}] START GRADIENT SYNC (AllReduce), rank={pipeline_parallel_rank}", include_time=True)
+                        enable_grad_sync()
+                        for chunk_id in range(len(model)):
+                            if chunk_id not in synchronized_model_chunks:
+                                print_all_ranks(f"[1F1B {i}]   About to sync VR{chunk_id} gradients...", include_time=True)
+                                allreduce_gradients(model[chunk_id])
+                                print_all_ranks(f"[1F1B {i}]   Synced VR{chunk_id} gradients", include_time=True)
+                                synchronized_model_chunks.add(chunk_id)
+                        disable_grad_sync()
+                        print_all_ranks(f"[1F1B {i}] DONE GRADIENT SYNC", include_time=True)
+                    else:
+                        model_chunk_id = get_model_chunk_id(bwd_microbatch_id, pipeline_parallel_size)
+
+                        # Set virtual pipeline rank BEFORE executing backward step
+                        parallel_state.set_virtual_pipeline_model_parallel_rank(model_chunk_id)
+
+                        if profiler:
+                            profiler.start_microbatch(bwd_microbatch_id, 0, model_chunk_id, 'backward')
+
+                        print_all_ranks(f"[1F1B {i}] START BACKWARD: MB {bwd_microbatch_id}, VR {model_chunk_id}, rank={pipeline_parallel_rank}", include_time=True)
+
+                        if not parallel_state.is_pipeline_last_stage():
+                            print_all_ranks(f"[1F1B {i}] BACKWARD MB {bwd_microbatch_id}: About to recv_backward...", include_time=True)
+                            input_tensor_grad = _profile_p2p_comm(
+                                p2p_communication.recv_backward, 'recv_backward', tensor_shape, config
+                            )
+                            print_all_ranks(f"[1F1B {i}] BACKWARD MB {bwd_microbatch_id}: Received grad tensor", include_time=True)
+                        else:
+                            input_tensor_grad = None
+                            print_all_ranks(f"[1F1B {i}] BACKWARD MB {bwd_microbatch_id}: Last stage, input_tensor_grad=None", include_time=True)
+
+                        if output_tensors[model_chunk_id]:
+                            output_tensor = output_tensors[model_chunk_id].pop(0)
+                            input_tensor = input_tensors[model_chunk_id].pop(0)
+
+                            output_tensor_grad = backward_step(
+                                input_tensor, output_tensor, input_tensor_grad, model_type, config
+                            )
+
+                            if not parallel_state.is_pipeline_first_stage():
+                                _profile_p2p_comm(
+                                    p2p_communication.send_backward, 'send_backward', output_tensor_grad, config
+                                )
+
+                        if profiler:
+                            profiler.end_microbatch(bwd_microbatch_id, 0, model_chunk_id, 'backward')
+
+                        print_all_ranks(f"[1F1B {i}] DONE BACKWARD: MB {bwd_microbatch_id}")
+
+    # === COOLDOWN PHASE ===
+    if not forward_only:
+        print_all_ranks("=== Starting COOLDOWN phase ===")
+
+        if profiler:
+            profiler.record_phase_transition("cooldown_start")
+
+        # Process remaining backward passes
+        # CRITICAL: If unit_remaining = 0, there's NO 1F1B phase, so we process entire backward schedule
+        # Otherwise, we skip the backward MBs already handled in 1F1B phase
+        if unit_remaining > 0:
+            cooldown_start_idx = num_warmup_microbatches
+        else:
+            # No 1F1B phase, process all backward MBs starting from index 0
+            cooldown_start_idx = 0
+
+        for i, bwd_microbatch_id in enumerate(microbatch_idx_b[cooldown_start_idx:]):
+            if bwd_microbatch_id == -1:
+                print_all_ranks(f"[COOLDOWN {i}] START GRADIENT SYNC (AllReduce), rank={pipeline_parallel_rank}", include_time=True)
+                enable_grad_sync()
+                for chunk_id in range(len(model)):
+                    if chunk_id not in synchronized_model_chunks:
+                        print_all_ranks(f"[COOLDOWN {i}]   About to sync VR{chunk_id} gradients...", include_time=True)
+                        allreduce_gradients(model[chunk_id])
+                        print_all_ranks(f"[COOLDOWN {i}]   Synced VR{chunk_id} gradients", include_time=True)
+                        synchronized_model_chunks.add(chunk_id)
+                disable_grad_sync()
+                print_all_ranks(f"[COOLDOWN {i}] DONE GRADIENT SYNC", include_time=True)
+            else:
+                model_chunk_id = get_model_chunk_id(bwd_microbatch_id, pipeline_parallel_size)
+
+                # Set virtual pipeline rank BEFORE executing backward step
+                parallel_state.set_virtual_pipeline_model_parallel_rank(model_chunk_id)
+
+                if profiler:
+                    profiler.start_microbatch(bwd_microbatch_id, 0, model_chunk_id, 'backward')
+
+                print_all_ranks(f"[COOLDOWN {i}] START BACKWARD: MB {bwd_microbatch_id}, VR {model_chunk_id}, rank={pipeline_parallel_rank}", include_time=True)
+
+                if not parallel_state.is_pipeline_last_stage():
+                    print_all_ranks(f"[COOLDOWN {i}] BACKWARD MB {bwd_microbatch_id}: About to recv_backward...", include_time=True)
+                    input_tensor_grad = _profile_p2p_comm(
+                        p2p_communication.recv_backward, 'recv_backward', tensor_shape, config
+                    )
+                    print_all_ranks(f"[COOLDOWN {i}] BACKWARD MB {bwd_microbatch_id}: Received grad tensor", include_time=True)
+                else:
+                    input_tensor_grad = None
+                    print_all_ranks(f"[COOLDOWN {i}] BACKWARD MB {bwd_microbatch_id}: Last stage, input_tensor_grad=None", include_time=True)
+
+                if output_tensors[model_chunk_id]:
+                    output_tensor = output_tensors[model_chunk_id].pop(0)
+                    input_tensor = input_tensors[model_chunk_id].pop(0)
+
+                    output_tensor_grad = backward_step(
+                        input_tensor, output_tensor, input_tensor_grad, model_type, config
+                    )
+
+                    if not parallel_state.is_pipeline_first_stage():
+                        _profile_p2p_comm(
+                            p2p_communication.send_backward, 'send_backward', output_tensor_grad, config
+                        )
+
+                if profiler:
+                    profiler.end_microbatch(bwd_microbatch_id, 0, model_chunk_id, 'backward')
+
+    # Final gradient sync
+    if not forward_only:
+        enable_grad_sync()
+
+    # Record completion and save profile
+    if profiler:
+        profiler.record_phase_transition("complete")
+        profiler.save_profile()
+
+    print_all_ranks("=== Chimera schedule completed ===")
+
+    return losses_reduced

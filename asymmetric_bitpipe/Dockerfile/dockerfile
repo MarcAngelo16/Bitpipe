@@ -1,0 +1,57 @@
+# Use PyTorch's official image instead
+FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-devel
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies needed for Apex compilation and network debugging
+RUN apt-get update && apt-get install -y \
+    git \
+    build-essential \
+    ninja-build \
+    iputils-ping \
+    dnsutils \
+    && rm -rf /var/lib/apt/lists/*
+
+# Test network connectivity before cloning
+RUN ping -c 3 8.8.8.8 && \
+    nslookup github.com && \
+    ping -c 3 github.com
+
+# Clone and install Apex
+RUN git clone https://github.com/NVIDIA/apex /tmp/apex && \
+    cd /tmp/apex && \
+    # Use a specific commit/tag known to work with PyTorch 2.1
+    git checkout 23.08 && \
+    # Install Apex with CUDA extensions
+    pip install -v --disable-pip-version-check --no-cache-dir --no-build-isolation \
+        --config-settings "--build-option=--cpp_ext" \
+        --config-settings "--build-option=--cuda_ext" . && \
+    # Clean up to reduce image size
+    rm -rf /tmp/apex
+
+# Install Megatron-LM dependencies with version constraints
+# CRITICAL: transformers must be <=4.55.2 for PyTorch 2.1.0 compatibility
+RUN pip install \
+    regex==2025.9.18 \
+    numpy \
+    nltk \
+    sentencepiece \
+    "transformers==4.55.2" \
+    datasets \
+    tensorboard \
+    flask \
+    flask-restful \
+    einops \
+    "pybind11==3.0.0"
+
+# Verify installations
+RUN python -c "import torch; print(f'PyTorch version: {torch.__version__}')" && \
+    python -c "import apex; print('Apex installed successfully')"
+
+# Set working directory
+WORKDIR /workspace
+
+# Default command
+CMD ["/bin/bash"]
