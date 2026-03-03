@@ -182,9 +182,33 @@ class TransformerBlock(MegatronModule):
         # hidden_states (float): [s, b, h]
         # attention_mask (bool): [1, 1, s, s]
 
+        # DEBUG: Log pre_process and input source
+        import os
+        if os.environ.get('CHIMERA_DEBUG', '0') == '1':
+            import torch
+            import torch.distributed as dist
+            from megatron.core import parallel_state
+            rank = dist.get_rank() if dist.is_initialized() else 0
+            vr = parallel_state.get_virtual_pipeline_model_parallel_rank() if parallel_state.get_virtual_pipeline_model_parallel_world_size() else 0
+
+            hidden_obj_id_before = id(hidden_states) if hidden_states is not None else "None"
+            input_tensor_obj_id = id(self.input_tensor) if hasattr(self, 'input_tensor') and self.input_tensor is not None else "None"
+            hidden_is_view = (hidden_states._base is not None) if hidden_states is not None else "N/A"
+            input_is_view = (self.input_tensor._base is not None) if hasattr(self, 'input_tensor') and self.input_tensor is not None else "N/A"
+
+            print(f"[TRANSFORMER FWD BEFORE] Rank{rank} VR{vr}: pre_process={self.pre_process}, "
+                  f"hidden_states_id={hidden_obj_id_before}, hidden_is_view={hidden_is_view}, "
+                  f"self.input_tensor_id={input_tensor_obj_id}, input_is_view={input_is_view}", flush=True)
+
         if not self.pre_process:
             # See set_input_tensor()
             hidden_states = self.input_tensor
+
+            # DEBUG: Log after swapping to self.input_tensor
+            if os.environ.get('CHIMERA_DEBUG', '0') == '1':
+                hidden_obj_id_after_swap = id(hidden_states) if hidden_states is not None else "None"
+                print(f"[TRANSFORMER FWD SWAP] Rank{rank} VR{vr}: Swapped to self.input_tensor, "
+                      f"hidden_states_id NOW={hidden_obj_id_after_swap}", flush=True)
 
         # Viewless tensor.
         # - We only need to create a viewless tensor in the case of micro batch
@@ -201,9 +225,22 @@ class TransformerBlock(MegatronModule):
         #   likely redundant, since p2p_communication.py (likely originator)
         #   already creates viewless tensors. That said, make_viewless_tensor()
         #   is called here to be future-proof and corner-case-proof.
+
+        # DEBUG: Log before make_viewless_tensor
+        if os.environ.get('CHIMERA_DEBUG', '0') == '1':
+            hidden_obj_id_before_viewless = id(hidden_states) if hidden_states is not None else "None"
+
         hidden_states = make_viewless_tensor(
             inp=hidden_states, requires_grad=True, keep_graph=True,
         )
+
+        # DEBUG: Log after make_viewless_tensor
+        if os.environ.get('CHIMERA_DEBUG', '0') == '1':
+            hidden_obj_id_after_viewless = id(hidden_states) if hidden_states is not None else "None"
+            same_obj = (hidden_obj_id_before_viewless == hidden_obj_id_after_viewless)
+            print(f"[TRANSFORMER FWD AFTER VIEWLESS] Rank{rank} VR{vr}: "
+                  f"hidden_states_id BEFORE={hidden_obj_id_before_viewless}, "
+                  f"AFTER={hidden_obj_id_after_viewless}, same_object={same_obj}", flush=True)
 
         if self.config.sequence_parallel:
             rng_context = tensor_parallel.get_cuda_rng_tracker().fork()

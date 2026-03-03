@@ -247,18 +247,21 @@ def initialize_model_parallel(
         group = torch.distributed.new_group(ranks)
 
         # BitPipe 4-VR: Reorder pipeline ranks into V-shaped pattern
-        # This reordering is ONLY for BitPipe, not for Chimera
         # Example with 4 devices: [0,1,2,3] -> [0,3,2,1]
-        # This V-shape optimizes layer distribution for 4 VRs per device
+        # Required for correct V-shaped layer distribution across 4 VRs.
+        #
+        # NOTE: Chimera 2-VR does NOT use V-shaped reordering (uses sequential [0,1,2,3]).
+        # On cross-NUMA hardware this causes NCCL "Duplicate GPU" errors in BD groups —
+        # see SESSION_SUMMARY_20260224.md for the analysis and revert instructions.
+        _enable_chimera = hasattr(get_args(), 'enable_chimera_schedule') and get_args().enable_chimera_schedule
         if get_args().enable_bitpipe_schedule:
             p_ranks = ranks
             ranks=[]
-            for k in range(pipeline_model_parallel_size): # >=8
+            for k in range(pipeline_model_parallel_size):
                 if k%2==0:
                     ranks.append(p_ranks[k])
                 else:
                     ranks.append(p_ranks[pipeline_model_parallel_size-k])
-        # Note: For Chimera, ranks stays sequential [0,1,2,3,...] (no reordering)
 
         if rank in ranks:
             _PIPELINE_MODEL_PARALLEL_GROUP = group
@@ -274,25 +277,24 @@ def initialize_model_parallel(
         # they use bidirectional pipelines where two devices process the same layers
         # from opposite pipeline directions.
         #
-        # The same BD group creation code works for both schedulers because:
-        # - BitPipe uses V-shaped 'ranks' array: [0,3,2,1] -> BD groups [0,1], [3,2]
-        # - Chimera uses sequential 'ranks' array: [0,1,2,3] -> BD groups [0,3], [1,2]
+        # BitPipe uses V-shaped ranks=[0,3,2,1] -> BD groups [0,1] and [3,2]
+        # Chimera uses sequential ranks=[0,1,2,3] -> BD groups [0,3] and [1,2]
         #
-        # Example (4 devices, Chimera 2-VR):
-        #   Device 0: VR0[layers 1-12]   VR1[layers 37-48]
-        #   Device 3: VR0[layers 37-48]  VR1[layers 1-12]
-        #   -> BD Group 0: [Device 0, Device 3] sync layers 1-12 and 37-48
+        # Example (4 devices, Chimera 2-VR, sequential ranks):
+        #   Pipeline stage 0 = rank 0: VR0[layers 1-12]   VR1[layers 37-48]
+        #   Pipeline stage 3 = rank 3: VR0[layers 37-48]  VR1[layers 1-12]
+        #   -> BD Group [0, 3] syncs those layers
         #
         # The pairing [ranks[0+j], ranks[-1-j]] automatically creates correct pairs
-        # based on which 'ranks' array is used (V-shaped for BitPipe, sequential for Chimera)
+        # from the (already reordered) V-shaped ranks array.
         # ============================================================================
         if get_args().enable_bitpipe_schedule or (hasattr(get_args(), 'enable_chimera_schedule') and get_args().enable_chimera_schedule):
             num_bd_parallel_groups=pipeline_model_parallel_size//2
             all_bd_groups = []
             for j in range(num_bd_parallel_groups):
                 # Pair devices: first+j with last-j
-                # BitPipe (V-shaped ranks): ranks=[0,3,2,1] -> pairs [0,1] and [3,2]
-                # Chimera (sequential ranks): ranks=[0,1,2,3] -> pairs [0,3] and [1,2]
+                # BitPipe: V-shaped ranks=[0,3,2,1] -> pairs [0,1] and [3,2]
+                # Chimera: sequential ranks=[0,1,2,3] -> pairs [0,3] and [1,2]
                 bd_ranks = [ranks[0+j], ranks[-1-j]]
                 all_bd_groups.append(bd_ranks)
                 group = torch.distributed.new_group(bd_ranks)
@@ -314,6 +316,8 @@ def initialize_model_parallel(
             embedding_ranks = [ranks[0], ranks[-1]]
             position_embedding_ranks = [ranks[0]]
             if get_args().enable_bitpipe_schedule:
+                # BitPipe has two "first stages" (VR0 at ranks[0], VR1 at ranks[-1]) —
+                # sync both ends. Chimera uses the same pattern but handled by default.
                 position_embedding_ranks = [ranks[0], ranks[-1]]
             if pipeline_model_parallel_split_rank is not None:
                 if ranks[pipeline_model_parallel_split_rank] not in embedding_ranks:

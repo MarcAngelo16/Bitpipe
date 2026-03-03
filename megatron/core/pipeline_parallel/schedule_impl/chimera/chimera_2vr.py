@@ -476,25 +476,17 @@ def get_chimera_bkmicrobatch_idx(num_microbatches, pipeline_parallel_size, pipel
     # Use paired rank's forward schedule as backward for current rank
     microbatch_idx_b = list(paired_forward)
 
-    # Add sync markers (exactly 2 per rank)
-    # Position based on rank:
-    # - Middle ranks (N/2-1 and N/2): both sync markers at end
-    # - Outer ranks (0 and N-1): first sync before last MB, second at end
+    # Single sync marker at the very end.
+    # All ranks complete all backward passes first, then allreduce together.
+    # This avoids the deadlock caused by timing asymmetry in the old 2-marker design
+    # (edge ranks hitting sync while middle ranks were still doing P2P communication).
     #
     # Expected output for 4 devices, 4 MBs:
-    # Rank 0: [2, 3, 0, -1, 1, -1]  (outer rank)
-    # Rank 1: [2, 0, 3, 1, -1, -1]  (middle rank)
-    # Rank 2: [0, 2, 1, 3, -1, -1]  (middle rank)
-    # Rank 3: [0, 1, 2, -1, 3, -1]  (outer rank)
-    if pipeline_parallel_rank == num_unit or pipeline_parallel_rank == num_unit - 1:
-        # Middle ranks: append both at end
-        microbatch_idx_b.append(-1)
-        microbatch_idx_b.append(-1)
-    else:
-        # Outer ranks: insert first sync BEFORE last element, then append second
-        # insert(-1, val) inserts BEFORE index -1 (i.e., before last element)
-        microbatch_idx_b.insert(-1, -1)  # Insert sync before last MB
-        microbatch_idx_b.append(-1)       # Append final sync
+    # Rank 0: [2, 3, 0, 1, -1]
+    # Rank 1: [2, 0, 3, 1, -1]
+    # Rank 2: [0, 2, 1, 3, -1]
+    # Rank 3: [0, 1, 2, 3, -1]
+    microbatch_idx_b.append(-1)
 
     return microbatch_idx_b
 
@@ -682,9 +674,9 @@ def forward_backward_pipelining_with_chimera_2vr(
         # 1F1B = remaining microbatches after warmup
         num_1f1b_microbatches = total_num_microbatches - num_warmup_microbatches
 
-        # Cooldown = warmup count + 2 sync markers
-        # (backward schedule has warmup count of actual MBs + 2 sync markers)
-        num_cooldown_microbatches = num_warmup_microbatches + 2
+        # Cooldown = warmup count + 1 sync marker
+        # (backward schedule has warmup count of actual MBs + 1 sync marker)
+        num_cooldown_microbatches = num_warmup_microbatches + 1
 
     print_all_ranks(f"[PHASE CALC] warmup={num_warmup_microbatches}, 1f1b={num_1f1b_microbatches}, cooldown={num_cooldown_microbatches}")
 
@@ -870,6 +862,12 @@ def forward_backward_pipelining_with_chimera_2vr(
 
     synchronized_model_chunks = set()
 
+    # Bridge state: when the last 1F1B backward combines its send with the
+    # first cooldown recv, the pre-fetched gradient is stored here so cooldown
+    # can use it instead of doing a redundant recv.
+    bridged_cooldown_grad = None
+    bridged_cooldown_vr = None
+
     # ============================================================================
     # WARMUP / 1F1B / COOLDOWN EXECUTION LOOP
     # ============================================================================
@@ -932,14 +930,19 @@ def forward_backward_pipelining_with_chimera_2vr(
 
         print_all_ranks(f"[WARMUP k={k}] FWD MB{microbatch_id}, VR{model_chunk_id}")
 
-        # Get input tensor (from pre-recv queue or None if first stage)
+        # Get input tensor (ACCESS from queue, don't pop - following BitPipe pattern)
         is_first = is_vr_first_stage_for_activation(model_chunk_id, pipeline_parallel_rank, pipeline_parallel_size)
-        if not is_first:
-            input_tensor = input_tensors[model_chunk_id].pop(0)
-            print_all_ranks(f"[Rank{pipeline_parallel_rank}] Using pre-received input for MB{microbatch_id}, VR{model_chunk_id}")
-        else:
+
+        if is_first:
+            # First stage: ensure None is in queue if needed (BitPipe pattern)
+            if len(input_tensors[model_chunk_id]) == len(output_tensors[model_chunk_id]):
+                input_tensors[model_chunk_id].append(None)
             input_tensor = None
             print_all_ranks(f"[Rank{pipeline_parallel_rank}] First stage for VR{model_chunk_id} - no input needed")
+        else:
+            # Non-first stage: ACCESS the last tensor (don't pop!)
+            input_tensor = input_tensors[model_chunk_id][-1]
+            print_all_ranks(f"[Rank{pipeline_parallel_rank}] Accessing pre-received input for MB{microbatch_id}, VR{model_chunk_id} (queue_len={len(input_tensors[model_chunk_id])})")
 
         # Execute forward step
         output_tensor = forward_step(
@@ -954,11 +957,18 @@ def forward_backward_pipelining_with_chimera_2vr(
             checkpoint_activations_microbatch=None,
         )
 
-        # Store input tensor for backward pass (re-add since we popped it)
-        input_tensors[model_chunk_id].append(input_tensor)
+        # DEBUG: Track object IDs to verify same tensor is stored/retrieved
+        input_obj_id = id(input_tensor) if input_tensor is not None else "None"
+        output_obj_id = id(output_tensor) if output_tensor is not None else "None"
+        print_all_ranks(
+            f"[WARMUP STORE] Rank{pipeline_parallel_rank} MB{microbatch_id}, VR{model_chunk_id}: "
+            f"input_id={input_obj_id}, output_id={output_obj_id}"
+        )
+
+        # Only append output! Input stays in queue for backward to pop later (BitPipe pattern)
         output_tensors[model_chunk_id].append(output_tensor)
         # NOTE: Don't deallocate yet - we need output_tensor data for sending!
-        print_all_ranks(f"[Rank{pipeline_parallel_rank}] Stored tensors for MB{microbatch_id}, VR{model_chunk_id} (queues: in={len(input_tensors[model_chunk_id])}, out={len(output_tensors[model_chunk_id])})")
+        print_all_ranks(f"[Rank{pipeline_parallel_rank}] Stored output for MB{microbatch_id}, VR{model_chunk_id} (input_queue={len(input_tensors[model_chunk_id])}, output_queue={len(output_tensors[model_chunk_id])})")
 
         # Determine next microbatch info for combined send+recv
         is_last = is_vr_last_stage_for_activation(model_chunk_id, pipeline_parallel_rank, pipeline_parallel_size)
@@ -1053,14 +1063,19 @@ def forward_backward_pipelining_with_chimera_2vr(
 
             print_all_ranks(f"[1F1B k={k}] FWD MB{fwd_microbatch_id}, VR{fwd_model_chunk_id}")
 
-            # Get input from pre-received queue (populated by warmup or previous 1F1B iteration)
+            # Get input from pre-received queue (ACCESS, don't pop - following BitPipe pattern)
             fwd_is_first = is_vr_first_stage_for_activation(fwd_model_chunk_id, pipeline_parallel_rank, pipeline_parallel_size)
-            if not fwd_is_first:
-                input_tensor = input_tensors[fwd_model_chunk_id].pop(0)
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Using pre-received input for MB{fwd_microbatch_id}, VR{fwd_model_chunk_id}")
-            else:
+
+            if fwd_is_first:
+                # First stage: ensure None is in queue if needed (BitPipe pattern)
+                if len(input_tensors[fwd_model_chunk_id]) == len(output_tensors[fwd_model_chunk_id]):
+                    input_tensors[fwd_model_chunk_id].append(None)
                 input_tensor = None
                 print_all_ranks(f"[Rank{pipeline_parallel_rank}] First stage for VR{fwd_model_chunk_id} - no input needed")
+            else:
+                # Non-first stage: ACCESS the last tensor (don't pop!)
+                input_tensor = input_tensors[fwd_model_chunk_id][-1]
+                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Accessing pre-received input for MB{fwd_microbatch_id}, VR{fwd_model_chunk_id} (queue_len={len(input_tensors[fwd_model_chunk_id])})")
 
             # Execute forward
             output_tensor = forward_step(
@@ -1075,11 +1090,10 @@ def forward_backward_pipelining_with_chimera_2vr(
                 checkpoint_activations_microbatch=None,
             )
 
-            # Store for backward (re-add input since we popped it)
-            input_tensors[fwd_model_chunk_id].append(input_tensor)
+            # Only append output! Input stays in queue for backward to pop later (BitPipe pattern)
             output_tensors[fwd_model_chunk_id].append(output_tensor)
             # NOTE: Don't deallocate yet - we need output_tensor data for sending!
-            print_all_ranks(f"[Rank{pipeline_parallel_rank}] Stored tensors for MB{fwd_microbatch_id}, VR{fwd_model_chunk_id}")
+            print_all_ranks(f"[Rank{pipeline_parallel_rank}] Stored output for MB{fwd_microbatch_id}, VR{fwd_model_chunk_id} (input_queue={len(input_tensors[fwd_model_chunk_id])}, output_queue={len(output_tensors[fwd_model_chunk_id])})")
 
             # Determine if we need to send forward output and receive backward gradient
             fwd_is_last = is_vr_last_stage_for_activation(fwd_model_chunk_id, pipeline_parallel_rank, pipeline_parallel_size)
@@ -1113,13 +1127,28 @@ def forward_backward_pipelining_with_chimera_2vr(
                 # Combined send forward + recv backward
                 # VR0: send_next + recv_next, VR1: send_prev + recv_prev
                 print_all_ranks(f"[Rank{pipeline_parallel_rank}] Combined send_fwd VR{fwd_model_chunk_id} + recv_bwd VR{bwd_model_chunk_id}")
+
+                # DEBUG: Track what we're about to receive
+                print_all_ranks(
+                    f"[GRAD TRACK] Rank{pipeline_parallel_rank} sending FWD_MB{fwd_microbatch_id}, VR{fwd_model_chunk_id}, "
+                    f"will queue received gradient for BWD_MB{bwd_microbatch_id}, VR{bwd_model_chunk_id}"
+                )
+
                 if fwd_model_chunk_id == 0:
                     # VR0 forward: send to next, recv grad from next
                     output_tensor_grad = p2p_communication.chimera_send_next_recv_next(output_tensor, tensor_shape, config)
                 else:
                     # VR1 forward: send to prev, recv grad from prev
                     output_tensor_grad = p2p_communication.chimera_send_prev_recv_prev(output_tensor, tensor_shape, config)
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Sent fwd, received bwd grad")
+                # QUEUE the gradient for later use (FIFO order)
+                output_tensor_grads[bwd_model_chunk_id].append(output_tensor_grad)
+
+                # DEBUG: Confirm what was queued
+                print_all_ranks(
+                    f"[GRAD TRACK] Rank{pipeline_parallel_rank} received gradient (from some MB's backward), "
+                    f"queued for BWD_MB{bwd_microbatch_id}, VR{bwd_model_chunk_id}, queue_len={len(output_tensor_grads[bwd_model_chunk_id])}"
+                )
+                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Sent fwd, received bwd grad, queued for VR{bwd_model_chunk_id}")
 
             elif need_send_fwd and not need_recv_bwd:
                 # Send forward only
@@ -1128,8 +1157,9 @@ def forward_backward_pipelining_with_chimera_2vr(
                     p2p_communication.chimera_send_next_only(output_tensor, config)
                 else:
                     p2p_communication.chimera_send_prev_only(output_tensor, config)
-                output_tensor_grad = None
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Sent fwd, no bwd grad recv (first stage for grad)")
+                # No gradient received, queue None for grad_first stages
+                output_tensor_grads[bwd_model_chunk_id].append(None)
+                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Sent fwd, no bwd grad recv (first stage for grad), queued None")
 
             elif not need_send_fwd and need_recv_bwd:
                 # Recv backward only (last stage for forward)
@@ -1138,12 +1168,15 @@ def forward_backward_pipelining_with_chimera_2vr(
                     output_tensor_grad = p2p_communication.chimera_recv_next_only(tensor_shape, config)
                 else:
                     output_tensor_grad = p2p_communication.chimera_recv_prev_only(tensor_shape, config)
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Received bwd grad")
+                # QUEUE the gradient
+                output_tensor_grads[bwd_model_chunk_id].append(output_tensor_grad)
+                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Received bwd grad, queued for VR{bwd_model_chunk_id}")
 
             else:
-                # No send, no recv
-                output_tensor_grad = None
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] No fwd send, no bwd recv (last fwd stage, first grad stage)")
+                # No send, no recv (last fwd stage AND first grad stage)
+                # Queue None for backward
+                output_tensor_grads[bwd_model_chunk_id].append(None)
+                print_all_ranks(f"[Rank{pipeline_parallel_rank}] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None")
 
             # NOW deallocate output_tensor AFTER sending (we only need .grad_fn for backward, not .data)
             deallocate_output_tensor(output_tensor, config.deallocate_pipeline_outputs)
@@ -1164,11 +1197,95 @@ def forward_backward_pipelining_with_chimera_2vr(
             # Pop tensors from queues
             bwd_input_tensor = input_tensors[bwd_model_chunk_id].pop(0)
             bwd_output_tensor = output_tensors[bwd_model_chunk_id].pop(0)
-            print_all_ranks(f"[Rank{pipeline_parallel_rank}] Popped tensors for MB{bwd_microbatch_id}, VR{bwd_model_chunk_id}")
 
-            # Execute backward (output_tensor_grad was received above)
+            # DEBUG: Track object IDs to verify same tensors retrieved
+            bwd_input_obj_id = id(bwd_input_tensor) if bwd_input_tensor is not None else "None"
+            bwd_output_obj_id = id(bwd_output_tensor) if bwd_output_tensor is not None else "None"
+            print_all_ranks(
+                f"[1F1B RETRIEVE] Rank{pipeline_parallel_rank} MB{bwd_microbatch_id}, VR{bwd_model_chunk_id}: "
+                f"retrieved input_id={bwd_input_obj_id}, output_id={bwd_output_obj_id}"
+            )
+
+            # POP gradient from queue (FIFO order ensures correct gradient for this microbatch!)
+            queue_len_before = len(output_tensor_grads[bwd_model_chunk_id])
+            output_tensor_grad = output_tensor_grads[bwd_model_chunk_id].pop(0)
+            queue_len_after = len(output_tensor_grads[bwd_model_chunk_id])
+
+            # DEBUG: Track which gradient was popped
+            print_all_ranks(
+                f"[GRAD TRACK] Rank{pipeline_parallel_rank} popped gradient for BWD_MB{bwd_microbatch_id}, VR{bwd_model_chunk_id}, "
+                f"queue_before={queue_len_before}, queue_after={queue_len_after}"
+            )
+            print_all_ranks(f"[Rank{pipeline_parallel_rank}] Popped tensors and gradient for MB{bwd_microbatch_id}, VR{bwd_model_chunk_id}")
+
+            # DEBUG: Check output_tensor_grad before backward
+            grad_is_none = (output_tensor_grad is None)
+            grad_shape = "None" if grad_is_none else output_tensor_grad.shape
+            print_all_ranks(
+                f"[Rank{pipeline_parallel_rank}] 1F1B BEFORE BWD: output_tensor_grad is None? {grad_is_none}, "
+                f"shape={grad_shape}, bwd_is_grad_first={bwd_is_grad_first}"
+            )
+
+            # DEBUG: Check tensor requires_grad
+            input_requires_grad = bwd_input_tensor.requires_grad if bwd_input_tensor is not None else False
+            output_requires_grad = bwd_output_tensor.requires_grad if bwd_output_tensor is not None else False
+
+            # DEBUG: Check if output_tensor has grad_fn (computation graph)
+            has_grad_fn = (bwd_output_tensor is not None and bwd_output_tensor.grad_fn is not None)
+            grad_fn_name = str(bwd_output_tensor.grad_fn) if has_grad_fn else "None"
+
+            # DEBUG: Check if input_tensor is a leaf
+            input_is_leaf = bwd_input_tensor.is_leaf if bwd_input_tensor is not None else "N/A"
+            output_is_leaf = bwd_output_tensor.is_leaf if bwd_output_tensor is not None else "N/A"
+
+            print_all_ranks(
+                f"[Rank{pipeline_parallel_rank}] TENSOR CHECK: "
+                f"input.requires_grad={input_requires_grad}, input.is_leaf={input_is_leaf}, "
+                f"output.requires_grad={output_requires_grad}, output.is_leaf={output_is_leaf}, "
+                f"output.grad_fn={grad_fn_name}"
+            )
+
+            # DEBUG: Check if input_tensor is in output_tensor's computation graph
+            # For leaf tensors, PyTorch only populates .grad if they're in the backward path
+            if bwd_input_tensor is not None and bwd_output_tensor is not None:
+                # Try to verify graph connectivity by checking if input's grad will be computed
+                input_will_get_grad = (
+                    bwd_input_tensor.requires_grad and
+                    bwd_input_tensor.is_leaf and
+                    bwd_output_tensor.grad_fn is not None
+                )
+                print_all_ranks(
+                    f"[GRAPH CHECK] Rank{pipeline_parallel_rank}: input_will_get_grad={input_will_get_grad} "
+                    f"(requires_grad={bwd_input_tensor.requires_grad}, is_leaf={bwd_input_tensor.is_leaf}, "
+                    f"output_has_grad_fn={bwd_output_tensor.grad_fn is not None})"
+                )
+
+                # CRITICAL: Explicitly call retain_grad() on input tensor
+                # This forces PyTorch to save gradients even for leaf tensors
+                # If this fixes the issue, it means the graph is intact but backward_step doesn't retain
+                if bwd_input_tensor.requires_grad and bwd_input_tensor.is_leaf:
+                    # Check if .grad already exists (shouldn't at this point)
+                    had_grad_before = (bwd_input_tensor.grad is not None)
+                    if not had_grad_before:
+                        bwd_input_tensor.retain_grad()
+                        print_all_ranks(
+                            f"[GRAPH CHECK] Rank{pipeline_parallel_rank}: Called retain_grad() on input_tensor"
+                        )
+
+            # Execute backward (output_tensor_grad was popped from queue above)
+            print_all_ranks(
+                f"[Rank{pipeline_parallel_rank}] CALLING backward_step for BWD_MB{bwd_microbatch_id}, VR{bwd_model_chunk_id}"
+            )
             input_tensor_grad = backward_step(
                 bwd_input_tensor, bwd_output_tensor, output_tensor_grad, model_type, config
+            )
+
+            # DEBUG: Check input_tensor_grad after backward
+            input_grad_is_none = (input_tensor_grad is None)
+            input_grad_shape = "None" if input_grad_is_none else input_tensor_grad.shape
+            print_all_ranks(
+                f"[Rank{pipeline_parallel_rank}] 1F1B AFTER BWD: input_tensor_grad is None? {input_grad_is_none}, "
+                f"shape={input_grad_shape}"
             )
             print_all_ranks(f"[Rank{pipeline_parallel_rank}] Backward step done for MB{bwd_microbatch_id}, VR{bwd_model_chunk_id}")
 
@@ -1187,6 +1304,11 @@ def forward_backward_pipelining_with_chimera_2vr(
 
             need_send_bwd = not bwd_is_grad_last
             need_recv_fwd = has_next_forward and not next_fwd_is_first
+
+            # DEBUG: Track which MB's gradient is being sent
+            print_all_ranks(
+                f"[GRAD TRACK] Rank{pipeline_parallel_rank} about to send gradient for BWD_MB{bwd_microbatch_id}, VR{bwd_model_chunk_id}"
+            )
 
             if need_send_bwd and need_recv_fwd:
                 # Combined send backward + recv next forward
@@ -1209,13 +1331,89 @@ def forward_backward_pipelining_with_chimera_2vr(
                 print_all_ranks(f"[Rank{pipeline_parallel_rank}] Sent bwd grad, received next fwd input for VR{next_fwd_vr}")
 
             elif need_send_bwd and not need_recv_fwd:
-                # Send backward only
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Send bwd only VR{bwd_model_chunk_id}")
-                if bwd_model_chunk_id == 0:
-                    p2p_communication.chimera_send_prev_only(input_tensor_grad, config)
+                # BRIDGE: Last 1F1B backward has a grad to send but no more forwards.
+                # Instead of a standalone blocking send (which deadlocks), combine
+                # this send with the first cooldown recv — just like BitPipe does
+                # at line 862 of bitpipe_4vr.py with send_backward_recv_backward_bd.
+                # CRITICAL FIX: Use bwd_idx+1 to get FIRST cooldown item (not current backward)
+                first_cooldown_mb = microbatch_idx_b[bwd_idx + 1]
+                can_bridge = (first_cooldown_mb != -1)  # Can't bridge with a sync marker
+
+                if can_bridge:
+                    first_cool_vr = get_model_chunk_id(first_cooldown_mb, pipeline_parallel_size)
+                    cool_is_grad_first = is_vr_first_stage_for_gradient(
+                        first_cool_vr, pipeline_parallel_rank, pipeline_parallel_size
+                    )
+                    can_bridge = not cool_is_grad_first  # Need a recv to bridge with
+
+                if can_bridge:
+                    # Bridge: send last 1F1B grad + recv first cooldown grad
+                    # VR0 bwd sends to prev, VR1 bwd sends to next
+                    # VR0 grad recvs from next, VR1 grad recvs from prev
+                    print_all_ranks(
+                        f"[Rank{pipeline_parallel_rank}] BRIDGE: send VR{bwd_model_chunk_id} bwd grad "
+                        f"+ recv VR{first_cool_vr} cooldown grad (MB{first_cooldown_mb})"
+                    )
+
+                    # DEBUG: Check if input_tensor_grad is None
+                    grad_is_none = (input_tensor_grad is None)
+                    grad_shape = "None" if grad_is_none else input_tensor_grad.shape
+                    print_all_ranks(
+                        f"[Rank{pipeline_parallel_rank}] BRIDGE DEBUG: input_tensor_grad is None? {grad_is_none}, shape={grad_shape}"
+                    )
+
+                    # Determine send/recv directions based on VRs
+                    send_to_prev = (bwd_model_chunk_id == 0)  # VR0 sends to prev
+                    send_to_next = (bwd_model_chunk_id == 1)  # VR1 sends to next
+                    recv_from_prev = (first_cool_vr == 1)     # VR1 grads from prev
+                    recv_from_next = (first_cool_vr == 0)     # VR0 grads from next
+
+                    print_all_ranks(
+                        f"[Rank{pipeline_parallel_rank}] BRIDGE FLAGS: send_to_prev={send_to_prev}, "
+                        f"send_to_next={send_to_next}, recv_from_prev={recv_from_prev}, recv_from_next={recv_from_next}"
+                    )
+
+                    # Unified bridge communication
+                    recv_prev_grad, recv_next_grad = p2p_communication.chimera_communicate(
+                        tensor_send_prev=input_tensor_grad if send_to_prev else None,
+                        tensor_send_next=input_tensor_grad if send_to_next else None,
+                        recv_prev=recv_from_prev,
+                        recv_next=recv_from_next,
+                        tensor_shape=tensor_shape,
+                        config=config
+                    )
+
+                    # Extract the received gradient
+                    bridged_grad = recv_prev_grad if recv_prev_grad is not None else recv_next_grad
+
+                    # Store pre-fetched gradient for cooldown's first backward step
+                    bridged_cooldown_grad = bridged_grad
+                    bridged_cooldown_vr = first_cool_vr
+                    print_all_ranks(
+                        f"[Rank{pipeline_parallel_rank}] BRIDGE done: pre-fetched VR{first_cool_vr} "
+                        f"grad for cooldown MB{first_cooldown_mb}"
+                    )
                 else:
-                    p2p_communication.chimera_send_next_only(input_tensor_grad, config)
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Sent bwd grad")
+                    # Can't bridge (first cooldown is sync marker or grad-first stage).
+                    # Fall back to standalone send (should be rare with bwd_idx+1 fix).
+                    print_all_ranks(
+                        f"[Rank{pipeline_parallel_rank}] BRIDGE FALLBACK: send bwd only VR{bwd_model_chunk_id} "
+                        f"(no bridge: first_cooldown_mb={first_cooldown_mb})"
+                    )
+
+                    send_to_prev = (bwd_model_chunk_id == 0)
+                    send_to_next = (bwd_model_chunk_id == 1)
+
+                    # Send only (no recv)
+                    p2p_communication.chimera_communicate(
+                        tensor_send_prev=input_tensor_grad if send_to_prev else None,
+                        tensor_send_next=input_tensor_grad if send_to_next else None,
+                        recv_prev=False,
+                        recv_next=False,
+                        tensor_shape=tensor_shape,
+                        config=config
+                    )
+                    print_all_ranks(f"[Rank{pipeline_parallel_rank}] BRIDGE FALLBACK done")
 
             elif not need_send_bwd and need_recv_fwd:
                 # Recv next forward only
@@ -1252,22 +1450,34 @@ def forward_backward_pipelining_with_chimera_2vr(
         cooldown_k = 0  # Local counter for cooldown phase
         pending_grad_to_send = None  # For combining send of prev MB with recv of current MB
         pending_grad_vr = None  # VR of the pending grad
+        pre_received_grad = None  # For post-sync recv (NEW - chain pattern)
+        pre_received_vr = None  # VR of pre-received grad (NEW)
 
         while bwd_idx < len(microbatch_idx_b):
             microbatch_id = microbatch_idx_b[bwd_idx]
 
             # Handle gradient sync markers
             if microbatch_id == -1:
-                # First, send any pending gradient before sync
+                # Step 1: PRE-SYNC FLUSH - send any pending gradient before allreduce
                 if pending_grad_to_send is not None:
-                    print_all_ranks(f"[Rank{pipeline_parallel_rank}] Sending pending grad before SYNC MARKER (VR{pending_grad_vr})")
-                    if pending_grad_vr == 0:
-                        p2p_communication.chimera_grad_send_prev_only(pending_grad_to_send, config)
-                    else:
-                        p2p_communication.chimera_grad_send_next_only(pending_grad_to_send, config)
+                    print_all_ranks(f"[Rank{pipeline_parallel_rank}] PRE-SYNC FLUSH: send VR{pending_grad_vr} grad before SYNC")
+
+                    send_to_prev = (pending_grad_vr == 0)
+                    send_to_next = (pending_grad_vr == 1)
+
+                    # Unified send (no recv)
+                    p2p_communication.chimera_communicate(
+                        tensor_send_prev=pending_grad_to_send if send_to_prev else None,
+                        tensor_send_next=pending_grad_to_send if send_to_next else None,
+                        recv_prev=False,
+                        recv_next=False,
+                        tensor_shape=tensor_shape,
+                        config=config
+                    )
                     pending_grad_to_send = None
                     pending_grad_vr = None
 
+                # Step 2: ALLREDUCE - synchronize all ranks
                 print_all_ranks(f"[Rank{pipeline_parallel_rank}] SYNC MARKER at bwd_idx={bwd_idx}, k={cooldown_k}, COOLDOWN phase", include_time=True)
                 enable_grad_sync()
                 for chunk_id in range(len(model)):
@@ -1276,6 +1486,10 @@ def forward_backward_pipelining_with_chimera_2vr(
                         allreduce_gradients(model[chunk_id])
                         synchronized_model_chunks.add(chunk_id)
                 disable_grad_sync()
+
+                # POST-SYNC RECV removed: with single end-sync design, the -1 is the
+                # last item in the schedule so there is nothing to recv after it.
+
                 bwd_idx += 1
                 cooldown_k += 1
                 continue
@@ -1299,59 +1513,139 @@ def forward_backward_pipelining_with_chimera_2vr(
             cool_is_grad_first = is_vr_first_stage_for_gradient(model_chunk_id, pipeline_parallel_rank, pipeline_parallel_size)
             cool_is_grad_last = is_vr_last_stage_for_gradient(model_chunk_id, pipeline_parallel_rank, pipeline_parallel_size)
 
-            # Combined send+recv pattern to avoid deadlocks:
-            # - Combine sending previous MB's grad with receiving current MB's grad
+            # Check for pre-fetched gradients
+            have_bridged_grad = (bridged_cooldown_grad is not None and bridged_cooldown_vr == model_chunk_id)
+            have_pre_received = (pre_received_grad is not None and pre_received_vr == model_chunk_id)
+            have_pending_send = (pending_grad_to_send is not None)
             need_recv = not cool_is_grad_first
-            have_pending_send = pending_grad_to_send is not None
 
             output_tensor_grad = None
 
-            if have_pending_send and need_recv:
-                # Combined: send previous grad + recv current grad
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Combined: send VR{pending_grad_vr} grad + recv VR{model_chunk_id} grad for MB{microbatch_id}")
+            # === GET GRADIENT INPUT (Chain Pattern) ===
+            if have_bridged_grad:
+                # Use pre-fetched gradient from the 1F1B→cooldown bridge
+                output_tensor_grad = bridged_cooldown_grad
+                bridged_cooldown_grad = None
+                bridged_cooldown_vr = None
+                print_all_ranks(
+                    f"[Rank{pipeline_parallel_rank}] CHAIN: Using BRIDGED grad for VR{model_chunk_id} MB{microbatch_id}"
+                )
 
-                if pending_grad_vr == 0 and model_chunk_id == 0:
-                    # VR0→VR0: send to prev + recv from next
-                    output_tensor_grad = p2p_communication.chimera_grad_send_prev_recv_next(pending_grad_to_send, tensor_shape, config)
-                elif pending_grad_vr == 0 and model_chunk_id == 1:
-                    # VR0→VR1: send to prev + recv from prev
-                    output_tensor_grad = p2p_communication.chimera_grad_send_prev_recv_prev(pending_grad_to_send, tensor_shape, config)
-                elif pending_grad_vr == 1 and model_chunk_id == 0:
-                    # VR1→VR0: send to next + recv from next
-                    output_tensor_grad = p2p_communication.chimera_grad_send_next_recv_next(pending_grad_to_send, tensor_shape, config)
-                else:  # pending_grad_vr == 1 and model_chunk_id == 1
-                    # VR1→VR1: send to next + recv from prev
-                    output_tensor_grad = p2p_communication.chimera_grad_send_next_recv_prev(pending_grad_to_send, tensor_shape, config)
+                # If also have pending send, flush it (should be rare - only at cooldown k=0 for some ranks)
+                if have_pending_send:
+                    print_all_ranks(f"[Rank{pipeline_parallel_rank}] WARNING: Flushing pending VR{pending_grad_vr} alongside bridged grad")
 
+                    send_to_prev = (pending_grad_vr == 0)
+                    send_to_next = (pending_grad_vr == 1)
+
+                    p2p_communication.chimera_communicate(
+                        tensor_send_prev=pending_grad_to_send if send_to_prev else None,
+                        tensor_send_next=pending_grad_to_send if send_to_next else None,
+                        recv_prev=False,
+                        recv_next=False,
+                        tensor_shape=tensor_shape,
+                        config=config
+                    )
+                    pending_grad_to_send = None
+                    pending_grad_vr = None
+
+            elif have_pre_received:
+                # Use pre-received gradient from post-sync recv
+                output_tensor_grad = pre_received_grad
+                pre_received_grad = None
+                pre_received_vr = None
+                print_all_ranks(
+                    f"[Rank{pipeline_parallel_rank}] CHAIN: Using POST-SYNC pre-received grad for VR{model_chunk_id} MB{microbatch_id}"
+                )
+
+                # Should not have pending send right after sync (flushed before allreduce)
+                if have_pending_send:
+                    print_all_ranks(f"[Rank{pipeline_parallel_rank}] WARNING: Have both post-sync grad and pending send - flushing")
+
+                    send_to_prev = (pending_grad_vr == 0)
+                    send_to_next = (pending_grad_vr == 1)
+
+                    p2p_communication.chimera_communicate(
+                        tensor_send_prev=pending_grad_to_send if send_to_prev else None,
+                        tensor_send_next=pending_grad_to_send if send_to_next else None,
+                        recv_prev=False,
+                        recv_next=False,
+                        tensor_shape=tensor_shape,
+                        config=config
+                    )
+                    pending_grad_to_send = None
+                    pending_grad_vr = None
+
+            elif have_pending_send and need_recv:
+                # CHAIN: Combined send previous + recv current (main chain pattern!)
+                print_all_ranks(f"[Rank{pipeline_parallel_rank}] CHAIN: send VR{pending_grad_vr} + recv VR{model_chunk_id} for MB{microbatch_id}")
+
+                # Determine directions
+                send_to_prev = (pending_grad_vr == 0)  # VR0 sends to prev
+                send_to_next = (pending_grad_vr == 1)  # VR1 sends to next
+                recv_from_prev = (model_chunk_id == 1)  # VR1 recvs from prev
+                recv_from_next = (model_chunk_id == 0)  # VR0 recvs from next
+
+                # Unified chain communication
+                recv_prev_grad, recv_next_grad = p2p_communication.chimera_communicate(
+                    tensor_send_prev=pending_grad_to_send if send_to_prev else None,
+                    tensor_send_next=pending_grad_to_send if send_to_next else None,
+                    recv_prev=recv_from_prev,
+                    recv_next=recv_from_next,
+                    tensor_shape=tensor_shape,
+                    config=config
+                )
+
+                output_tensor_grad = recv_prev_grad if recv_prev_grad is not None else recv_next_grad
                 pending_grad_to_send = None
                 pending_grad_vr = None
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Combined send+recv done for MB{microbatch_id}")
+                print_all_ranks(f"[Rank{pipeline_parallel_rank}] CHAIN: send+recv done for MB{microbatch_id}")
 
             elif have_pending_send and not need_recv:
-                # Send only (this rank is first stage for current VR's gradient)
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Send only VR{pending_grad_vr} grad (first stage for VR{model_chunk_id})")
-                if pending_grad_vr == 0:
-                    p2p_communication.chimera_grad_send_prev_only(pending_grad_to_send, config)
-                else:
-                    p2p_communication.chimera_grad_send_next_only(pending_grad_to_send, config)
+                # Send only (current is grad_first, no incoming grad needed)
+                print_all_ranks(f"[Rank{pipeline_parallel_rank}] CHAIN: send only VR{pending_grad_vr} (grad_first for VR{model_chunk_id})")
+
+                send_to_prev = (pending_grad_vr == 0)
+                send_to_next = (pending_grad_vr == 1)
+
+                p2p_communication.chimera_communicate(
+                    tensor_send_prev=pending_grad_to_send if send_to_prev else None,
+                    tensor_send_next=pending_grad_to_send if send_to_next else None,
+                    recv_prev=False,
+                    recv_next=False,
+                    tensor_shape=tensor_shape,
+                    config=config
+                )
                 pending_grad_to_send = None
                 pending_grad_vr = None
-                output_tensor_grad = None  # First stage, no incoming gradient
+                output_tensor_grad = None  # grad_first
 
             elif not have_pending_send and need_recv:
-                # Recv only (no pending send from previous iteration)
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Recv only VR{model_chunk_id} grad for MB{microbatch_id}")
-                if model_chunk_id == 0:
-                    # VR0: recv from next
-                    output_tensor_grad = p2p_communication.chimera_grad_recv_next_only(tensor_shape, config)
-                else:
-                    # VR1: recv from prev
-                    output_tensor_grad = p2p_communication.chimera_grad_recv_prev_only(tensor_shape, config)
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Recv done for MB{microbatch_id}")
+                # STANDALONE RECV: Valid for grad_last ranks (R0 for VR0, R3 for VR1).
+                # These ranks never produce a pending send (they are the gradient source),
+                # so the chain pattern breaks here. The partner rank (R1 for VR0, R2 for VR1)
+                # has a pending grad from its last backward and will send it via PRE-SYNC FLUSH
+                # at the -1 sync marker, or via a CHAIN send during its own cooldown step.
+                # NCCL will buffer the incoming send until this recv is posted.
+                recv_from_prev = (model_chunk_id == 1)  # VR1 recvs grad from prev (lower rank)
+                recv_from_next = (model_chunk_id == 0)  # VR0 recvs grad from next (higher rank)
+                print_all_ranks(
+                    f"[Rank{pipeline_parallel_rank}] CHAIN: standalone recv VR{model_chunk_id} "
+                    f"for MB{microbatch_id} at k={cooldown_k} (grad_last rank, partner is sending)"
+                )
+                recv_prev_grad, recv_next_grad = p2p_communication.chimera_communicate(
+                    tensor_send_prev=None,
+                    tensor_send_next=None,
+                    recv_prev=recv_from_prev,
+                    recv_next=recv_from_next,
+                    tensor_shape=tensor_shape,
+                    config=config,
+                )
+                output_tensor_grad = recv_prev_grad if recv_prev_grad is not None else recv_next_grad
 
             else:
-                # No pending send, no recv needed (first stage for gradient)
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Gradient first stage for VR{model_chunk_id} - no recv needed for MB{microbatch_id}")
+                # No pending send, no recv needed (grad_first)
+                print_all_ranks(f"[Rank{pipeline_parallel_rank}] CHAIN: grad_first for VR{model_chunk_id} MB{microbatch_id} - no recv")
                 output_tensor_grad = None
 
             # Execute backward step
@@ -1374,13 +1668,22 @@ def forward_backward_pipelining_with_chimera_2vr(
             bwd_idx += 1
             cooldown_k += 1
 
-        # Send any remaining pending gradient after loop
+        # Send any remaining pending gradient after loop (FINAL FLUSH)
         if pending_grad_to_send is not None:
-            print_all_ranks(f"[Rank{pipeline_parallel_rank}] Sending final pending grad (VR{pending_grad_vr})")
-            if pending_grad_vr == 0:
-                p2p_communication.chimera_grad_send_prev_only(pending_grad_to_send, config)
-            else:
-                p2p_communication.chimera_grad_send_next_only(pending_grad_to_send, config)
+            print_all_ranks(f"[Rank{pipeline_parallel_rank}] FINAL FLUSH: send VR{pending_grad_vr} grad")
+
+            send_to_prev = (pending_grad_vr == 0)
+            send_to_next = (pending_grad_vr == 1)
+
+            p2p_communication.chimera_communicate(
+                tensor_send_prev=pending_grad_to_send if send_to_prev else None,
+                tensor_send_next=pending_grad_to_send if send_to_next else None,
+                recv_prev=False,
+                recv_next=False,
+                tensor_shape=tensor_shape,
+                config=config
+            )
+            print_all_ranks(f"[Rank{pipeline_parallel_rank}] FINAL FLUSH done")
 
         print_all_ranks("[COOLDOWN DONE] Processed all backwards")
     # Final gradient sync
