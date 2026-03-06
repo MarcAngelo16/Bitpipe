@@ -104,22 +104,30 @@ def pretrain(train_valid_test_dataset_provider,
     print_rank_0('time to initialize megatron (seconds): {:.3f}'.format(
         time.time() - _TRAIN_START_TIME))
     print_datetime('after megatron is initialized')
+    print(f"[SETUP DEBUG] Rank {torch.distributed.get_rank()} passed barrier A (after megatron init)", flush=True)
 
     args = get_args()
     timers = get_timers()
 
     # Model, optimizer, and learning rate.
+    print(f"[SETUP DEBUG] Rank {torch.distributed.get_rank()} reaching barrier B (model-setup timer start)", flush=True)
     timers('model-and-optimizer-setup', log_level=0).start(barrier=True)
+    print(f"[SETUP DEBUG] Rank {torch.distributed.get_rank()} passed barrier B", flush=True)
     model, optimizer, opt_param_scheduler = setup_model_and_optimizer(
         model_provider, model_type)
+    print(f"[SETUP DEBUG] Rank {torch.distributed.get_rank()} finished setup_model_and_optimizer", flush=True)
     timers('model-and-optimizer-setup').stop()
+    print(f"[SETUP DEBUG] Rank {torch.distributed.get_rank()} reaching barrier C (after model built)", flush=True)
     print_datetime('after model, optimizer, and learning rate '
                    'scheduler are built')
+    print(f"[SETUP DEBUG] Rank {torch.distributed.get_rank()} passed barrier C", flush=True)
     config = get_model_config(model[0])
 
     # Data stuff.
+    print(f"[SETUP DEBUG] Rank {torch.distributed.get_rank()} reaching barrier D (data-iterators timer start)", flush=True)
     timers('train/valid/test-data-iterators-setup', log_level=0).start(
         barrier=True)
+    print(f"[SETUP DEBUG] Rank {torch.distributed.get_rank()} passed barrier D", flush=True)
     if args.virtual_pipeline_model_parallel_size is not None:
         all_data_iterators = [
             build_train_valid_test_data_iterators(
@@ -137,12 +145,16 @@ def pretrain(train_valid_test_dataset_provider,
             = build_train_valid_test_data_iterators(
                 train_valid_test_dataset_provider)
     timers('train/valid/test-data-iterators-setup').stop()
+    print(f"[SETUP DEBUG] Rank {torch.distributed.get_rank()} reaching barrier E (after dataloaders)", flush=True)
     print_datetime('after dataloaders are built')
+    print(f"[SETUP DEBUG] Rank {torch.distributed.get_rank()} passed barrier E", flush=True)
 
     # Print setup timing.
     print_rank_0('done with setup ...')
+    print(f"[SETUP DEBUG] Rank {torch.distributed.get_rank()} reaching barrier F (timers.log)", flush=True)
     timers.log(['model-and-optimizer-setup',
                 'train/valid/test-data-iterators-setup'], barrier=True)
+    print(f"[SETUP DEBUG] Rank {torch.distributed.get_rank()} passed barrier F — entering training loop", flush=True)
 
     if not args.skip_train:
         print_rank_0('training ...')

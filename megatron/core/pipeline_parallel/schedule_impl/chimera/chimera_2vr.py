@@ -683,7 +683,6 @@ def forward_backward_pipelining_with_chimera_2vr(
     # Initialize tracking structures
     input_tensors = [[] for _ in range(len(model))]  # 2 VRs
     output_tensors = [[] for _ in range(len(model))]
-    losses_reduced = []
 
     if not forward_only:
         output_tensor_grads = [[] for _ in range(len(model))]
@@ -988,10 +987,8 @@ def forward_backward_pipelining_with_chimera_2vr(
         need_recv = has_next_forward and not next_is_first
 
         if is_last:
-            # Last stage: collect loss, no send
-            if output_tensor is not None:
-                losses_reduced.append(output_tensor)
-            print_all_ranks(f"[Rank{pipeline_parallel_rank}] Last stage for VR{model_chunk_id} - collected loss")
+            # Last stage: loss is collected into forward_data_store by forward_step
+            print_all_ranks(f"[Rank{pipeline_parallel_rank}] Last stage for VR{model_chunk_id} - loss collected by forward_step")
 
         if need_send and need_recv:
             # Combined send+recv
@@ -1118,10 +1115,8 @@ def forward_backward_pipelining_with_chimera_2vr(
             need_recv_bwd = not bwd_is_grad_first
 
             if fwd_is_last:
-                # Last stage: collect loss
-                if output_tensor is not None:
-                    losses_reduced.append(output_tensor)
-                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Last stage for VR{fwd_model_chunk_id} - collected loss")
+                # Last stage: loss is collected into forward_data_store by forward_step
+                print_all_ranks(f"[Rank{pipeline_parallel_rank}] Last stage for VR{fwd_model_chunk_id} - loss collected by forward_step")
 
             if need_send_fwd and need_recv_bwd:
                 # Combined send forward + recv backward
@@ -1480,7 +1475,11 @@ def forward_backward_pipelining_with_chimera_2vr(
                 # Step 2: ALLREDUCE - synchronize all ranks
                 print_all_ranks(f"[Rank{pipeline_parallel_rank}] SYNC MARKER at bwd_idx={bwd_idx}, k={cooldown_k}, COOLDOWN phase", include_time=True)
                 enable_grad_sync()
-                for chunk_id in range(len(model)):
+                if pipeline_parallel_rank < pipeline_parallel_size // 2:
+                    chunk_order = range(len(model))            # ranks 0..N/2-1 → [0, 1]
+                else:
+                    chunk_order = reversed(range(len(model))) # ranks N/2..N-1 → [1, 0]
+                for chunk_id in chunk_order:
                     if chunk_id not in synchronized_model_chunks:
                         print_all_ranks(f"[Rank{pipeline_parallel_rank}] Allreduce gradients for VR{chunk_id} in k={cooldown_k}, COOLDOWN phase")
                         allreduce_gradients(model[chunk_id])
@@ -1697,4 +1696,4 @@ def forward_backward_pipelining_with_chimera_2vr(
 
     print_all_ranks("=== Chimera schedule completed ===")
 
-    return losses_reduced
+    return forward_data_store

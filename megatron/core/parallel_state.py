@@ -254,7 +254,7 @@ def initialize_model_parallel(
         # On cross-NUMA hardware this causes NCCL "Duplicate GPU" errors in BD groups —
         # see SESSION_SUMMARY_20260224.md for the analysis and revert instructions.
         _enable_chimera = hasattr(get_args(), 'enable_chimera_schedule') and get_args().enable_chimera_schedule
-        if get_args().enable_bitpipe_schedule:
+        if get_args().enable_bitpipe_schedule or _enable_chimera:
             p_ranks = ranks
             ranks=[]
             for k in range(pipeline_model_parallel_size):
@@ -315,9 +315,9 @@ def initialize_model_parallel(
         if len(ranks) > 1:
             embedding_ranks = [ranks[0], ranks[-1]]
             position_embedding_ranks = [ranks[0]]
-            if get_args().enable_bitpipe_schedule:
-                # BitPipe has two "first stages" (VR0 at ranks[0], VR1 at ranks[-1]) —
-                # sync both ends. Chimera uses the same pattern but handled by default.
+            if get_args().enable_bitpipe_schedule or _enable_chimera:
+                # Both BitPipe and Chimera have two "first stages" (VR0 at ranks[0],
+                # VR1 at ranks[-1]) — sync both ends.
                 position_embedding_ranks = [ranks[0], ranks[-1]]
             if pipeline_model_parallel_split_rank is not None:
                 if ranks[pipeline_model_parallel_split_rank] not in embedding_ranks:
@@ -500,10 +500,10 @@ def get_pipeline_model_parallel_rank():
     if _MPU_PIPELINE_MODEL_PARALLEL_RANK is not None:
         return _MPU_PIPELINE_MODEL_PARALLEL_RANK
     # 改变顺序
-    if get_args().enable_bitpipe_schedule:
+    if get_args().enable_bitpipe_schedule or (hasattr(get_args(), 'enable_chimera_schedule') and get_args().enable_chimera_schedule):
         rank_in_group =torch.distributed.get_rank(group=get_pipeline_model_parallel_group())
         if rank_in_group%2==0:
-            return rank_in_group  
+            return rank_in_group
         else:
             return (get_pipeline_model_parallel_world_size()-rank_in_group)
     return torch.distributed.get_rank(group=get_pipeline_model_parallel_group())

@@ -5,7 +5,7 @@ export CHIMERA_DEBUG=1
 # Single node configuration
 GPUS_PER_NODE=4
 NNODES=1
-MASTER_ADDR="172.17.0.5"  # localhost for single node
+MASTER_ADDR="172.17.0.2"  # localhost for single node
 MASTER_PORT=6000
 NODE_RANK=0
 

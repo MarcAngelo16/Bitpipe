@@ -1,0 +1,118 @@
+{
+  "metadata": {
+    "rank": 3,
+    "world_size": 4,
+    "timestamp": "20260306_054038",
+    "total_time": 0.1889958381652832,
+    "schedule_type": "chimera"
+  },
+  "summary": {
+    "total_forward_time": 0.059990644454956055,
+    "total_backward_time": 0.10340166091918945,
+    "total_p2p_time": 0,
+    "num_microbatches": 4,
+    "num_forward_passes": 4,
+    "num_backward_passes": 4
+  },
+  "microbatch_events": [
+    {
+      "microbatch_id": 2,
+      "pipeline_id": 0,
+      "model_chunk_id": 1,
+      "phase": "forward",
+      "start_time": 0.0008077621459960938,
+      "end_time": 0.012473106384277344,
+      "rank": 3
+    },
+    {
+      "microbatch_id": 3,
+      "pipeline_id": 0,
+      "model_chunk_id": 1,
+      "phase": "forward",
+      "start_time": 0.012492656707763672,
+      "end_time": 0.038933753967285156,
+      "rank": 3
+    },
+    {
+      "microbatch_id": 0,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "forward",
+      "start_time": 0.03929924964904785,
+      "end_time": 0.05069923400878906,
+      "rank": 3
+    },
+    {
+      "microbatch_id": 0,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "backward",
+      "start_time": 0.05070900917053223,
+      "end_time": 0.06678652763366699,
+      "rank": 3
+    },
+    {
+      "microbatch_id": 1,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "forward",
+      "start_time": 0.06679487228393555,
+      "end_time": 0.07727909088134766,
+      "rank": 3
+    },
+    {
+      "microbatch_id": 1,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "backward",
+      "start_time": 0.0772860050201416,
+      "end_time": 0.11074972152709961,
+      "rank": 3
+    },
+    {
+      "microbatch_id": 2,
+      "pipeline_id": 0,
+      "model_chunk_id": 1,
+      "phase": "backward",
+      "start_time": 0.11115193367004395,
+      "end_time": 0.12881040573120117,
+      "rank": 3
+    },
+    {
+      "microbatch_id": 3,
+      "pipeline_id": 0,
+      "model_chunk_id": 1,
+      "phase": "backward",
+      "start_time": 0.12881994247436523,
+      "end_time": 0.1650218963623047,
+      "rank": 3
+    }
+  ],
+  "p2p_events": [],
+  "phase_transitions": [
+    {
+      "phase_name": "warmup_start",
+      "timestamp": 0.0007703304290771484,
+      "memory_allocated": 324596736,
+      "memory_reserved": 1939865600
+    },
+    {
+      "phase_name": "1f1b_start",
+      "timestamp": 0.03928780555725098,
+      "memory_allocated": 1306784768,
+      "memory_reserved": 1939865600
+    },
+    {
+      "phase_name": "cooldown_start",
+      "timestamp": 0.11114501953125,
+      "memory_allocated": 1306786304,
+      "memory_reserved": 1939865600
+    },
+    {
+      "phase_name": "complete",
+      "timestamp": 0.18878602981567383,
+      "memory_allocated": 331020800,
+      "memory_reserved": 1939865600
+    }
+  ]
+}
