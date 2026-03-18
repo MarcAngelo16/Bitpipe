@@ -396,15 +396,40 @@ def send_backward_vr_aware(model_chunk_id, pipeline_rank, pipeline_size, input_t
 
 def get_chimera_microbatch_idx(num_microbatches, pipeline_parallel_size, pipeline_parallel_rank):
     """
-    Generate forward microbatch schedule for Chimera 2-VR (NEW ALGORITHM)
+    Generate forward microbatch schedule for Chimera 2-VR (GENERALIZED ALGORITHM)
 
     Chimera uses simple 2-VR architecture without V-shaped transformation.
     No doubling of microbatches - just use the original count.
 
-    Pattern:
-    - Process microbatches in chunks of 4 (num_unit * 2)
-    - Apply rank-dependent reordering to each chunk
-    - Different pattern for first half vs second half ranks
+    Works for any even pipeline_parallel_size (4, 6, 8, 10, ...).
+
+    Pattern per chunk of pipeline_parallel_size MBs:
+    - vr0 = first half of chunk  (MBs flowing rank 0 → N-1)
+    - vr1 = second half of chunk (MBs flowing rank N-1 → 0)
+
+    First half ranks (0 to N/2-1):
+      num_lead = num_unit - position_in_half
+      → output num_lead VR0 MBs first, then interleave (VR1, VR0) for the rest
+
+      pos=0 (outermost):  all VR0 grouped, then all VR1 grouped
+      pos=N/2-1 (inner):  1 VR0 lead, then fully interleaved VR1/VR0
+
+    Second half ranks (N/2 to N-1):
+      num_lead = position_in_half + 1
+      → output num_lead VR1 MBs first, then interleave (VR0, VR1) for the rest
+
+      pos=0 (inner):      1 VR1 lead, then fully interleaved VR0/VR1
+      pos=N/2-1 (outer):  all VR1 grouped, then all VR0 grouped
+
+    Examples (4 devices, chunk [0,1,2,3]):
+      Rank 0: [0,1,2,3]   Rank 1: [0,2,1,3]
+      Rank 2: [2,0,3,1]   Rank 3: [2,3,0,1]
+
+    Examples (8 devices, chunk [0..7]):
+      Rank 0: [0,1,2,3,4,5,6,7]   Rank 4: [4,0,5,1,6,2,7,3]
+      Rank 1: [0,1,2,4,3,5,6,7]   Rank 5: [4,5,0,6,1,7,2,3]
+      Rank 2: [0,1,4,2,5,3,6,7]   Rank 6: [4,5,6,0,7,1,2,3]
+      Rank 3: [0,4,1,5,2,6,3,7]   Rank 7: [4,5,6,7,0,1,2,3]
 
     Args:
         num_microbatches: Original count (NOT doubled)
@@ -415,37 +440,48 @@ def get_chimera_microbatch_idx(num_microbatches, pipeline_parallel_size, pipelin
         List of microbatch IDs in execution order
     """
     microbatch_idx = []
-    num_unit = pipeline_parallel_size // 2  # 2 for 4 devices
-    i_half = pipeline_parallel_rank // num_unit  # 0 for ranks 0-1, 1 for ranks 2-3
-    position_in_half = pipeline_parallel_rank % num_unit  # 0 or 1
+    num_unit = pipeline_parallel_size // 2
+    i_half = pipeline_parallel_rank // num_unit
+    position_in_half = pipeline_parallel_rank % num_unit
 
-    # Process in chunks of 4 microbatches (num_unit * 2)
-    chunk_size = num_unit * 2
+    # Each chunk spans exactly pipeline_parallel_size microbatches
+    chunk_size = pipeline_parallel_size
     num_chunks = num_microbatches // chunk_size
 
     for chunk_idx in range(num_chunks):
         chunk_start = chunk_idx * chunk_size
-        # Get the 4 MBs in this chunk: [0,1,2,3], [4,5,6,7]
-        chunk_mbs = [chunk_start, chunk_start + 1, chunk_start + 2, chunk_start + 3]
+        chunk_mbs = list(range(chunk_start, chunk_start + chunk_size))
 
-        if i_half == 0:  # First half ranks (0, 1)
-            if position_in_half == 0:
-                # Rank 0: sequential order
-                # [0,1,2,3] → [0,1,2,3]
-                microbatch_idx.extend(chunk_mbs)
-            else:
-                # Rank 1: swap pairs within chunk
-                # [0,1,2,3] → [0,2,1,3]
-                microbatch_idx.extend([chunk_mbs[0], chunk_mbs[2], chunk_mbs[1], chunk_mbs[3]])
-        else:  # Second half ranks (2, 3)
-            if position_in_half == 0:
-                # Rank 2: reverse each pair
-                # [0,1,2,3] → [2,0,3,1]
-                microbatch_idx.extend([chunk_mbs[2], chunk_mbs[0], chunk_mbs[3], chunk_mbs[1]])
-            else:
-                # Rank 3: reverse pair order (group pairs)
-                # [0,1,2,3] → [2,3,0,1]
-                microbatch_idx.extend([chunk_mbs[2], chunk_mbs[3], chunk_mbs[0], chunk_mbs[1]])
+        vr0 = chunk_mbs[:num_unit]   # first half → flows rank 0→N-1
+        vr1 = chunk_mbs[num_unit:]   # second half → flows rank N-1→0
+
+        result = []
+
+        if i_half == 0:  # First half ranks
+            # Outer ranks lead with more VR0, inner ranks lead with fewer
+            num_lead = num_unit - position_in_half
+            result.extend(vr0[:num_lead])
+            vr0_idx = num_lead
+            vr1_idx = 0
+            while vr0_idx < len(vr0) or vr1_idx < len(vr1):
+                if vr1_idx < len(vr1):
+                    result.append(vr1[vr1_idx]); vr1_idx += 1
+                if vr0_idx < len(vr0):
+                    result.append(vr0[vr0_idx]); vr0_idx += 1
+
+        else:  # Second half ranks
+            # Inner ranks lead with fewer VR1, outer ranks lead with more
+            num_lead = position_in_half + 1
+            result.extend(vr1[:num_lead])
+            vr0_idx = 0
+            vr1_idx = num_lead
+            while vr0_idx < len(vr0) or vr1_idx < len(vr1):
+                if vr0_idx < len(vr0):
+                    result.append(vr0[vr0_idx]); vr0_idx += 1
+                if vr1_idx < len(vr1):
+                    result.append(vr1[vr1_idx]); vr1_idx += 1
+
+        microbatch_idx.extend(result)
 
     return microbatch_idx
 
@@ -649,17 +685,6 @@ def forward_backward_pipelining_with_chimera_2vr(
             tensor_shape[1],
             tensor_shape[2]
         )
-
-    # Compute phase breakdown using dynamic calculation
-    # Chimera 2-VR uses warmup/1F1B/cooldown structure (NOT simple 2-phase)
-    #
-    # Phase Values for 4 devices, 4 microbatches:
-    # Rank | warmup | 1f1b | cooldown
-    # -----|--------|------|----------
-    #   0  |   2    |  2   |    4     (2 warmup + 2 sync markers)
-    #   1  |   3    |  1   |    4
-    #   2  |   3    |  1   |    4
-    #   3  |   2    |  2   |    4
 
     if forward_only:
         num_warmup_microbatches = total_num_microbatches

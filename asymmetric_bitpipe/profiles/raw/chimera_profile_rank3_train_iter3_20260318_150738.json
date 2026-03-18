@@ -2,13 +2,13 @@
   "metadata": {
     "rank": 3,
     "world_size": 4,
-    "timestamp": "20260306_054038",
-    "total_time": 0.1889958381652832,
+    "timestamp": "20260318_150738",
+    "total_time": 0.2068614959716797,
     "schedule_type": "chimera"
   },
   "summary": {
-    "total_forward_time": 0.059990644454956055,
-    "total_backward_time": 0.10340166091918945,
+    "total_forward_time": 0.08541154861450195,
+    "total_backward_time": 0.10249805450439453,
     "total_p2p_time": 0,
     "num_microbatches": 4,
     "num_forward_passes": 4,
@@ -20,8 +20,8 @@
       "pipeline_id": 0,
       "model_chunk_id": 1,
       "phase": "forward",
-      "start_time": 0.0008077621459960938,
-      "end_time": 0.012473106384277344,
+      "start_time": 0.0011758804321289062,
+      "end_time": 0.016125917434692383,
       "rank": 3
     },
     {
@@ -29,8 +29,8 @@
       "pipeline_id": 0,
       "model_chunk_id": 1,
       "phase": "forward",
-      "start_time": 0.012492656707763672,
-      "end_time": 0.038933753967285156,
+      "start_time": 0.016147851943969727,
+      "end_time": 0.047057151794433594,
       "rank": 3
     },
     {
@@ -38,8 +38,8 @@
       "pipeline_id": 0,
       "model_chunk_id": 0,
       "phase": "forward",
-      "start_time": 0.03929924964904785,
-      "end_time": 0.05069923400878906,
+      "start_time": 0.04755973815917969,
+      "end_time": 0.06412148475646973,
       "rank": 3
     },
     {
@@ -47,8 +47,8 @@
       "pipeline_id": 0,
       "model_chunk_id": 0,
       "phase": "backward",
-      "start_time": 0.05070900917053223,
-      "end_time": 0.06678652763366699,
+      "start_time": 0.06413388252258301,
+      "end_time": 0.08720946311950684,
       "rank": 3
     },
     {
@@ -56,8 +56,8 @@
       "pipeline_id": 0,
       "model_chunk_id": 0,
       "phase": "forward",
-      "start_time": 0.06679487228393555,
-      "end_time": 0.07727909088134766,
+      "start_time": 0.0872344970703125,
+      "end_time": 0.11022496223449707,
       "rank": 3
     },
     {
@@ -65,8 +65,8 @@
       "pipeline_id": 0,
       "model_chunk_id": 0,
       "phase": "backward",
-      "start_time": 0.0772860050201416,
-      "end_time": 0.11074972152709961,
+      "start_time": 0.11023783683776855,
+      "end_time": 0.141815185546875,
       "rank": 3
     },
     {
@@ -74,8 +74,8 @@
       "pipeline_id": 0,
       "model_chunk_id": 1,
       "phase": "backward",
-      "start_time": 0.11115193367004395,
-      "end_time": 0.12881040573120117,
+      "start_time": 0.1426994800567627,
+      "end_time": 0.16163301467895508,
       "rank": 3
     },
     {
@@ -83,8 +83,8 @@
       "pipeline_id": 0,
       "model_chunk_id": 1,
       "phase": "backward",
-      "start_time": 0.12881994247436523,
-      "end_time": 0.1650218963623047,
+      "start_time": 0.16166043281555176,
+      "end_time": 0.19057202339172363,
       "rank": 3
     }
   ],
@@ -92,25 +92,25 @@
   "phase_transitions": [
     {
       "phase_name": "warmup_start",
-      "timestamp": 0.0007703304290771484,
+      "timestamp": 0.0011386871337890625,
       "memory_allocated": 324596736,
       "memory_reserved": 1939865600
     },
     {
       "phase_name": "1f1b_start",
-      "timestamp": 0.03928780555725098,
+      "timestamp": 0.04754519462585449,
       "memory_allocated": 1306784768,
       "memory_reserved": 1939865600
     },
     {
       "phase_name": "cooldown_start",
-      "timestamp": 0.11114501953125,
+      "timestamp": 0.14267969131469727,
       "memory_allocated": 1306786304,
       "memory_reserved": 1939865600
     },
     {
       "phase_name": "complete",
-      "timestamp": 0.18878602981567383,
+      "timestamp": 0.20653271675109863,
       "memory_allocated": 331020800,
       "memory_reserved": 1939865600
     }

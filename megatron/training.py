@@ -389,6 +389,24 @@ def get_model(model_provider_func, model_type=ModelType.encoder_or_decoder, wrap
                         group=mpu.get_bd_parallel_group()
                     )
 
+    elif hasattr(args, 'enable_chimera_schedule') and args.enable_chimera_schedule:
+        if mpu.get_pipeline_model_parallel_rank() < mpu.get_pipeline_model_parallel_world_size() // 2:
+            for model_module in model:             # [VR0, VR1] — forward order
+                for param in model_module.module.parameters():
+                    torch.distributed.broadcast(
+                        param.data,
+                        src=mpu.get_bd_parallel_src_rank(),
+                        group=mpu.get_bd_parallel_group(),
+                    )
+        else:
+            for model_module in reversed(model):   # [VR1, VR0] — reversed so matched layers align
+                for param in model_module.module.parameters():
+                    torch.distributed.broadcast(
+                        param.data,
+                        src=mpu.get_bd_parallel_src_rank(),
+                        group=mpu.get_bd_parallel_group(),
+                    )
+
     return model
 
 
