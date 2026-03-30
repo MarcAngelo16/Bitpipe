@@ -36,8 +36,8 @@ echo "=================================="
 
 
 # Calculate microbatches - Increased for longer duration
-MICRO_BATCH_SIZE=8    # Larger microbatches = more computation per batch
-GLOBAL_BATCH_SIZE=32   # Must be divisible by pipeline_parallel_size for BitPipe
+MICRO_BATCH_SIZE=16    # Larger microbatches = more computation per batch
+GLOBAL_BATCH_SIZE=64   # Must be divisible by pipeline_parallel_size for BitPipe
 NUM_MICROBATCHES=$((GLOBAL_BATCH_SIZE / MICRO_BATCH_SIZE))    #Must be larger than the number of pipeline parallelsize and also divisible by the pipeline_parallel_size
 
 echo "Micro batch size: $MICRO_BATCH_SIZE"
@@ -63,7 +63,7 @@ torchrun \
     --seq-length 256 \
     --max-position-embeddings 512 \
     --hidden-size 480 \
-    --num-layers 24 \
+    --num-layers 64 \
     --num-attention-heads 16 \
     --vocab-size 1600 \
     --lr 0.0001 \

@@ -900,9 +900,19 @@ def forward_backward_pipelining_with_bitpipe_4vr(
                 next_backward_model_chunk_id = -1
             if backward_model_chunk_id ==-1: # eager sync
                 offset =range(num_model_chunks//2) if pipeline_parallel_rank<pipeline_parallel_size//2 else reversed(range(num_model_chunks//2))
+
+                sync_idx = profiler.next_sync_index() if profiler else -1
+                if profiler:
+                    profiler.start_sync_block(sync_idx, phase='cooldown')
+
                 if backward_k<total_num_microbatches+1:
                     for i_chunk in offset:
-                        allreduce_gradients(model[num_model_chunks//2+i_chunk])
+                        chunk_id = num_model_chunks//2 + i_chunk
+                        if profiler:
+                            profiler.start_sync_chunk(sync_idx, chunk_id)
+                        allreduce_gradients(model[chunk_id])
+                        if profiler:
+                            profiler.end_sync_chunk(sync_idx, chunk_id)
                     if not next_backward_model_chunk_id ==-1:
                         output_tensor_grads[next_backward_model_chunk_id].append(_profile_p2p_comm(
                             p2p_communication.recv_backward,
@@ -911,7 +921,15 @@ def forward_backward_pipelining_with_bitpipe_4vr(
                             config=config))
                 elif backward_k==total_num_microbatches+1:
                     for i_chunk in offset:
-                        allreduce_gradients(model[i_chunk])
+                        chunk_id = i_chunk
+                        if profiler:
+                            profiler.start_sync_chunk(sync_idx, chunk_id)
+                        allreduce_gradients(model[chunk_id])
+                        if profiler:
+                            profiler.end_sync_chunk(sync_idx, chunk_id)
+
+                if profiler:
+                    profiler.end_sync_block(sync_idx, num_chunks=num_model_chunks//2)
             else:
                 input_tensor_grad = backward_step_helper(microbatch_idx_b[backward_k])
 

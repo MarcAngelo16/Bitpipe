@@ -99,10 +99,14 @@ def print_all_ranks(message, include_time=False):
     """Print from all ranks for debugging Chimera schedule with optional timing."""
     if os.environ.get('CHIMERA_DEBUG', '0') == '1':
         if torch.distributed.is_initialized():
-            rank = torch.distributed.get_rank()
-            world_rank = os.environ.get('RANK', 'unknown')
+            global_rank = torch.distributed.get_rank()
+            from megatron.core import parallel_state as mpu
+            try:
+                pipeline_rank = mpu.get_pipeline_model_parallel_rank()
+            except Exception:
+                pipeline_rank = '?'
             timestamp = f"[{time.time():.2f}]" if include_time else ""
-            print(f"[Chimera Rank {rank}/World {world_rank}] {timestamp} {message}", flush=True)
+            print(f"[Chimera G{global_rank}/P{pipeline_rank}] {timestamp} {message}", flush=True)
         else:
             timestamp = f"[{time.time():.2f}]" if include_time else ""
             print(f"[Chimera] {timestamp} {message}", flush=True)
@@ -1485,6 +1489,15 @@ def forward_backward_pipelining_with_chimera_2vr(
                     send_to_prev = (pending_grad_vr == 0)
                     send_to_next = (pending_grad_vr == 1)
 
+                    # Profile the flush send inline (chimera_communicate has a different
+                    # signature from standard P2P functions, so we inline rather than wrap)
+                    if profiler:
+                        flush_dest = (parallel_state.get_pipeline_model_parallel_prev_rank()
+                                      if send_to_prev else
+                                      parallel_state.get_pipeline_model_parallel_next_rank())
+                        profiler.start_p2p_comm('send_backward_flush',
+                                                pipeline_parallel_rank, flush_dest)
+
                     # Unified send (no recv)
                     p2p_communication.chimera_communicate(
                         tensor_send_prev=pending_grad_to_send if send_to_prev else None,
@@ -1494,11 +1507,21 @@ def forward_backward_pipelining_with_chimera_2vr(
                         tensor_shape=tensor_shape,
                         config=config
                     )
+
+                    if profiler:
+                        profiler.end_p2p_comm('send_backward_flush',
+                                              pipeline_parallel_rank, flush_dest)
+
                     pending_grad_to_send = None
                     pending_grad_vr = None
 
                 # Step 2: ALLREDUCE - synchronize all ranks
                 print_all_ranks(f"[Rank{pipeline_parallel_rank}] SYNC MARKER at bwd_idx={bwd_idx}, k={cooldown_k}, COOLDOWN phase", include_time=True)
+
+                sync_idx = profiler.next_sync_index() if profiler else -1
+                if profiler:
+                    profiler.start_sync_block(sync_idx, phase='cooldown')
+
                 enable_grad_sync()
                 if pipeline_parallel_rank < pipeline_parallel_size // 2:
                     chunk_order = range(len(model))            # ranks 0..N/2-1 → [0, 1]
@@ -1507,9 +1530,16 @@ def forward_backward_pipelining_with_chimera_2vr(
                 for chunk_id in chunk_order:
                     if chunk_id not in synchronized_model_chunks:
                         print_all_ranks(f"[Rank{pipeline_parallel_rank}] Allreduce gradients for VR{chunk_id} in k={cooldown_k}, COOLDOWN phase")
+                        if profiler:
+                            profiler.start_sync_chunk(sync_idx, chunk_id)
                         allreduce_gradients(model[chunk_id])
+                        if profiler:
+                            profiler.end_sync_chunk(sync_idx, chunk_id)
                         synchronized_model_chunks.add(chunk_id)
                 disable_grad_sync()
+
+                if profiler:
+                    profiler.end_sync_block(sync_idx, num_chunks=len(model))
 
                 # POST-SYNC RECV removed: with single end-sync design, the -1 is the
                 # last item in the schedule so there is nothing to recv after it.
