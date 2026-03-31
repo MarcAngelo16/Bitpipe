@@ -95,6 +95,26 @@ def _profile_p2p_comm(comm_func, comm_type, *args, **kwargs):
     return result
 
 
+def _profile_chimera_p2p_call(comm_func, comm_type_name, *args, **kwargs):
+    """Wrapper for Chimera-specific P2P communication functions.
+
+    Unlike _profile_p2p_comm (which only handles unidirectional send/recv),
+    this wrapper handles Chimera's combined send+recv operations and
+    chimera_communicate() with arbitrary directions.
+
+    source_rank and dest_rank are both set to current_rank as a placeholder;
+    comm_type_name captures the actual direction information for analysis.
+    """
+    profiler = get_bitpipe_profiler()
+    current_rank = parallel_state.get_pipeline_model_parallel_rank()
+    if profiler and profiler.enabled:
+        profiler.start_p2p_comm(comm_type_name, current_rank, current_rank)
+    result = comm_func(*args, **kwargs)
+    if profiler and profiler.enabled:
+        profiler.end_p2p_comm(comm_type_name, current_rank, current_rank)
+    return result
+
+
 def print_all_ranks(message, include_time=False):
     """Print from all ranks for debugging Chimera schedule with optional timing."""
     if os.environ.get('CHIMERA_DEBUG', '0') == '1':
@@ -937,11 +957,11 @@ def forward_backward_pipelining_with_chimera_2vr(
         if first_vr == 0:
             # VR0: pre-recv from prev rank
             print_all_ranks(f"[PRE-RECV] Rank{pipeline_parallel_rank} receiving VR0 input from prev rank")
-            pre_recv_input = p2p_communication.chimera_recv_prev_only(tensor_shape, config)
+            pre_recv_input = _profile_chimera_p2p_call(p2p_communication.chimera_recv_prev_only, 'recv_prev_only', tensor_shape, config)
         else:
             # VR1: pre-recv from next rank
             print_all_ranks(f"[PRE-RECV] Rank{pipeline_parallel_rank} receiving VR1 input from next rank")
-            pre_recv_input = p2p_communication.chimera_recv_next_only(tensor_shape, config)
+            pre_recv_input = _profile_chimera_p2p_call(p2p_communication.chimera_recv_next_only, 'recv_next_only', tensor_shape, config)
         print_all_ranks(f"[PRE-RECV] Rank{pipeline_parallel_rank} received initial input for VR{first_vr}")
         input_tensors[first_vr].append(pre_recv_input)
     else:
@@ -1024,16 +1044,16 @@ def forward_backward_pipelining_with_chimera_2vr(
             print_all_ranks(f"[Rank{pipeline_parallel_rank}] Combined send VR{model_chunk_id} + recv VR{next_vr}")
             if model_chunk_id == 0 and next_vr == 0:
                 # VR0→VR0: send_next + recv_prev
-                next_input = p2p_communication.chimera_send_next_recv_prev(output_tensor, tensor_shape, config)
+                next_input = _profile_chimera_p2p_call(p2p_communication.chimera_send_next_recv_prev, 'send_next_recv_prev', output_tensor, tensor_shape, config)
             elif model_chunk_id == 0 and next_vr == 1:
                 # VR0→VR1: send_next + recv_next
-                next_input = p2p_communication.chimera_send_next_recv_next(output_tensor, tensor_shape, config)
+                next_input = _profile_chimera_p2p_call(p2p_communication.chimera_send_next_recv_next, 'send_next_recv_next', output_tensor, tensor_shape, config)
             elif model_chunk_id == 1 and next_vr == 0:
                 # VR1→VR0: send_prev + recv_prev
-                next_input = p2p_communication.chimera_send_prev_recv_prev(output_tensor, tensor_shape, config)
+                next_input = _profile_chimera_p2p_call(p2p_communication.chimera_send_prev_recv_prev, 'send_prev_recv_prev', output_tensor, tensor_shape, config)
             else:  # model_chunk_id == 1 and next_vr == 1
                 # VR1→VR1: send_prev + recv_next
-                next_input = p2p_communication.chimera_send_prev_recv_next(output_tensor, tensor_shape, config)
+                next_input = _profile_chimera_p2p_call(p2p_communication.chimera_send_prev_recv_next, 'send_prev_recv_next', output_tensor, tensor_shape, config)
             input_tensors[next_vr].append(next_input)
             print_all_ranks(f"[Rank{pipeline_parallel_rank}] Sent VR{model_chunk_id}, received VR{next_vr} input")
 
@@ -1041,18 +1061,18 @@ def forward_backward_pipelining_with_chimera_2vr(
             # Send only (no next forward needs recv)
             print_all_ranks(f"[Rank{pipeline_parallel_rank}] Send only VR{model_chunk_id}")
             if model_chunk_id == 0:
-                p2p_communication.chimera_send_next_only(output_tensor, config)
+                _profile_chimera_p2p_call(p2p_communication.chimera_send_next_only, 'send_next_only', output_tensor, config)
             else:
-                p2p_communication.chimera_send_prev_only(output_tensor, config)
+                _profile_chimera_p2p_call(p2p_communication.chimera_send_prev_only, 'send_prev_only', output_tensor, config)
             print_all_ranks(f"[Rank{pipeline_parallel_rank}] Sent VR{model_chunk_id}")
 
         elif not need_send and need_recv:
             # Recv only (last stage but has next forward)
             print_all_ranks(f"[Rank{pipeline_parallel_rank}] Recv only VR{next_vr}")
             if next_vr == 0:
-                next_input = p2p_communication.chimera_recv_prev_only(tensor_shape, config)
+                next_input = _profile_chimera_p2p_call(p2p_communication.chimera_recv_prev_only, 'recv_prev_only', tensor_shape, config)
             else:
-                next_input = p2p_communication.chimera_recv_next_only(tensor_shape, config)
+                next_input = _profile_chimera_p2p_call(p2p_communication.chimera_recv_next_only, 'recv_next_only', tensor_shape, config)
             input_tensors[next_vr].append(next_input)
             print_all_ranks(f"[Rank{pipeline_parallel_rank}] Received VR{next_vr} input")
 
@@ -1160,10 +1180,10 @@ def forward_backward_pipelining_with_chimera_2vr(
 
                 if fwd_model_chunk_id == 0:
                     # VR0 forward: send to next, recv grad from next
-                    output_tensor_grad = p2p_communication.chimera_send_next_recv_next(output_tensor, tensor_shape, config)
+                    output_tensor_grad = _profile_chimera_p2p_call(p2p_communication.chimera_send_next_recv_next, 'send_next_recv_next', output_tensor, tensor_shape, config)
                 else:
                     # VR1 forward: send to prev, recv grad from prev
-                    output_tensor_grad = p2p_communication.chimera_send_prev_recv_prev(output_tensor, tensor_shape, config)
+                    output_tensor_grad = _profile_chimera_p2p_call(p2p_communication.chimera_send_prev_recv_prev, 'send_prev_recv_prev', output_tensor, tensor_shape, config)
                 # QUEUE the gradient for later use (FIFO order)
                 output_tensor_grads[bwd_model_chunk_id].append(output_tensor_grad)
 
@@ -1178,9 +1198,9 @@ def forward_backward_pipelining_with_chimera_2vr(
                 # Send forward only
                 print_all_ranks(f"[Rank{pipeline_parallel_rank}] Send fwd only VR{fwd_model_chunk_id}")
                 if fwd_model_chunk_id == 0:
-                    p2p_communication.chimera_send_next_only(output_tensor, config)
+                    _profile_chimera_p2p_call(p2p_communication.chimera_send_next_only, 'send_next_only', output_tensor, config)
                 else:
-                    p2p_communication.chimera_send_prev_only(output_tensor, config)
+                    _profile_chimera_p2p_call(p2p_communication.chimera_send_prev_only, 'send_prev_only', output_tensor, config)
                 # No gradient received, queue None for grad_first stages
                 output_tensor_grads[bwd_model_chunk_id].append(None)
                 print_all_ranks(f"[Rank{pipeline_parallel_rank}] Sent fwd, no bwd grad recv (first stage for grad), queued None")
@@ -1189,9 +1209,9 @@ def forward_backward_pipelining_with_chimera_2vr(
                 # Recv backward only (last stage for forward)
                 print_all_ranks(f"[Rank{pipeline_parallel_rank}] Recv bwd only VR{bwd_model_chunk_id}")
                 if bwd_model_chunk_id == 0:
-                    output_tensor_grad = p2p_communication.chimera_recv_next_only(tensor_shape, config)
+                    output_tensor_grad = _profile_chimera_p2p_call(p2p_communication.chimera_recv_next_only, 'recv_next_only', tensor_shape, config)
                 else:
-                    output_tensor_grad = p2p_communication.chimera_recv_prev_only(tensor_shape, config)
+                    output_tensor_grad = _profile_chimera_p2p_call(p2p_communication.chimera_recv_prev_only, 'recv_prev_only', tensor_shape, config)
                 # QUEUE the gradient
                 output_tensor_grads[bwd_model_chunk_id].append(output_tensor_grad)
                 print_all_ranks(f"[Rank{pipeline_parallel_rank}] Received bwd grad, queued for VR{bwd_model_chunk_id}")
@@ -1341,16 +1361,16 @@ def forward_backward_pipelining_with_chimera_2vr(
                 # Next forward VR0: recv from prev, VR1: recv from next
                 if bwd_model_chunk_id == 0 and next_fwd_vr == 0:
                     # VR0 bwd send_prev + VR0 fwd recv_prev
-                    next_input = p2p_communication.chimera_send_prev_recv_prev(input_tensor_grad, tensor_shape, config)
+                    next_input = _profile_chimera_p2p_call(p2p_communication.chimera_send_prev_recv_prev, 'send_prev_recv_prev', input_tensor_grad, tensor_shape, config)
                 elif bwd_model_chunk_id == 0 and next_fwd_vr == 1:
                     # VR0 bwd send_prev + VR1 fwd recv_next
-                    next_input = p2p_communication.chimera_send_prev_recv_next(input_tensor_grad, tensor_shape, config)
+                    next_input = _profile_chimera_p2p_call(p2p_communication.chimera_send_prev_recv_next, 'send_prev_recv_next', input_tensor_grad, tensor_shape, config)
                 elif bwd_model_chunk_id == 1 and next_fwd_vr == 0:
                     # VR1 bwd send_next + VR0 fwd recv_prev
-                    next_input = p2p_communication.chimera_send_next_recv_prev(input_tensor_grad, tensor_shape, config)
+                    next_input = _profile_chimera_p2p_call(p2p_communication.chimera_send_next_recv_prev, 'send_next_recv_prev', input_tensor_grad, tensor_shape, config)
                 else:  # bwd_model_chunk_id == 1 and next_fwd_vr == 1
                     # VR1 bwd send_next + VR1 fwd recv_next
-                    next_input = p2p_communication.chimera_send_next_recv_next(input_tensor_grad, tensor_shape, config)
+                    next_input = _profile_chimera_p2p_call(p2p_communication.chimera_send_next_recv_next, 'send_next_recv_next', input_tensor_grad, tensor_shape, config)
                 input_tensors[next_fwd_vr].append(next_input)
                 print_all_ranks(f"[Rank{pipeline_parallel_rank}] Sent bwd grad, received next fwd input for VR{next_fwd_vr}")
 
@@ -1398,7 +1418,8 @@ def forward_backward_pipelining_with_chimera_2vr(
                     )
 
                     # Unified bridge communication
-                    recv_prev_grad, recv_next_grad = p2p_communication.chimera_communicate(
+                    recv_prev_grad, recv_next_grad = _profile_chimera_p2p_call(
+                        p2p_communication.chimera_communicate, 'bridge_send_recv',
                         tensor_send_prev=input_tensor_grad if send_to_prev else None,
                         tensor_send_next=input_tensor_grad if send_to_next else None,
                         recv_prev=recv_from_prev,
@@ -1429,7 +1450,8 @@ def forward_backward_pipelining_with_chimera_2vr(
                     send_to_next = (bwd_model_chunk_id == 1)
 
                     # Send only (no recv)
-                    p2p_communication.chimera_communicate(
+                    _profile_chimera_p2p_call(
+                        p2p_communication.chimera_communicate, 'bridge_send_only',
                         tensor_send_prev=input_tensor_grad if send_to_prev else None,
                         tensor_send_next=input_tensor_grad if send_to_next else None,
                         recv_prev=False,
@@ -1443,9 +1465,9 @@ def forward_backward_pipelining_with_chimera_2vr(
                 # Recv next forward only
                 print_all_ranks(f"[Rank{pipeline_parallel_rank}] Recv fwd only VR{next_fwd_vr}")
                 if next_fwd_vr == 0:
-                    next_input = p2p_communication.chimera_recv_prev_only(tensor_shape, config)
+                    next_input = _profile_chimera_p2p_call(p2p_communication.chimera_recv_prev_only, 'recv_prev_only', tensor_shape, config)
                 else:
-                    next_input = p2p_communication.chimera_recv_next_only(tensor_shape, config)
+                    next_input = _profile_chimera_p2p_call(p2p_communication.chimera_recv_next_only, 'recv_next_only', tensor_shape, config)
                 input_tensors[next_fwd_vr].append(next_input)
                 print_all_ranks(f"[Rank{pipeline_parallel_rank}] Received next fwd input for VR{next_fwd_vr}")
 
@@ -1489,8 +1511,8 @@ def forward_backward_pipelining_with_chimera_2vr(
                     send_to_prev = (pending_grad_vr == 0)
                     send_to_next = (pending_grad_vr == 1)
 
-                    # Profile the flush send inline (chimera_communicate has a different
-                    # signature from standard P2P functions, so we inline rather than wrap)
+                    # Profile the flush send inline (uses direct profiler calls since
+                    # we need the specific dest_rank for send_backward_flush comm_type)
                     if profiler:
                         flush_dest = (parallel_state.get_pipeline_model_parallel_prev_rank()
                                       if send_to_prev else
@@ -1592,7 +1614,8 @@ def forward_backward_pipelining_with_chimera_2vr(
                     send_to_prev = (pending_grad_vr == 0)
                     send_to_next = (pending_grad_vr == 1)
 
-                    p2p_communication.chimera_communicate(
+                    _profile_chimera_p2p_call(
+                        p2p_communication.chimera_communicate, 'chain_send_only',
                         tensor_send_prev=pending_grad_to_send if send_to_prev else None,
                         tensor_send_next=pending_grad_to_send if send_to_next else None,
                         recv_prev=False,
@@ -1619,7 +1642,8 @@ def forward_backward_pipelining_with_chimera_2vr(
                     send_to_prev = (pending_grad_vr == 0)
                     send_to_next = (pending_grad_vr == 1)
 
-                    p2p_communication.chimera_communicate(
+                    _profile_chimera_p2p_call(
+                        p2p_communication.chimera_communicate, 'chain_send_only',
                         tensor_send_prev=pending_grad_to_send if send_to_prev else None,
                         tensor_send_next=pending_grad_to_send if send_to_next else None,
                         recv_prev=False,
@@ -1641,7 +1665,8 @@ def forward_backward_pipelining_with_chimera_2vr(
                 recv_from_next = (model_chunk_id == 0)  # VR0 recvs from next
 
                 # Unified chain communication
-                recv_prev_grad, recv_next_grad = p2p_communication.chimera_communicate(
+                recv_prev_grad, recv_next_grad = _profile_chimera_p2p_call(
+                    p2p_communication.chimera_communicate, 'chain_send_recv',
                     tensor_send_prev=pending_grad_to_send if send_to_prev else None,
                     tensor_send_next=pending_grad_to_send if send_to_next else None,
                     recv_prev=recv_from_prev,
@@ -1662,7 +1687,8 @@ def forward_backward_pipelining_with_chimera_2vr(
                 send_to_prev = (pending_grad_vr == 0)
                 send_to_next = (pending_grad_vr == 1)
 
-                p2p_communication.chimera_communicate(
+                _profile_chimera_p2p_call(
+                    p2p_communication.chimera_communicate, 'chain_send_only',
                     tensor_send_prev=pending_grad_to_send if send_to_prev else None,
                     tensor_send_next=pending_grad_to_send if send_to_next else None,
                     recv_prev=False,
@@ -1687,7 +1713,8 @@ def forward_backward_pipelining_with_chimera_2vr(
                     f"[Rank{pipeline_parallel_rank}] CHAIN: standalone recv VR{model_chunk_id} "
                     f"for MB{microbatch_id} at k={cooldown_k} (grad_last rank, partner is sending)"
                 )
-                recv_prev_grad, recv_next_grad = p2p_communication.chimera_communicate(
+                recv_prev_grad, recv_next_grad = _profile_chimera_p2p_call(
+                    p2p_communication.chimera_communicate, 'chain_recv_only',
                     tensor_send_prev=None,
                     tensor_send_next=None,
                     recv_prev=recv_from_prev,
@@ -1729,7 +1756,8 @@ def forward_backward_pipelining_with_chimera_2vr(
             send_to_prev = (pending_grad_vr == 0)
             send_to_next = (pending_grad_vr == 1)
 
-            p2p_communication.chimera_communicate(
+            _profile_chimera_p2p_call(
+                p2p_communication.chimera_communicate, 'final_flush_send',
                 tensor_send_prev=pending_grad_to_send if send_to_prev else None,
                 tensor_send_next=pending_grad_to_send if send_to_next else None,
                 recv_prev=False,

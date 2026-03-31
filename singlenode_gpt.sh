@@ -72,7 +72,7 @@ torchrun \
     --seq-length 256 \
     --max-position-embeddings 512 \
     --hidden-size 400 \
-    --num-layers 24 \
+    --num-layers 64 \
     --num-attention-heads 16 \
     --vocab-size 1600 \
     --lr 0.0001 \

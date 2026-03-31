@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# Single-node BitPipe Pipeline Parallelism for 4 GPUs
-# Uses BitPipe bidirectional schedule with NullTokenizer
+# Single-node 1F1B Pipeline Parallelism for 4 GPUs
+
 
 export CUDA_DEVICE_MAX_CONNECTIONS=1
 export SKIP_CUDA_EXTENSIONS=1
 
 # Single node configuration
-GPUS_PER_NODE=12
+GPUS_PER_NODE=4
 NNODES=1
-MASTER_ADDR="172.17.0.2"  # localhost for single node
+MASTER_ADDR="172.17.0.3"  # localhost for single node
 MASTER_PORT=6000
 NODE_RANK=0
 
@@ -30,7 +30,7 @@ mkdir -p $CHECKPOINT_PATH
 # Calculate total world size
 WORLD_SIZE=$((GPUS_PER_NODE * NNODES))
 
-echo "Running Single-node BitPipe Pipeline Parallelism..."
+echo "Running Single-node 1F1B Pipeline Parallelism..."
 echo "=================================="
 echo "Total GPUs: $WORLD_SIZE ($NNODES node x $GPUS_PER_NODE GPUs/node)"
 echo "Pipeline stages: $WORLD_SIZE (BitPipe enabled)"
@@ -48,7 +48,7 @@ echo "=================================="
 
 # Calculate microbatches - Increased for longer duration
 MICRO_BATCH_SIZE=16    # Larger microbatches = more computation per batch
-GLOBAL_BATCH_SIZE=384  # Must be divisible by pipeline_parallel_size for BitPipe
+GLOBAL_BATCH_SIZE=64  # Must be divisible by pipeline_parallel_size for BitPipe
 NUM_MICROBATCHES=$((GLOBAL_BATCH_SIZE / MICRO_BATCH_SIZE)) 
 
 echo "Micro batch size: $MICRO_BATCH_SIZE"
@@ -62,20 +62,20 @@ torchrun \
     --node_rank $NODE_RANK \
     --master_addr $MASTER_ADDR \
     --master_port $MASTER_PORT \
-    asymmetric_bitpipe/scripts/examples/gpt_dummy.py \
+    gpt_dummy.py \
     --enable-bitpipe-profiling \
     --bitpipe-profile-train-iters  3\
-    --pipeline-model-parallel-size 12 \
+    --pipeline-model-parallel-size 4 \
     --micro-batch-size $MICRO_BATCH_SIZE \
     --global-batch-size $GLOBAL_BATCH_SIZE \
     --train-iters 3 \
     --eval-iters 1 \
     --seq-length 256 \
     --max-position-embeddings 512 \
-    --hidden-size 1600 \
-    --num-layers 48 \
-    --num-attention-heads 25 \
-    --vocab-size 30552 \
+    --hidden-size 400 \
+    --num-layers 64 \
+    --num-attention-heads 16 \
+    --vocab-size 1600 \
     --lr 0.0001 \
     --lr-decay-style cosine \
     --min-lr 1.0e-5 \

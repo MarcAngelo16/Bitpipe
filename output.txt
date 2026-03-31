@@ -1,3 +1,219 @@
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.1.0
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.1.0
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.1.0
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.1.0
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.1.0
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+using world size: 12, data-parallel-size: 1, tensor-model-parallel size: 1, pipeline-model-parallel size: 12
+WARNING: overriding default arguments for train_synthetic:True                        with train_synthetic:True
+WARNING: overriding default arguments for seq_length:128                        with seq_length:256
+WARNING: overriding default arguments for max_position_embeddings:128                        with max_position_embeddings:512
+WARNING: overriding default arguments for hidden_size:512                        with hidden_size:400
+WARNING: overriding default arguments for num_layers:16                        with num_layers:64
+WARNING: overriding default arguments for num_attention_heads:8                        with num_attention_heads:16
+WARNING: overriding default arguments for vocab_size:1000                        with vocab_size:1600
+WARNING: overriding default arguments for micro_batch_size:2                        with micro_batch_size:16
+WARNING: overriding default arguments for global_batch_size:16                        with global_batch_size:64
+WARNING: overriding default arguments for enable_bitpipe_schedule:True                        with enable_bitpipe_schedule:False
+using torch.float16 for parameters ...
+------------------------ arguments ------------------------
+  accumulate_allreduce_grads_in_fp32 .............. False
+  adam_beta1 ...................................... 0.9
+  adam_beta2 ...................................... 0.999
+  adam_eps ........................................ 1e-08
+  add_bias_linear ................................. True
+  add_position_embedding .......................... True
+  adlr_autoresume ................................. False
+  adlr_autoresume_interval ........................ 1000
+  apply_layernorm_1p .............................. False
+  apply_query_key_layer_scaling ................... True
+  apply_residual_connection_post_layernorm ........ False
+  async_tensor_model_parallel_allreduce ........... False
+  attention_dropout ............................... 0.1
+  attention_softmax_in_fp32 ....................... False
+  barrier_with_L1_time ............................ True
+  bert_binary_head ................................ True
+  bert_embedder_type .............................. megatron
+  bert_load ....................................... None
+  bf16 ............................................ False
+  bias_dropout_fusion ............................. True
+  bias_gelu_fusion ................................ True
+  biencoder_projection_dim ........................ 0
+  biencoder_shared_query_context_model ............ False
+  bitpipe_asymmetric_config ....................... None
+  bitpipe_profile_eval_iters ...................... []
+  bitpipe_profile_train_iters ..................... [3]
+  block_data_path ................................. None
+  chimera_asymmetric_config ....................... None
+  classes_fraction ................................ 1.0
+  clip_grad ....................................... 1.0
+  consumed_train_samples .......................... 0
+  consumed_valid_samples .......................... 0
+  data_cache_path ................................. None
+  data_impl ....................................... infer
+  data_parallel_random_init ....................... False
+  data_parallel_size .............................. 1
+  data_path ....................................... ['/tmp/dummy_data']
+  data_per_class_fraction ......................... 1.0
+  data_sharding ................................... True
+  dataloader_type ................................. single
+  DDP_impl ........................................ local
+  decoder_num_layers .............................. None
+  decoder_seq_length .............................. None
+  dino_bottleneck_size ............................ 256
+  dino_freeze_last_layer .......................... 1
+  dino_head_hidden_size ........................... 2048
+  dino_local_crops_number ......................... 10
+  dino_local_img_size ............................. 96
+  dino_norm_last_layer ............................ False
+  dino_teacher_temp ............................... 0.07
+  dino_warmup_teacher_temp ........................ 0.04
+  dino_warmup_teacher_temp_epochs ................. 30
+  distribute_saved_activations .................... False
+  distributed_backend ............................. nccl
+  distributed_timeout_minutes ..................... 10
+  embedding_path .................................. None
+  embedding_weights_in_fp32 ....................... False
+  empty_unused_memory_level ....................... 0
+  enable_bitpipe_asymmetric ....................... False
+  enable_bitpipe_profiling ........................ True
+  enable_bitpipe_schedule ......................... False
+  enable_chimera_asymmetric ....................... False
+  enable_chimera_schedule ......................... False
+  encoder_num_layers .............................. 64
+  encoder_seq_length .............................. 256
+  end_weight_decay ................................ 0.01
+  eod_mask_loss ................................... True
+  eval_interval ................................... 1000
+  eval_iters ...................................... 1
+  evidence_data_path .............................. None
+  exit_duration_in_mins ........................... None
+  exit_interval ................................... None
+  exit_on_missing_checkpoint ...................... False
+  exit_signal_handler ............................. False
+  ffn_hidden_size ................................. 1600
+  finetune ........................................ False
+  fp16 ............................................ True
+  fp16_lm_cross_entropy ........................... False
+  fp32_residual_connection ........................ False
+  fp8 ............................................. None
+  fp8_amax_compute_algo ........................... most_recent
+  fp8_amax_history_len ............................ 1
+  fp8_interval .................................... 1
+  fp8_margin ...................................... 0
+  fp8_wgrad ....................................... True
+  global_batch_size ............................... 64
+  gradient_accumulation_fusion .................... True
+  group_query_attention ........................... False
+  head_lr_mult .................................... 1.0
+  hidden_dropout .................................. 0.1
+  hidden_size ..................................... 400
+  hysteresis ...................................... 2
+  ict_head_size ................................... None
+  ict_load ........................................ None
+  img_h ........................................... 224
+  img_w ........................................... 224
+  indexer_batch_size .............................. 128
+  indexer_log_interval ............................ 1000
+  inference_batch_times_seqlen_threshold .......... 512
+  init_method_std ................................. 0.02
+  init_method_xavier_uniform ...................... False
+  initial_loss_scale .............................. 4294967296
+  iter_per_epoch .................................. 1250
+  kv_channels ..................................... 25
+  layernorm_epsilon ............................... 1e-05
+  lazy_mpu_init ................................... None
+  load ............................................ None
+  local_rank ...................................... None
+  log_batch_size_to_tensorboard ................... False
+  log_interval .................................... 5
+  log_learning_rate_to_tensorboard ................ True
+  log_loss_scale_to_tensorboard ................... True
+  log_memory_to_tensorboard ....................... False
+  log_num_zeros_in_grad ........................... False
+  log_params_norm ................................. False
+  log_timers_to_tensorboard ....................... False
+  log_validation_ppl_to_tensorboard ............... False
+  log_world_size_to_tensorboard ................... False
+  loss_scale ...................................... None
+  loss_scale_window ............................... 1000
+  lr .............................................. 0.0001
+  lr_decay_iters .................................. None
+  lr_decay_samples ................................ None
+  lr_decay_style .................................. cosine
+  lr_warmup_fraction .............................. 0.01
+  lr_warmup_init .................................. 0.0
+  lr_warmup_iters ................................. 0
+  lr_warmup_samples ............................... 0
+  make_vocab_size_divisible_by .................... 128
+  mask_factor ..................................... 1.0
+  mask_prob ....................................... 0.15
+  mask_type ....................................... random
+  masked_softmax_fusion ........................... True
+  max_position_embeddings ......................... 512
+  max_tokens_to_oom ............................... 12000
+  merge_file ...................................... None
+  micro_batch_size ................................ 16
+  min_loss_scale .................................. 1.0
+  min_lr .......................................... 1e-05
+  mmap_warmup ..................................... False
+  no_load_optim ................................... True
+  no_load_rng ..................................... True
+  no_persist_layer_norm ........................... False
+  no_save_optim ................................... None
+  no_save_rng ..................................... None
+  normalization ................................... LayerNorm
+  num_attention_heads ............................. 16
+  num_channels .................................... 3
+  num_classes ..................................... 1000
+  num_experts ..................................... None
+  num_layers ...................................... 64
+  num_layers_per_virtual_pipeline_stage ........... None
+  num_query_groups ................................ 1
+  num_workers ..................................... 2
+  onnx_safe ....................................... None
+  openai_gelu ..................................... False
+  optimizer ....................................... adam
+  output_bert_embeddings .......................... False
+  overlap_p2p_comm ................................ False
+  override_opt_param_scheduler .................... False
+  params_dtype .................................... torch.float16
+  patch_dim ....................................... 16
+  perform_initialization .......................... True
+  pipeline_model_parallel_size .................... 12
+  pipeline_model_parallel_split_rank .............. None
+  position_embedding_type ......................... learned_absolute
+  profile ......................................... False
+  profile_ranks ................................... [0]
+  profile_step_end ................................ 12
+  profile_step_start .............................. 10
+  query_in_block_prob ............................. 0.1
+  rampup_batch_size ............................... None
+  rank ............................................ 0
+  recompute_granularity ........................... None
+  recompute_method ................................ None
+  recompute_num_layers ............................ None
+  reset_attention_mask ............................ True
+  reset_position_ids .............................. True
+  retriever_report_topk_accuracies ................ []
+  retriever_score_scaling ......................... False
+  retriever_seq_length ............................ 256
+  retro_add_retriever ............................. False
+  retro_cyclic_train_iters ........................ None
+  retro_encoder_attention_dropout ................. 0.1
+  retro_encoder_hidden_dropout .................... 0.1
+  retro_encoder_layers ............................ 2
   retro_num_neighbors ............................. 2
   retro_num_retrieved_chunks ...................... 2
   retro_return_doc_ids ............................ False
@@ -5,8 +221,8 @@
   rotary_percent .................................. 1.0
   rotary_seq_len_interpolation_factor ............. None
   sample_rate ..................................... 1.0
-  save ............................................ None
-  save_interval ................................... None
+  save ............................................ /tmp/bitpipe_8gpu_test
+  save_interval ................................... 25
   scatter_gather_tensors_in_pipeline .............. True
   seed ............................................ 1234
   seq_length ...................................... 256
@@ -35,7 +251,7 @@
   train_samples ................................... None
   train_synthetic ................................. True
   transformer_impl ................................ local
-  transformer_pipeline_model_parallel_size ........ 4
+  transformer_pipeline_model_parallel_size ........ 12
   untie_embeddings_and_output_weights ............. False
   use_checkpoint_args ............................. False
   use_checkpoint_opt_param_scheduler .............. False
@@ -48,7 +264,7 @@
   use_rotary_position_embeddings .................. False
   valid_data_path ................................. None
   variable_seq_lengths ............................ False
-  virtual_pipeline_model_parallel_size ............ 2
+  virtual_pipeline_model_parallel_size ............ None
   vision_backbone_type ............................ vit
   vision_pretraining .............................. False
   vision_pretraining_type ......................... classify
@@ -57,560 +273,238 @@
   vocab_size ...................................... 1600
   weight_decay .................................... 0.01
   weight_decay_incr_style ......................... constant
-  world_size ...................................... 4
+  world_size ...................................... 12
 -------------------- end of arguments ---------------------
-setting number of micro-batches to constant 8
+setting number of micro-batches to constant 4
 > building NullTokenizer tokenizer ...
  > padded vocab (size: 1601) with 63 dummy tokens (new size: 1664)
 > initializing torch distributed ...
-[Chimera BD Group] Rank 0 assigned to BD group 0: [0, 1]
-[Chimera BD Groups Summary] Total 2 BD groups created:
-[Chimera BD Groups Summary]   BD Group 0: [0, 1]
-[Chimera BD Groups Summary]   BD Group 1: [3, 2]
 > initialized tensor model parallel with size 1
-> initialized pipeline model parallel with size 4
+> initialized pipeline model parallel with size 12
 > setting random seeds to 1234 ...
 > compiling dataset index builder ...
 make: Entering directory '/root/Bitpipe/megatron/data'
 make: Nothing to be done for 'default'.
 make: Leaving directory '/root/Bitpipe/megatron/data'
->>> done with dataset index builder. Compilation time: 0.059 seconds
+>>> done with dataset index builder. Compilation time: 0.061 seconds
 > compiling and loading fused kernels ...
-[Chimera BD Group] Rank 1 assigned to BD group 0: [0, 1]
-[Chimera BD Group] Rank 2 assigned to BD group 1: [3, 2]
-[Chimera BD Group] Rank 3 assigned to BD group 1: [3, 2]
->>> done with compiling and loading fused kernels. Compilation time: 0.502 seconds
-/root/Bitpipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/wor
-k/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
-  output = bias_gelu(bias, input)
-/root/Bitpipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/wor
-k/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
-  output = bias_gelu(bias, input)
-/root/Bitpipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/wor
-k/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
-  output = bias_gelu(bias, input)
-/root/Bitpipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/wor
-k/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
-  output = bias_gelu(bias, input)
-/root/Bitpipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dty
-pe=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
-  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
-/root/Bitpipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dty
-pe=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
-  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
-/root/Bitpipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dty
-pe=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
-  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
-/root/Bitpipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dty
-pe=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
-  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
-time to initialize megatron (seconds): 3.653
-[SETUP DEBUG] Rank 1 passed barrier A (after megatron init)[after megatron is initialized] datetime: 2026-03-24 00:31:57
-
-[SETUP DEBUG] Rank 0 passed barrier A (after megatron init)
-[SETUP DEBUG] Rank 1 reaching barrier B (model-setup timer start)
-[SETUP DEBUG] Rank 3 passed barrier A (after megatron init)[SETUP DEBUG] Rank 0 reaching barrier B (model-setup timer start)
-
-[SETUP DEBUG] Rank 3 reaching barrier B (model-setup timer start)
-[SETUP DEBUG] Rank 2 passed barrier A (after megatron init)
-[SETUP DEBUG] Rank 2 reaching barrier B (model-setup timer start)
-[SETUP DEBUG] Rank 1 passed barrier B
-[SETUP DEBUG] Rank 3 passed barrier B
-[SETUP DEBUG] Rank 2 passed barrier B[VR_INIT] Chimera 2-VR | Device 3 | VR 0 | pre_process=False | post_process=True
-
-[SETUP DEBUG] Rank 0 passed barrier B
-[VR_INIT] Chimera 2-VR | Device 1 | VR 0 | pre_process=False | post_process=False
-[VR_INIT] Chimera 2-VR | Device 2 | VR 0 | pre_process=False | post_process=False
-[VR_INIT] Chimera 2-VR | Device 0 | VR 0 | pre_process=True  | post_process=False
-Building BitPipe GPT model ...
-[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
-[LAYER_CALC] Result: Each device gets 16 base layers
-[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
-[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
-[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
-[LAYER_CALC] Result: Each device gets 16 base layers
-[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
-[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
-[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
-[LAYER_CALC] Result: Each device gets 16 base layers
-[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
-[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
-[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
-[LAYER_CALC] Result: Each device gets 16 base layers
-[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
-[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
-[CHIMERA OFFSET] Device 0 - Input:
-  self.num_layers = 16 (total for both VRs, will be used for offset calc)
-  VR = 0
-  pipeline_size = 4
-[CHIMERA OFFSET] Device 0 | VR 0 | Layers: 16 | Offset: 0 (0-based) → Creating layers [1..16] (1-based)
-[CHIMERA OFFSET] Device 1 | VR 0 | Layers: 16 | Offset: 16 (0-based) → Creating layers [17..32] (1-based)
-[CHIMERA OFFSET] Device 3 | VR 0 | Layers: 16 | Offset: 48 (0-based) → Creating layers [49..64] (1-based)
-[CHIMERA OFFSET] Device 2 | VR 0 | Layers: 16 | Offset: 32 (0-based) → Creating layers [33..48] (1-based)
-[BITPIPE LOG] Device 0 | Virtual Rank 0 | Created layers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-[BITPIPE LOG] Device 3 | Virtual Rank 0 | Created layers: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
-[BITPIPE LOG] Device 2 | Virtual Rank 0 | Created layers: [33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48]
-[VR_INIT] Chimera 2-VR | Device 2 | VR 1 | pre_process=False | post_process=False
-[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
-[LAYER_CALC] Result: Each device gets 16 base layers
-[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
-[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
-[BITPIPE LOG] Device 1 | Virtual Rank 0 | Created layers: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
-[VR_INIT] Chimera 2-VR | Device 1 | VR 1 | pre_process=False | post_process=False
-[CHIMERA OFFSET] Device 2 | VR 1 | Layers: 16 | Offset: 16 (0-based) → Creating layers [17..32] (1-based)
-[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
-[LAYER_CALC] Result: Each device gets 16 base layers
-[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
-[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
-[CHIMERA OFFSET] Device 1 | VR 1 | Layers: 16 | Offset: 32 (0-based) → Creating layers [33..48] (1-based)
-[BITPIPE LOG] Device 2 | Virtual Rank 1 | Created layers: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
-[BITPIPE LOG] Device 1 | Virtual Rank 1 | Created layers: [33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48]
- > number of parameters on (tensor, pipeline) model parallel rank (0, 2): 88673280
- > number of parameters on (tensor, pipeline) model parallel rank (0, 1): 88673280
-[VR_INIT] Chimera 2-VR | Device 3 | VR 1 | pre_process=True  | post_process=False
-[VR_INIT] Chimera 2-VR | Device 0 | VR 1 | pre_process=False | post_process=True
-Building BitPipe GPT model ...
-[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
-[LAYER_CALC] Result: Each device gets 16 base layers
-[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
-[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
-[CHIMERA OFFSET] Device 0 - Input:
-  self.num_layers = 16 (total for both VRs, will be used for offset calc)
-  VR = 1
-  pipeline_size = 4
-[CHIMERA OFFSET] Device 0 | VR 1 | Layers: 16 | Offset: 48 (0-based) → Creating layers [49..64] (1-based)
-[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
-[LAYER_CALC] Result: Each device gets 16 base layers
-[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
-[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
-[CHIMERA OFFSET] Device 3 | VR 1 | Layers: 16 | Offset: 0 (0-based) → Creating layers [1..16] (1-based)
-[BITPIPE LOG] Device 0 | Virtual Rank 1 | Created layers: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
- > number of parameters on (tensor, pipeline) model parallel rank (0, 0): 90517440
-[BITPIPE LOG] Device 3 | Virtual Rank 1 | Created layers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
- > number of parameters on (tensor, pipeline) model parallel rank (0, 3): 90517440
-[SETUP DEBUG] Rank 2 finished setup_model_and_optimizer
-[SETUP DEBUG] Rank 2 reaching barrier C (after model built)
-[SETUP DEBUG] Rank 3 finished setup_model_and_optimizer
-[SETUP DEBUG] Rank 3 reaching barrier C (after model built)
-> learning rate decay style: cosine
-[SETUP DEBUG] Rank 0 finished setup_model_and_optimizer
-[SETUP DEBUG] Rank 1 finished setup_model_and_optimizer
-[SETUP DEBUG] Rank 0 reaching barrier C (after model built)
-[SETUP DEBUG] Rank 1 reaching barrier C (after model built)
-[after model, optimizer, and learning rate scheduler are built] datetime: 2026-03-24 00:31:58
-[SETUP DEBUG] Rank 0 passed barrier C
-[SETUP DEBUG] Rank 2 passed barrier C[SETUP DEBUG] Rank 1 passed barrier C
-
-[SETUP DEBUG] Rank 0 reaching barrier D (data-iterators timer start)
-[SETUP DEBUG] Rank 3 passed barrier C
-[SETUP DEBUG] Rank 1 reaching barrier D (data-iterators timer start)[SETUP DEBUG] Rank 2 reaching barrier D (data-iterators timer start)
-
-[SETUP DEBUG] Rank 3 reaching barrier D (data-iterators timer start)
-[SETUP DEBUG] Rank 0 passed barrier D[SETUP DEBUG] Rank 1 passed barrier D
-
-[SETUP DEBUG] Rank 2 passed barrier D
-> building train, validation, and test datasets ...
- > datasets target sizes (minimum size):[SETUP DEBUG] Rank 3 passed barrier D
-
-    train:      192
-    validation: 64
-    test:       64
-> building dummy datasets for BitPipe...
-> created dummy datasets: train=192, valid=64, test=64
-> building train, validation, and test datasets ...
- > datasets target sizes (minimum size):
-    train:      192
-    validation: 64
-    test:       64
-> building dummy datasets for BitPipe...
-> created dummy datasets: train=192, valid=64, test=64
-[SETUP DEBUG] Rank 1 reaching barrier E (after dataloaders)
-[SETUP DEBUG] Rank 0 reaching barrier E (after dataloaders)
-[SETUP DEBUG] Rank 3 reaching barrier E (after dataloaders)
-[SETUP DEBUG] Rank 2 reaching barrier E (after dataloaders)
-[after dataloaders are built] datetime: 2026-03-24 00:31:58 [SETUP DEBUG] Rank 1 passed barrier E
-
-[SETUP DEBUG] Rank 3 passed barrier E[SETUP DEBUG] Rank 1 reaching barrier F (timers.log)
-[SETUP DEBUG] Rank 0 passed barrier E
-
-[SETUP DEBUG] Rank 3 reaching barrier F (timers.log)done with setup ...
-
-[SETUP DEBUG] Rank 0 reaching barrier F (timers.log)
-[SETUP DEBUG] Rank 2 passed barrier E
-[SETUP DEBUG] Rank 2 reaching barrier F (timers.log)
-[SETUP DEBUG] Rank 0 passed barrier F — entering training loop
-training ...
-(min, max) time across ranks (ms):
-    model-and-optimizer-setup ......................: (557.55, 632.60)
-    train/valid/test-data-iterators-setup ..........: (326.51, 404.38)
-[SETUP DEBUG] Rank 3 passed barrier F — entering training loop
-[SETUP DEBUG] Rank 2 passed barrier F — entering training loop
-[SETUP DEBUG] Rank 1 passed barrier F — entering training loop
-[before the start of training step] datetime: 2026-03-24 00:31:58
-[DEBUG] Chimera 2-VR schedule ENABLED[DEBUG] Chimera 2-VR schedule ENABLED
-
-[Chimera G1/P3]  Chimera Config: pipeline_size=4, rank=3[Chimera G0/P0]  Chimera Config: pipeline_size=4, rank=0
-
-[Chimera G0/P0]  Microbatches: user=8, total=8 (NO doubling)[Chimera G1/P3]  Microbatches: user=8, total=8 (NO doubling)
-
-[Chimera G0/P0]  [PHASE CALC] warmup=2, 1f1b=6, cooldown=3[Chimera G1/P3]  [PHASE CALC] warmup=2, 1f1b=6, cooldown=3
-
-[DEBUG] Chimera 2-VR schedule ENABLED
-[Chimera G1/P3]  Forward schedule: [2, 3, 0, 1, 6, 7, 4, 5]
-[Chimera G1/P3]  Backward schedule: [0, 1, 2, 3, 4, 5, 6, 7, -1][Chimera G0/P0]  Forward schedule: [0, 1, 2, 3, 4, 5, 6, 7]
-
-[Chimera G1/P3]  [INIT] Rank 3/4 ready for execution[Chimera G0/P0]  Backward schedule: [2, 3, 0, 1, 6, 7, 4, 5, -1]
-
-[Chimera G0/P0]  [INIT] Rank 0/4 ready for execution
-[DEBUG] Chimera 2-VR schedule ENABLED
-[Chimera G1/P3]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
-[Chimera G1/P3]  Forward schedule: [2, 3, 0, 1, 6, 7, 4, 5]
-[Chimera G0/P0]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
-[Chimera G1/P3]  Backward schedule: [0, 1, 2, 3, 4, 5, 6, 7, -1]
-[Chimera G0/P0]  Forward schedule: [0, 1, 2, 3, 4, 5, 6, 7]
-[Chimera G3/P1]  Chimera Config: pipeline_size=4, rank=1[Chimera G0/P0]  Backward schedule: [2, 3, 0, 1, 6, 7, 4, 5, -1][Chimera G1/P3]  === WARMUP PHASE (2 forwards) ===
-
-
-[Chimera G0/P0]  === WARMUP PHASE (2 forwards) ===[Chimera G1/P3]  [PRE-RECV] Rank3 is first stage for VR1, no pre-recv needed[Chimera G3/P1]  Microbatches: user=8, total=8 (NO
- doubling)
-
-
-[Chimera G0/P0]  [PRE-RECV] Rank0 is first stage for VR0, no pre-recv needed[Chimera G1/P3]  [WARMUP k=0] FWD MB2, VR1
-
-[Chimera G3/P1]  [PHASE CALC] warmup=3, 1f1b=5, cooldown=4
-[Chimera G1/P3]  [Rank3] First stage for VR1 - no input needed
-[Chimera G2/P2]  Chimera Config: pipeline_size=4, rank=2[Chimera G0/P0]  [WARMUP k=0] FWD MB0, VR0
-
-[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>]
-[Chimera G0/P0]  [Rank0] First stage for VR0 - no input needed[Chimera G2/P2]  Microbatches: user=8, total=8 (NO doubling)[Chimera G3/P1]  Forward schedule: [0, 2, 1, 3, 4, 6,
-5, 7]
-
-
-[forward_step] set_input_tensor done
-[Chimera G3/P1]  Backward schedule: [2, 0, 3, 1, 6, 4, 7, 5, -1]
-[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>][Chimera G3/P1]  [INIT] Rank 1/4 ready for execution
-
-[Chimera G2/P2]  [PHASE CALC] warmup=3, 1f1b=5, cooldown=4
-[forward_step] set_input_tensor done
-[Chimera G3/P1]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===[Chimera G2/P2]  Forward schedule: [2, 0, 3, 1, 6, 4, 7, 5]
-
-[Chimera G2/P2]  Backward schedule: [0, 2, 1, 3, 4, 6, 5, 7, -1]
-[Chimera G3/P1]  Forward schedule: [0, 2, 1, 3, 4, 6, 5, 7]
-[Chimera G2/P2]  [INIT] Rank 2/4 ready for execution
-[Chimera G3/P1]  Backward schedule: [2, 0, 3, 1, 6, 4, 7, 5, -1]
-[Chimera G3/P1]  === WARMUP PHASE (3 forwards) ===
-[Chimera G3/P1]  [PRE-RECV] Rank1 receiving VR0 input from prev rank
-[Chimera G2/P2]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
-[Chimera G2/P2]  Forward schedule: [2, 0, 3, 1, 6, 4, 7, 5]
-[Chimera G2/P2]  Backward schedule: [0, 2, 1, 3, 4, 6, 5, 7, -1]
-[Chimera G2/P2]  === WARMUP PHASE (3 forwards) ===
-[P2P ACTUAL] R3: recv←R0[Chimera G2/P2]  [PRE-RECV] Rank2 receiving VR1 input from next rank
-
-[P2P ACTUAL] R2: recv←R1
-[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
-[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
-[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Chimera G1/P3]  [WARMUP STORE] Rank3 MB2, VR1: input_id=None, output_id=140009158284672
-[Chimera G1/P3]  [Rank3] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
-[Chimera G1/P3]  [Rank3] Send only VR1
-[P2P ACTUAL] R1: send→R2
-[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
-[Chimera G0/P0]  [WARMUP STORE] Rank0 MB0, VR0: input_id=None, output_id=139692674085440
-[Chimera G0/P0]  [Rank0] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
-[Chimera G0/P0]  [Rank0] Send only VR0
-[P2P ACTUAL] R0: send→R3
-[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
-[Chimera G1/P3]  [Rank3] Sent VR1
-[Chimera G2/P2]  [PRE-RECV] Rank2 received initial input for VR1
-[Chimera G1/P3]  [WARMUP k=1] FWD MB3, VR1
-[Chimera G1/P3]  [Rank3] First stage for VR1 - no input needed
-[Chimera G2/P2]  [WARMUP k=0] FWD MB2, VR1
-[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB2, VR1 (queue_len=1)[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class
- 'NoneType'>]
-
-[forward_step] set_input_tensor done
-[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
-[forward_step] set_input_tensor done
-[Chimera G0/P0]  [Rank0] Sent VR0
-[Chimera G3/P1]  [PRE-RECV] Rank1 received initial input for VR0[Chimera G0/P0]  [WARMUP k=1] FWD MB1, VR0
-
-[Chimera G0/P0]  [Rank0] First stage for VR0 - no input needed
-[Chimera G3/P1]  [WARMUP k=0] FWD MB0, VR0
-[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>]
-[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB0, VR0 (queue_len=1)
-[forward_step] set_input_tensor done
-[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
-[forward_step] set_input_tensor done
-[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Chimera G1/P3]  [WARMUP STORE] Rank3 MB3, VR1: input_id=None, output_id=140009158402000
-[Chimera G1/P3]  [Rank3] Stored output for MB3, VR1 (input_queue=2, output_queue=2)
-[Chimera G1/P3]  [Rank3] Combined send VR1 + recv VR0
-[P2P ACTUAL] R1: send→R2, recv←R2
-[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
-[Chimera G0/P0]  [WARMUP STORE] Rank0 MB1, VR0: input_id=None, output_id=139692674170320
-[Chimera G0/P0]  [Rank0] Stored output for MB1, VR0 (input_queue=2, output_queue=2)
-[Chimera G0/P0]  [Rank0] Combined send VR0 + recv VR1
-[P2P ACTUAL] R0: send→R3, recv←R3
-[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
-[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Chimera G2/P2]  [WARMUP STORE] Rank2 MB2, VR1: input_id=139647273548064, output_id=139647138664416
-[Chimera G2/P2]  [Rank2] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
-[Chimera G2/P2]  [Rank2] Combined send VR1 + recv VR0
-[P2P ACTUAL] R2: send→R3, recv←R3
-[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
-[Chimera G3/P1]  [WARMUP STORE] Rank1 MB0, VR0: input_id=139949626976320, output_id=139949294832992
-[Chimera G3/P1]  [Rank1] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
-[Chimera G3/P1]  [Rank1] Combined send VR0 + recv VR1
-[P2P ACTUAL] R3: send→R2, recv←R2
-[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
-[Chimera G2/P2]  [Rank2] Sent VR1, received VR0 input
-[Chimera G2/P2]  [WARMUP k=1] FWD MB0, VR0
-[Chimera G3/P1]  [Rank1] Sent VR0, received VR1 input[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB0, VR0 (queue_len=1)
-
-[Chimera G3/P1]  [WARMUP k=1] FWD MB2, VR1[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
-
-[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB2, VR1 (queue_len=1)
-[forward_step] set_input_tensor done
-[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
-[forward_step] set_input_tensor done
-[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Chimera G2/P2]  [WARMUP STORE] Rank2 MB0, VR0: input_id=139647952182528, output_id=139647138764880
-[Chimera G2/P2]  [Rank2] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
-[Chimera G2/P2]  [Rank2] Combined send VR0 + recv VR1
-[P2P ACTUAL] R2: send→R1, recv←R1
-[Chimera G3/P1]  [WARMUP STORE] Rank1 MB2, VR1: input_id=139949296451264, output_id=139949294933456
-[Chimera G3/P1]  [Rank1] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
-[Chimera G3/P1]  [Rank1] Combined send VR1 + recv VR0
-[P2P ACTUAL] R3: send→R0, recv←R0
-[Chimera G1/P3]  [Rank3] Sent VR1, received VR0 input
-[Chimera G2/P2]  [Rank2] Sent VR0, received VR1 input
-[Chimera G1/P3]  [WARMUP DONE] Processed 2 forwards, fwd_idx now at 2
-[Chimera G2/P2]  [WARMUP k=2] FWD MB3, VR1
-[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB3, VR1 (queue_len=2)[Chimera G1/P3]  === 1F1B PHASE (n_loop=1, unit_remaining=2 pairs/chunk) ===
-
-[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
-[Chimera G1/P3]  [1F1B k=0] FWD MB0, VR0[forward_step] set_input_tensor done
-
-[Chimera G1/P3]  [Rank3] Accessing pre-received input for MB0, VR0 (queue_len=1)
-[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
-[forward_step] set_input_tensor done
-[Chimera G0/P0]  [Rank0] Sent VR0, received VR1 input
-[Chimera G0/P0]  [WARMUP DONE] Processed 2 forwards, fwd_idx now at 2
-[Chimera G0/P0]  === 1F1B PHASE (n_loop=1, unit_remaining=2 pairs/chunk) ===
-[Chimera G3/P1]  [Rank1] Sent VR1, received VR0 input[Chimera G0/P0]  [1F1B k=0] FWD MB2, VR1
-
-[Chimera G0/P0]  [Rank0] Accessing pre-received input for MB2, VR1 (queue_len=1)
-[Chimera G3/P1]  [WARMUP k=2] FWD MB1, VR0
-[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>][Chimera G3/P1]  [Rank1] Accessing pre-received input for MB1,
-VR0 (queue_len=2)
-
-[forward_step] set_input_tensor done
-[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
-[forward_step] set_input_tensor done
-[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Chimera G2/P2]  [WARMUP STORE] Rank2 MB3, VR1: input_id=139647138445680, output_id=139647138865824
-[Chimera G2/P2]  [Rank2] Stored output for MB3, VR1 (input_queue=2, output_queue=2)
-[Chimera G2/P2]  [Rank2] Combined send VR1 + recv VR0
-[P2P ACTUAL] R2: send→R3, recv←R3
-[Chimera G3/P1]  [WARMUP STORE] Rank1 MB1, VR0: input_id=139949296877008, output_id=139949295034880
-[Chimera G3/P1]  [Rank1] Stored output for MB1, VR0 (input_queue=2, output_queue=2)
-[Chimera G3/P1]  [Rank1] Combined send VR0 + recv VR1
-[P2P ACTUAL] R3: send→R2, recv←R2
-[Chimera G2/P2]  [Rank2] Sent VR1, received VR0 input
-[Chimera G2/P2]  [WARMUP DONE] Processed 3 forwards, fwd_idx now at 3
-[Chimera G2/P2]  === 1F1B PHASE (n_loop=1, unit_remaining=1 pairs/chunk) ===
-[Chimera G2/P2]  [1F1B k=0] FWD MB1, VR0
-[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB1, VR0 (queue_len=2)
-[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
-[Chimera G3/P1]  [Rank1] Sent VR0, received VR1 input
-[forward_step] set_input_tensor done
-[Chimera G3/P1]  [WARMUP DONE] Processed 3 forwards, fwd_idx now at 3
-[Chimera G3/P1]  === 1F1B PHASE (n_loop=1, unit_remaining=1 pairs/chunk) ===
-[Chimera G3/P1]  [1F1B k=0] FWD MB3, VR1
-[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB3, VR1 (queue_len=2)
-[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
-[forward_step] set_input_tensor done
-[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Chimera G2/P2]  [Rank2] Stored output for MB1, VR0 (input_queue=2, output_queue=2)
-[Chimera G2/P2]  [Rank2] Combined send_fwd VR0 + recv_bwd VR0
-[Chimera G2/P2]  [GRAD TRACK] Rank2 sending FWD_MB1, VR0, will queue received gradient for BWD_MB0, VR0
-[P2P ACTUAL] R2: send→R1, recv←R1
-[Chimera G3/P1]  [Rank1] Stored output for MB3, VR1 (input_queue=2, output_queue=2)
-[Chimera G3/P1]  [Rank1] Combined send_fwd VR1 + recv_bwd VR1
-[Chimera G3/P1]  [GRAD TRACK] Rank1 sending FWD_MB3, VR1, will queue received gradient for BWD_MB2, VR1
-[P2P ACTUAL] R3: send→R0, recv←R0
-[Chimera G0/P0]  [Rank0] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
-[Chimera G0/P0]  [Rank0] Last stage for VR1 - loss collected by forward_step
-[Chimera G0/P0]  [Rank0] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
-[Chimera G0/P0]  [1F1B k=0] BWD MB2, VR1
-[Chimera G0/P0]  [1F1B RETRIEVE] Rank0 MB2, VR1: retrieved input_id=139693006303328, output_id=139692674352848
-[Chimera G0/P0]  [GRAD TRACK] Rank0 popped gradient for BWD_MB2, VR1, queue_before=1, queue_after=0
-[Chimera G0/P0]  [Rank0] Popped tensors and gradient for MB2, VR1
-[Chimera G0/P0]  [Rank0] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
-[Chimera G0/P0]  [Rank0] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7
-f0cbc354250>
-[Chimera G0/P0]  [GRAPH CHECK] Rank0: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
-[Chimera G0/P0]  [GRAPH CHECK] Rank0: Called retain_grad() on input_tensor
-[Chimera G0/P0]  [Rank0] CALLING backward_step for BWD_MB2, VR1
-[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
-[Chimera G1/P3]  [Rank3] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
-[Chimera G1/P3]  [Rank3] Last stage for VR0 - loss collected by forward_step
-[Chimera G1/P3]  [Rank3] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
-[Chimera G1/P3]  [1F1B k=0] BWD MB0, VR0
-[Chimera G1/P3]  [1F1B RETRIEVE] Rank3 MB0, VR0: retrieved input_id=140009158357248, output_id=140009158502464
-[Chimera G1/P3]  [GRAD TRACK] Rank3 popped gradient for BWD_MB0, VR0, queue_before=1, queue_after=0
-[Chimera G1/P3]  [Rank3] Popped tensors and gradient for MB0, VR0
-[Chimera G1/P3]  [Rank3] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
-[Chimera G1/P3]  [Rank3] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7
-f566c2033d0>
-[Chimera G1/P3]  [GRAPH CHECK] Rank3: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
-[Chimera G1/P3]  [GRAPH CHECK] Rank3: Called retain_grad() on input_tensor
-[Chimera G1/P3]  [Rank3] CALLING backward_step for BWD_MB0, VR0
-[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
-[Chimera G0/P0]  [Rank0] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 8, 480])
-[Chimera G0/P0]  [Rank0] Backward step done for MB2, VR1
-[Chimera G0/P0]  [GRAD TRACK] Rank0 about to send gradient for BWD_MB2, VR1
-[Chimera G0/P0]  [Rank0] Combined send_bwd VR1 + recv_fwd VR1
-[P2P ACTUAL] R0: send→R3, recv←R3
-[Chimera G1/P3]  [Rank3] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 8, 480])
-[Chimera G1/P3]  [Rank3] Backward step done for MB0, VR0
-[Chimera G1/P3]  [GRAD TRACK] Rank3 about to send gradient for BWD_MB0, VR0
-[Chimera G1/P3]  [Rank3] Combined send_bwd VR0 + recv_fwd VR0
-[P2P ACTUAL] R1: send→R2, recv←R2
-[Chimera G0/P0]  [Rank0] Sent bwd grad, received next fwd input for VR1
-[Chimera G0/P0]  [1F1B k=1] FWD MB3, VR1
-[Chimera G0/P0]  [Rank0] Accessing pre-received input for MB3, VR1 (queue_len=1)
-[Chimera G3/P1]  [GRAD TRACK] Rank1 received gradient (from some MB's backward), queued for BWD_MB2, VR1, queue_len=1[forward_step] Calling set_input_tensor with: type=<class '
-list'>, is_list=True, content=[<class 'torch.Tensor'>]
-
-[Chimera G3/P1]  [Rank1] Sent fwd, received bwd grad, queued for VR1
-[forward_step] set_input_tensor done
-[Chimera G3/P1]  [1F1B k=0] BWD MB2, VR1
-[Chimera G3/P1]  [1F1B RETRIEVE] Rank1 MB2, VR1: retrieved input_id=139949296451264, output_id=139949294933456
-[Chimera G3/P1]  [GRAD TRACK] Rank1 popped gradient for BWD_MB2, VR1, queue_before=1, queue_after=0
-[Chimera G3/P1]  [Rank1] Popped tensors and gradient for MB2, VR1
-[Chimera G3/P1]  [Rank1] 1F1B BEFORE BWD: output_tensor_grad is None? False, shape=torch.Size([256, 8, 480]), bwd_is_grad_first=False
-[Chimera G3/P1]  [Rank1] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<CppFunction object at 0x7f
-487c1d24a0>
-[Chimera G3/P1]  [GRAPH CHECK] Rank1: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
-[Chimera G3/P1]  [GRAPH CHECK] Rank1: Called retain_grad() on input_tensor
-[Chimera G3/P1]  [Rank1] CALLING backward_step for BWD_MB2, VR1
-[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=983040, will_use_custom_backward=False
-[Chimera G1/P3]  [Rank3] Sent bwd grad, received next fwd input for VR0
-[Chimera G1/P3]  [1F1B k=1] FWD MB1, VR0
-[Chimera G1/P3]  [Rank3] Accessing pre-received input for MB1, VR0 (queue_len=1)[Chimera G2/P2]  [GRAD TRACK] Rank2 received gradient (from some MB's backward), queued for BWD_
-MB0, VR0, queue_len=1
-
-[Chimera G2/P2]  [Rank2] Sent fwd, received bwd grad, queued for VR0
-[Chimera G2/P2]  [1F1B k=0] BWD MB0, VR0
-[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
-[Chimera G2/P2]  [1F1B RETRIEVE] Rank2 MB0, VR0: retrieved input_id=139647952182528, output_id=139647138764880
-[forward_step] set_input_tensor done
-[Chimera G2/P2]  [GRAD TRACK] Rank2 popped gradient for BWD_MB0, VR0, queue_before=1, queue_after=0
-[Chimera G2/P2]  [Rank2] Popped tensors and gradient for MB0, VR0
-[Chimera G2/P2]  [Rank2] 1F1B BEFORE BWD: output_tensor_grad is None? False, shape=torch.Size([256, 8, 480]), bwd_is_grad_first=False
-[Chimera G2/P2]  [Rank2] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<CppFunction object at 0x7f
-02221471c0>
-[Chimera G2/P2]  [GRAPH CHECK] Rank2: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
-[Chimera G2/P2]  [GRAPH CHECK] Rank2: Called retain_grad() on input_tensor
-[Chimera G2/P2]  [Rank2] CALLING backward_step for BWD_MB0, VR0
-[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=983040, will_use_custom_backward=False
-[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
-[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
-[Chimera G0/P0]  [Rank0] Stored output for MB3, VR1 (input_queue=1, output_queue=1)
-[Chimera G0/P0]  [Rank0] Last stage for VR1 - loss collected by forward_step
-[Chimera G0/P0]  [Rank0] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
-[Chimera G0/P0]  [1F1B k=1] BWD MB3, VR1
-[Chimera G0/P0]  [1F1B RETRIEVE] Rank0 MB3, VR1: retrieved input_id=139692673689424, output_id=139692674361568
-[Chimera G0/P0]  [GRAD TRACK] Rank0 popped gradient for BWD_MB3, VR1, queue_before=1, queue_after=0
-[Chimera G0/P0]  [Rank0] Popped tensors and gradient for MB3, VR1
-[Chimera G0/P0]  [Rank0] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
-[Chimera G0/P0]  [Rank0] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7
-f0cbc357010>
-[Chimera G0/P0]  [GRAPH CHECK] Rank0: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
-[Chimera G0/P0]  [GRAPH CHECK] Rank0: Called retain_grad() on input_tensor
-[Chimera G0/P0]  [Rank0] CALLING backward_step for BWD_MB3, VR1
-[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
-[Chimera G1/P3]  [Rank3] Stored output for MB1, VR0 (input_queue=1, output_queue=1)
-[Chimera G1/P3]  [Rank3] Last stage for VR0 - loss collected by forward_step
-[Chimera G1/P3]  [Rank3] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
-[Chimera G1/P3]  [1F1B k=1] BWD MB1, VR0
-[Chimera G1/P3]  [1F1B RETRIEVE] Rank3 MB1, VR0: retrieved input_id=140009157948608, output_id=140009158642480
-[Chimera G1/P3]  [GRAD TRACK] Rank3 popped gradient for BWD_MB1, VR0, queue_before=1, queue_after=0
-[Chimera G1/P3]  [Rank3] Popped tensors and gradient for MB1, VR0
-[Chimera G1/P3]  [Rank3] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
-[Chimera G1/P3]  [Rank3] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7
-f566c203b20>
-[Chimera G1/P3]  [GRAPH CHECK] Rank3: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
-[Chimera G1/P3]  [GRAPH CHECK] Rank3: Called retain_grad() on input_tensor
-[Chimera G1/P3]  [Rank3] CALLING backward_step for BWD_MB1, VR0
-[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
-[Chimera G0/P0]  [Rank0] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 8, 480])
-[Chimera G0/P0]  [Rank0] Backward step done for MB3, VR1
-[Chimera G0/P0]  [GRAD TRACK] Rank0 about to send gradient for BWD_MB3, VR1
-[Chimera G0/P0]  [Rank0] MINI-BRIDGE: send VR1 + recv VR0 grad (MB0)
-[Chimera P2P Rank 0] chimera_communicate: send_next + recv_next
-[P2P ACTUAL] R0: send→R3, recv←R3
-[Chimera G1/P3]  [Rank3] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 8, 480])
-[Chimera G1/P3]  [Rank3] Backward step done for MB1, VR0
-[Chimera G1/P3]  [GRAD TRACK] Rank3 about to send gradient for BWD_MB1, VR0
-[Chimera G1/P3]  [Rank3] MINI-BRIDGE: send VR0 + recv VR1 grad (MB2)
-[Chimera P2P Rank 1] chimera_communicate: send_prev + recv_prev
-[P2P ACTUAL] R1: send→R2, recv←R2
-[Chimera G2/P2]  [Rank2] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 8, 480])
-[Chimera G2/P2]  [Rank2] Backward step done for MB0, VR0
-[Chimera G2/P2]  [GRAD TRACK] Rank2 about to send gradient for BWD_MB0, VR0
-[Chimera G2/P2]  [Rank2] Combined send_bwd VR0 + recv_fwd VR1
-[P2P ACTUAL] R2: send→R3, recv←R1
-[Chimera G3/P1]  [Rank1] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 8, 480])
-[Chimera G3/P1]  [Rank1] Backward step done for MB2, VR1
-[Chimera G3/P1]  [GRAD TRACK] Rank1 about to send gradient for BWD_MB2, VR1
-[Chimera G3/P1]  [Rank1] Combined send_bwd VR1 + recv_fwd VR0
-[P2P ACTUAL] R3: send→R2, recv←R0
-^C[2026-03-24 00:32:17,070] torch.distributed.elastic.agent.server.api: [WARNING] Received Signals.SIGINT death signal, shutting down workers
-[2026-03-24 00:32:17,071] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 2753 closing signal SIGINT
-[2026-03-24 00:32:17,071] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 2754 closing signal SIGINT
-[2026-03-24 00:32:17,072] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 2755 closing signal SIGINT
-[2026-03-24 00:32:17,072] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 2756 closing signal SIGINT
-^C[2026-03-24 00:32:18,852] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 2753 closing signal SIGTERM
-[2026-03-24 00:32:18,853] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 2754 closing signal SIGTERM
-[2026-03-24 00:32:18,854] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 2755 closing signal SIGTERM
-[2026-03-24 00:32:18,854] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 2756 closing signal SIGTERM
 Traceback (most recent call last):
-  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/elastic/agent/server/api.py", line 736, in run
-    result = self._invoke_run(role)
-  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/elastic/agent/server/api.py", line 877, in _invoke_run
-    time.sleep(monitor_interval)
-  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/elastic/multiprocessing/api.py", line 62, in _terminate_process_handler
-    raise SignalException(f"Process {os.getpid()} got signal: {sigval}", sigval=sigval)
-torch.distributed.elastic.multiprocessing.api.SignalException: Process 2741 got signal: 2
-
-During handling of the above exception, another exception occurred:
-
+  File "/root/Bitpipe/gpt_dummy.py", line 168, in <module>
+    pretrain(train_valid_test_datasets_provider,
+  File "/root/Bitpipe/megatron/training.py", line 91, in pretrain
+    initialize_megatron(extra_args_provider=extra_args_provider,
+  File "/root/Bitpipe/megatron/initialize.py", line 86, in initialize_megatron
+    _compile_dependencies()
+  File "/root/Bitpipe/megatron/initialize.py", line 150, in _compile_dependencies
+    torch.distributed.barrier()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3696, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1331, invalid usage (run wit
+h NCCL_DEBUG=WARN for details), NCCL version 2.18.5
+ncclInvalidUsage: This usually reflects invalid usage of NCCL library.
+Last error:
+Duplicate GPU detected : rank 11 and rank 3 both on CUDA device 42000
+Traceback (most recent call last):
+  File "/root/Bitpipe/gpt_dummy.py", line 168, in <module>
+    pretrain(train_valid_test_datasets_provider,
+  File "/root/Bitpipe/megatron/training.py", line 91, in pretrain
+    initialize_megatron(extra_args_provider=extra_args_provider,
+  File "/root/Bitpipe/megatron/initialize.py", line 86, in initialize_megatron
+    _compile_dependencies()
+  File "/root/Bitpipe/megatron/initialize.py", line 150, in _compile_dependencies
+    torch.distributed.barrier()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3696, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1331, invalid usage (run wit
+h NCCL_DEBUG=WARN for details), NCCL version 2.18.5
+ncclInvalidUsage: This usually reflects invalid usage of NCCL library.
+Last error:
+Duplicate GPU detected : rank 6 and rank 2 both on CUDA device 41000
+Traceback (most recent call last):
+  File "/root/Bitpipe/gpt_dummy.py", line 168, in <module>
+    pretrain(train_valid_test_datasets_provider,
+  File "/root/Bitpipe/megatron/training.py", line 91, in pretrain
+    initialize_megatron(extra_args_provider=extra_args_provider,
+  File "/root/Bitpipe/megatron/initialize.py", line 86, in initialize_megatron
+    _compile_dependencies()
+  File "/root/Bitpipe/megatron/initialize.py", line 150, in _compile_dependencies
+    torch.distributed.barrier()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3696, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1331, invalid usage (run wit
+h NCCL_DEBUG=WARN for details), NCCL version 2.18.5
+ncclInvalidUsage: This usually reflects invalid usage of NCCL library.
+Last error:
+Duplicate GPU detected : rank 7 and rank 3 both on CUDA device 42000
+Traceback (most recent call last):
+  File "/root/Bitpipe/gpt_dummy.py", line 168, in <module>
+    pretrain(train_valid_test_datasets_provider,
+  File "/root/Bitpipe/megatron/training.py", line 91, in pretrain
+    initialize_megatron(extra_args_provider=extra_args_provider,
+  File "/root/Bitpipe/megatron/initialize.py", line 86, in initialize_megatron
+    _compile_dependencies()
+  File "/root/Bitpipe/megatron/initialize.py", line 150, in _compile_dependencies
+    torch.distributed.barrier()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3696, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1331, invalid usage (run wit
+h NCCL_DEBUG=WARN for details), NCCL version 2.18.5
+ncclInvalidUsage: This usually reflects invalid usage of NCCL library.
+Last error:
+Duplicate GPU detected : rank 8 and rank 0 both on CUDA device 4000
+Traceback (most recent call last):
+  File "/root/Bitpipe/gpt_dummy.py", line 168, in <module>
+    pretrain(train_valid_test_datasets_provider,
+  File "/root/Bitpipe/megatron/training.py", line 91, in pretrain
+    initialize_megatron(extra_args_provider=extra_args_provider,
+  File "/root/Bitpipe/megatron/initialize.py", line 86, in initialize_megatron
+    _compile_dependencies()
+  File "/root/Bitpipe/megatron/initialize.py", line 150, in _compile_dependencies
+    torch.distributed.barrier()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3696, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1331, invalid usage (run wit
+h NCCL_DEBUG=WARN for details), NCCL version 2.18.5
+ncclInvalidUsage: This usually reflects invalid usage of NCCL library.
+Last error:
+Duplicate GPU detected : rank 5 and rank 1 both on CUDA device 21000
+Traceback (most recent call last):
+  File "/root/Bitpipe/gpt_dummy.py", line 168, in <module>
+    pretrain(train_valid_test_datasets_provider,
+  File "/root/Bitpipe/megatron/training.py", line 91, in pretrain
+    initialize_megatron(extra_args_provider=extra_args_provider,
+  File "/root/Bitpipe/megatron/initialize.py", line 86, in initialize_megatron
+    _compile_dependencies()
+  File "/root/Bitpipe/megatron/initialize.py", line 148, in _compile_dependencies
+    torch.distributed.barrier()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3696, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1331, invalid usage (run wit
+h NCCL_DEBUG=WARN for details), NCCL version 2.18.5
+ncclInvalidUsage: This usually reflects invalid usage of NCCL library.
+Last error:
+Duplicate GPU detected : rank 0 and rank 4 both on CUDA device 4000
+Traceback (most recent call last):
+  File "/root/Bitpipe/gpt_dummy.py", line 168, in <module>
+    pretrain(train_valid_test_datasets_provider,
+  File "/root/Bitpipe/megatron/training.py", line 91, in pretrain
+    initialize_megatron(extra_args_provider=extra_args_provider,
+  File "/root/Bitpipe/megatron/initialize.py", line 86, in initialize_megatron
+    _compile_dependencies()
+  File "/root/Bitpipe/megatron/initialize.py", line 150, in _compile_dependencies
+    torch.distributed.barrier()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3696, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1331, invalid usage (run wit
+h NCCL_DEBUG=WARN for details), NCCL version 2.18.5
+ncclInvalidUsage: This usually reflects invalid usage of NCCL library.
+Last error:
+Duplicate GPU detected : rank 10 and rank 2 both on CUDA device 41000
+Traceback (most recent call last):
+  File "/root/Bitpipe/gpt_dummy.py", line 168, in <module>
+    pretrain(train_valid_test_datasets_provider,
+  File "/root/Bitpipe/megatron/training.py", line 91, in pretrain
+    initialize_megatron(extra_args_provider=extra_args_provider,
+  File "/root/Bitpipe/megatron/initialize.py", line 86, in initialize_megatron
+    _compile_dependencies()
+  File "/root/Bitpipe/megatron/initialize.py", line 150, in _compile_dependencies
+    torch.distributed.barrier()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3696, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1331, invalid usage (run wit
+h NCCL_DEBUG=WARN for details), NCCL version 2.18.5
+ncclInvalidUsage: This usually reflects invalid usage of NCCL library.
+Last error:
+Duplicate GPU detected : rank 4 and rank 0 both on CUDA device 4000
+Traceback (most recent call last):
+  File "/root/Bitpipe/gpt_dummy.py", line 168, in <module>
+    pretrain(train_valid_test_datasets_provider,
+  File "/root/Bitpipe/megatron/training.py", line 91, in pretrain
+    initialize_megatron(extra_args_provider=extra_args_provider,
+  File "/root/Bitpipe/megatron/initialize.py", line 86, in initialize_megatron
+    _compile_dependencies()
+  File "/root/Bitpipe/megatron/initialize.py", line 150, in _compile_dependencies
+    torch.distributed.barrier()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3696, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1331, invalid usage (run wit
+h NCCL_DEBUG=WARN for details), NCCL version 2.18.5
+ncclInvalidUsage: This usually reflects invalid usage of NCCL library.
+Last error:
+Duplicate GPU detected : rank 3 and rank 7 both on CUDA device 42000
+Traceback (most recent call last):
+  File "/root/Bitpipe/gpt_dummy.py", line 168, in <module>
+    pretrain(train_valid_test_datasets_provider,
+  File "/root/Bitpipe/megatron/training.py", line 91, in pretrain
+    initialize_megatron(extra_args_provider=extra_args_provider,
+  File "/root/Bitpipe/megatron/initialize.py", line 86, in initialize_megatron
+    _compile_dependencies()
+  File "/root/Bitpipe/megatron/initialize.py", line 150, in _compile_dependencies
+    torch.distributed.barrier()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3696, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1331, invalid usage (run wit
+h NCCL_DEBUG=WARN for details), NCCL version 2.18.5
+ncclInvalidUsage: This usually reflects invalid usage of NCCL library.
+Last error:
+Duplicate GPU detected : rank 9 and rank 1 both on CUDA device 21000
+Traceback (most recent call last):
+  File "/root/Bitpipe/gpt_dummy.py", line 168, in <module>
+    pretrain(train_valid_test_datasets_provider,
+  File "/root/Bitpipe/megatron/training.py", line 91, in pretrain
+    initialize_megatron(extra_args_provider=extra_args_provider,
+  File "/root/Bitpipe/megatron/initialize.py", line 86, in initialize_megatron
+    _compile_dependencies()
+  File "/root/Bitpipe/megatron/initialize.py", line 150, in _compile_dependencies
+    torch.distributed.barrier()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3696, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1331, invalid usage (run wit
+h NCCL_DEBUG=WARN for details), NCCL version 2.18.5
+ncclInvalidUsage: This usually reflects invalid usage of NCCL library.
+Last error:
+Duplicate GPU detected : rank 1 and rank 5 both on CUDA device 21000
+Traceback (most recent call last):
+  File "/root/Bitpipe/gpt_dummy.py", line 168, in <module>
+    pretrain(train_valid_test_datasets_provider,
+  File "/root/Bitpipe/megatron/training.py", line 91, in pretrain
+    initialize_megatron(extra_args_provider=extra_args_provider,
+  File "/root/Bitpipe/megatron/initialize.py", line 86, in initialize_megatron
+    _compile_dependencies()
+  File "/root/Bitpipe/megatron/initialize.py", line 150, in _compile_dependencies
+    torch.distributed.barrier()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/distributed_c10d.py", line 3696, in barrier
+    work = default_pg.barrier(opts=opts)
+torch.distributed.DistBackendError: NCCL error in: /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1331, invalid usage (run wit
+h NCCL_DEBUG=WARN for details), NCCL version 2.18.5
+ncclInvalidUsage: This usually reflects invalid usage of NCCL library.
+Last error:
+Duplicate GPU detected : rank 2 and rank 6 both on CUDA device 41000
+[2026-03-31 04:19:01,310] torch.distributed.elastic.multiprocessing.api: [ERROR] failed (exitcode: 1) local_rank: 0 (pid: 7574) of binary: /opt/conda/bin/python
 Traceback (most recent call last):
   File "/opt/conda/bin/torchrun", line 33, in <module>
     sys.exit(load_entry_point('torch==2.1.0', 'console_scripts', 'torchrun')())
@@ -622,24 +516,99 @@ Traceback (most recent call last):
     elastic_launch(
   File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 134, in __call__
     return launch_agent(self._config, self._entrypoint, list(args))
-  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 255, in launch_agent
-    result = agent.run()
-  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/elastic/metrics/api.py", line 124, in wrapper
-    result = f(*args, **kwargs)
-  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/elastic/agent/server/api.py", line 743, in run
-    self._shutdown(e.sigval)
-  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/elastic/agent/server/local_elastic_agent.py", line 289, in _shutdown
-    self._pcontext.close(death_sig)
-  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/elastic/multiprocessing/api.py", line 331, in close
-    self._close(death_sig=death_sig, timeout=timeout)
-  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/elastic/multiprocessing/api.py", line 713, in _close
-    handler.proc.wait(time_to_wait)
-  File "/opt/conda/lib/python3.10/subprocess.py", line 1209, in wait
-    return self._wait(timeout=timeout)
-  File "/opt/conda/lib/python3.10/subprocess.py", line 1953, in _wait
-    time.sleep(delay)
-  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/elastic/multiprocessing/api.py", line 62, in _terminate_process_handler
-    raise SignalException(f"Process {os.getpid()} got signal: {sigval}", sigval=sigval)
-torch.distributed.elastic.multiprocessing.api.SignalException: Process 2741 got signal: 2
-root@C.33086586:~/Bitpipe$ tmux capture-pane -S -600 -p > output.txt
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 264, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError:
+============================================================
+gpt_dummy.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-03-31_04:19:01
+  host      : a59fb058e8fc
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 7575)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2026-03-31_04:19:01
+  host      : a59fb058e8fc
+  rank      : 2 (local_rank: 2)
+  exitcode  : 1 (pid: 7576)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[3]:
+  time      : 2026-03-31_04:19:01
+  host      : a59fb058e8fc
+  rank      : 3 (local_rank: 3)
+  exitcode  : 1 (pid: 7577)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[4]:
+  time      : 2026-03-31_04:19:01
+  host      : a59fb058e8fc
+  rank      : 4 (local_rank: 4)
+  exitcode  : 1 (pid: 7578)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[5]:
+  time      : 2026-03-31_04:19:01
+  host      : a59fb058e8fc
+  rank      : 5 (local_rank: 5)
+  exitcode  : 1 (pid: 7579)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[6]:
+  time      : 2026-03-31_04:19:01
+  host      : a59fb058e8fc
+  rank      : 6 (local_rank: 6)
+  exitcode  : 1 (pid: 7580)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[7]:
+  time      : 2026-03-31_04:19:01
+  host      : a59fb058e8fc
+  rank      : 7 (local_rank: 7)
+  exitcode  : 1 (pid: 7581)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[8]:
+  time      : 2026-03-31_04:19:01
+  host      : a59fb058e8fc
+  rank      : 8 (local_rank: 8)
+  exitcode  : 1 (pid: 7582)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[9]:
+  time      : 2026-03-31_04:19:01
+  host      : a59fb058e8fc
+  rank      : 9 (local_rank: 9)
+  exitcode  : 1 (pid: 7583)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[10]:
+  time      : 2026-03-31_04:19:01
+  host      : a59fb058e8fc
+  rank      : 10 (local_rank: 10)
+  exitcode  : 1 (pid: 7584)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[11]:
+  time      : 2026-03-31_04:19:01
+  host      : a59fb058e8fc
+  rank      : 11 (local_rank: 11)
+  exitcode  : 1 (pid: 7585)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-03-31_04:19:01
+  host      : a59fb058e8fc
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 7574)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+root@C.33086586:~/Bitpipe$ tmux capture-pane -pS -600 > output.txt
 
