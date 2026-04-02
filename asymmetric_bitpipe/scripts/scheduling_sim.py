@@ -263,7 +263,16 @@ class ChimeraScheduler:
         Pattern:
         - Backward is derived from the paired rank's forward schedule
         - Paired rank = num_devices - 1 - current_rank
-        - Add sync markers (-1) at specific positions
+        - Single sync marker at the very end (all ranks sync together)
+
+        All ranks complete all backward passes before allreduce, eliminating
+        the timing asymmetry deadlock from the old 2-marker design.
+
+        Expected output for 4 devices, 4 MBs:
+          Rank 0: [2, 3, 0, 1, -1]
+          Rank 1: [2, 0, 3, 1, -1]
+          Rank 2: [0, 2, 1, 3, -1]
+          Rank 3: [0, 1, 2, 3, -1]
 
         Args:
             pipeline_parallel_rank: Current device rank (0 to num_devices-1)
@@ -271,26 +280,15 @@ class ChimeraScheduler:
         Returns:
             List of microbatch IDs + sync markers in execution order
         """
-        microbatch_idx = []
-        num_unit = self.pipeline_parallel_size // 2
-
         # Get paired rank's forward schedule
         paired_rank = self.pipeline_parallel_size - 1 - pipeline_parallel_rank
         paired_forward = self.chimera_get_microbatch_idx(paired_rank)
 
         # Use paired rank's forward schedule as backward for current rank
-        microbatch_idx.extend(paired_forward)
+        microbatch_idx = list(paired_forward)
 
-        # Add sync markers (exactly 2 per rank)
-        # Position based on rank
-        if pipeline_parallel_rank == num_unit or pipeline_parallel_rank == num_unit - 1:
-            # Middle ranks: append both at end
-            microbatch_idx.append(-1)
-            microbatch_idx.append(-1)
-        else:
-            # Outer ranks: insert before last element
-            microbatch_idx.insert(-1, -1)
-            microbatch_idx.append(-1)
+        # Single sync marker at the very end — all ranks sync together
+        microbatch_idx.append(-1)
 
         return microbatch_idx
 
@@ -431,12 +429,7 @@ class ChimeraScheduler:
                     backward_schedule.append(microbatch_groups[0][vr0_idx])
                     vr0_idx += 1
 
-        # Add sync markers
-        num_unit = self.pipeline_parallel_size // 2
-        if pipeline_parallel_rank == num_unit or pipeline_parallel_rank == num_unit - 1:
-            backward_schedule.append(-1)
-        else:
-            backward_schedule.insert(-1, -1)
+        # Single sync marker at the very end — all ranks sync together
         backward_schedule.append(-1)
 
         return backward_schedule

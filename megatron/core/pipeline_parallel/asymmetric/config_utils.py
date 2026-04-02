@@ -175,7 +175,67 @@ def get_asymmetric_offset(pipeline_rank, vp_rank, asymmetric_device_config):
     return offset, num_layers_for_this_device_vr
 
 
+def generate_chimera_asymmetric_config(vr0_layers):
+    """
+    Generate full Chimera asymmetric configuration from VR0 layer partition.
+
+    Chimera has 2 VRs per device:
+    - VR0: forward direction (rank 0 → 1 → ... → N-1)
+    - VR1: reverse direction (rank N-1 → ... → 1 → 0)
+
+    VR1 is simply the reverse of VR0: rank r's VR1 gets the same layer count
+    as rank (N-1-r)'s VR0.
+
+    Args:
+        vr0_layers: List of layer counts for VR0, one per rank.
+            e.g. [24, 12, 12, 16] for 4 ranks, 64 layers total
+
+    Returns:
+        Full config: list of [vr0, vr1] per rank.
+            e.g. [[24,16], [12,12], [12,12], [16,24]]
+    """
+    n = len(vr0_layers)
+    return [[vr0_layers[r], vr0_layers[n - 1 - r]] for r in range(n)]
+
+
+def get_chimera_asymmetric_offset(pipeline_rank, vp_rank, chimera_device_config):
+    """
+    Offset calculation for asymmetric Chimera 2-VR.
+
+    Args:
+        pipeline_rank: Current device rank (0 to N-1)
+        vp_rank: Virtual rank (0 = VR0, 1 = VR1)
+        chimera_device_config: Full config from generate_chimera_asymmetric_config()
+            e.g. [[24,16], [12,12], [12,12], [16,24]]
+
+    Returns:
+        (offset, num_layers) for this rank×VR combination, both 0-based.
+
+    Layer layout:
+        VR0 sequential:  rank 0 gets layers [0..vr0[0]-1],
+                         rank 1 gets layers [vr0[0]..vr0[0]+vr0[1]-1], etc.
+        VR1 device-swap: rank r's VR1 covers the same layer range as
+                         rank (N-1-r)'s VR0.
+    """
+    n = len(chimera_device_config)
+    vr0_layers = [chimera_device_config[r][0] for r in range(n)]
+
+    if vp_rank == 0:
+        # VR0: sequential forward
+        offset = sum(vr0_layers[:pipeline_rank])
+        num_layers = vr0_layers[pipeline_rank]
+    else:
+        # VR1: same layers as the paired rank's VR0
+        paired_rank = n - 1 - pipeline_rank
+        offset = sum(vr0_layers[:paired_rank])
+        num_layers = vr0_layers[paired_rank]
+
+    return offset, num_layers
+
+
 __all__ = [
     'generate_asymmetric_config_from_user_input',
     'get_asymmetric_offset',
+    'generate_chimera_asymmetric_config',
+    'get_chimera_asymmetric_offset',
 ]

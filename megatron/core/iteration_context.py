@@ -42,8 +42,8 @@ def _validate_iteration_ranges():
     """
     args = get_args()
     
-    train_iters = getattr(args, 'bitpipe_profile_train_iters', [])
-    eval_iters = getattr(args, 'bitpipe_profile_eval_iters', [])
+    train_iters = getattr(args, 'profile_train_iters', [])
+    eval_iters = getattr(args, 'profile_eval_iters', [])
     max_train_iters = getattr(args, 'train_iters', 1)
     max_eval_iters = getattr(args, 'eval_iters', 1)
     
@@ -80,7 +80,7 @@ def should_profile_current_iteration():
     args = get_args()
     
     # If BitPipe profiling is not enabled, don't profile
-    if not getattr(args, 'enable_bitpipe_profiling', False):
+    if not getattr(args, 'enable_profiling', False):
         return False
     
     iteration, iter_type = get_iteration_context()
@@ -89,8 +89,8 @@ def should_profile_current_iteration():
     valid_train_iters, valid_eval_iters, has_warnings = _validate_iteration_ranges()
     
     # Get original requested lists for default behavior
-    train_iters = getattr(args, 'bitpipe_profile_train_iters', [])
-    eval_iters = getattr(args, 'bitpipe_profile_eval_iters', [])
+    train_iters = getattr(args, 'profile_train_iters', [])
+    eval_iters = getattr(args, 'profile_eval_iters', [])
     
     # Determine what to profile
     should_profile = False

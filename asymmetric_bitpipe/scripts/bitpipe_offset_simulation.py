@@ -275,7 +275,7 @@ def main():
     # Test 1: 4 devices (original example)
     print("🔹 TEST 1: 4 DEVICES")
     print("=" * 40)
-    total_layers = 16
+    total_layers = 64
     pipeline_size = 4  # 4 devices
     vp_size = 4        # 4 virtual pipeline ranks
     
@@ -284,16 +284,16 @@ def main():
     
     # print()
     
-    # # Run asymmetric simulation (device-oriented user input)
-    # print("Testing 4-device asymmetric example:") #Inikepake buat "compare_all_4device_32layer"
-    # first_half_distributions = [
-    #     [3, 3, 3, 5],  # Device 0: VR0=2, VR1=4, VR2=2, VR3=3 layers
-    #     [4, 5, 4, 5]   # Device 1: VR0=2, VR1=1, VR2=1, VR3=1 layers
-    # ]
+    # Run asymmetric simulation (device-oriented user input)
+    print("Testing 4-device symmetric example for 64 layers:") #Inikepake buat "compare_all_4device_32layer"
+    first_half_distributions = [
+        [8, 10, 10, 8],  
+        [8, 6, 6, 8]   
+    ]
     
-    # asymmetric_result = simulate_asymmetric_bitpipe(
-    #     total_layers, pipeline_size, vp_size, first_half_distributions
-    # )
+    asymmetric_result = simulate_asymmetric_bitpipe(
+        total_layers, pipeline_size, vp_size, first_half_distributions
+    )
 
     # Run asymmetric simulation (device-oriented user input)
     # print("Testing 8-device asymmetric example for 96 layers:") 
@@ -309,15 +309,15 @@ def main():
     # )
 
     # Run asymmetric simulation (device-oriented user input)
-    print("Testing 4-device asymmetric example for 16 layers:") 
-    first_half_distributions2 = [
-        [2, 2, 2, 2],
-        [2, 2, 2, 2]
-    ]
+    # print("Testing 4-device symmetric example for 16 layers:") 
+    # first_half_distributions2 = [
+    #     [2, 2, 2, 2],
+    #     [2, 2, 2, 2]
+    # ]
     
-    asymmetric_result2 = simulate_asymmetric_bitpipe(
-        total_layers, pipeline_size, vp_size, first_half_distributions2
-    )
+    # asymmetric_result2 = simulate_asymmetric_bitpipe(
+    #     total_layers, pipeline_size, vp_size, first_half_distributions2
+    # )
     
 if __name__ == "__main__":
     main()

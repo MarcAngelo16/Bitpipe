@@ -70,8 +70,8 @@ torchrun \
     --master_addr $MASTER_ADDR \
     --master_port $MASTER_PORT \
     asymmetric_bitpipe/scripts/examples/bert_dummy.py \
-    --enable-bitpipe-profiling \
-    --bitpipe-profile-train-iters  3\
+    --enable-profiling \
+    --profile-train-iters  3\
     --pipeline-model-parallel-size 4 \
     --micro-batch-size $MICRO_BATCH_SIZE \
     --global-batch-size $GLOBAL_BATCH_SIZE \
@@ -109,5 +109,5 @@ torchrun \
 echo "BERT pipeline training completed!"
 
 # Optional: Add profiling flags if you want to use your custom profiling
-# --enable-bitpipe-profiling \
-# --bitpipe-profile-train-iters 5 \
+# --enable-profiling \
+# --profile-train-iters 5 \

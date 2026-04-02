@@ -16,9 +16,13 @@ New location: megatron/core/pipeline_parallel/asymmetric/
 from .config_utils import (
     generate_asymmetric_config_from_user_input,
     get_asymmetric_offset,
+    generate_chimera_asymmetric_config,
+    get_chimera_asymmetric_offset,
 )
 
 __all__ = [
     'generate_asymmetric_config_from_user_input',
     'get_asymmetric_offset',
+    'generate_chimera_asymmetric_config',
+    'get_chimera_asymmetric_offset',
 ]

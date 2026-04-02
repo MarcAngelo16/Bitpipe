@@ -1,18 +1,15 @@
-#!/bin/bash
-
-#Uses GPT 96 layers
 export CUDA_DEVICE_MAX_CONNECTIONS=1
 export SKIP_CUDA_EXTENSIONS=1
+export CHIMERA_DEBUG=1
 
 # Single node configuration
-GPUS_PER_NODE=12
+GPUS_PER_NODE=4
 NNODES=1
-MASTER_ADDR="172.17.0.2"  # localhost for single node
+MASTER_ADDR="172.17.0.4"  # localhost for single node
 MASTER_PORT=6000
 NODE_RANK=0
 
-# Network interface (not critical for single node)
-export NCCL_SOCKET_IFNAME=lo
+export NCCL_SOCKET_IFNAME=eth0
 
 # Optional debugging - uncomment if needed
 # export NCCL_DEBUG=INFO
@@ -21,6 +18,7 @@ export NCCL_SOCKET_IFNAME=lo
 # Paths
 CHECKPOINT_PATH=/tmp/bitpipe_8gpu_test
 DATA_PATH=/tmp/dummy_data
+CHIMERA_ASYM_CONFIG=asymmetric_bitpipe/configs/chimera_4devices_64layers.json
 
 # Create checkpoint directory
 mkdir -p $CHECKPOINT_PATH
@@ -37,17 +35,11 @@ echo "Master addr: $MASTER_ADDR"
 echo "BitPipe: ENABLED"
 echo "=================================="
 
-# BitPipe configuration for 8 GPUs
-# For 8 GPUs with BitPipe:
-# - 8 pipeline stages 
-# - Model chunks (depends on BitPipe internal logic)
-# - Global batch size must be divisible by pipeline_size
-# - Microbatch count should be >= pipeline_size for efficiency
 
 # Calculate microbatches - Increased for longer duration
 MICRO_BATCH_SIZE=16    # Larger microbatches = more computation per batch
-GLOBAL_BATCH_SIZE=384  # Must be divisible by pipeline_parallel_size for BitPipe
-NUM_MICROBATCHES=$((GLOBAL_BATCH_SIZE / MICRO_BATCH_SIZE))  # = 16 microbatches
+GLOBAL_BATCH_SIZE=64   # Must be divisible by pipeline_parallel_size for BitPipe
+NUM_MICROBATCHES=$((GLOBAL_BATCH_SIZE / MICRO_BATCH_SIZE))    #Must be larger than the number of pipeline parallelsize and also divisible by the pipeline_parallel_size
 
 echo "Micro batch size: $MICRO_BATCH_SIZE"
 echo "Global batch size: $GLOBAL_BATCH_SIZE"
@@ -55,26 +47,28 @@ echo "Estimated microbatches: $NUM_MICROBATCHES"
 
 # Launch distributed training with BitPipe
 torchrun \
-    --nproc_per_node $GPUS_PER_NODE \
+    --nproc-per-node $GPUS_PER_NODE \
     --nnodes $NNODES \
-    --node_rank $NODE_RANK \
-    --master_addr $MASTER_ADDR \
-    --master_port $MASTER_PORT \
-    asymmetric_bitpipe/scripts/examples/gpt_dummy.py \
-    --enable-bitpipe-schedule \
-    --enable-bitpipe-profiling \
-    --bitpipe-profile-train-iters  3\
-    --pipeline-model-parallel-size 12 \
+    --node-rank $NODE_RANK \
+    --master-addr $MASTER_ADDR \
+    --master-port $MASTER_PORT \
+    gpt_dummy.py \
+    --enable-chimera-schedule \
+    --enable-chimera-asymmetric \
+    --chimera-asymmetric-config $CHIMERA_ASYM_CONFIG \
+    --enable-profiling \
+    --profile-train-iters  3\
+    --pipeline-model-parallel-size 4 \
     --micro-batch-size $MICRO_BATCH_SIZE \
     --global-batch-size $GLOBAL_BATCH_SIZE \
     --train-iters 3 \
     --eval-iters 1 \
     --seq-length 256 \
     --max-position-embeddings 512 \
-    --hidden-size 1600 \
-    --num-layers 48 \
-    --num-attention-heads 25 \
-    --vocab-size 30552 \
+    --hidden-size 400 \
+    --num-layers 64 \
+    --num-attention-heads 16 \
+    --vocab-size 1600 \
     --lr 0.0001 \
     --lr-decay-style cosine \
     --min-lr 1.0e-5 \
@@ -82,8 +76,6 @@ torchrun \
     --lr-warmup-fraction 0.01 \
     --clip-grad 1.0 \
     --log-interval 5 \
-    --save-interval 25 \
-    --save $CHECKPOINT_PATH \
     --no-load-optim \
     --no-load-rng \
     --fp16 \
@@ -97,25 +89,4 @@ torchrun \
     --no-async-tensor-model-parallel-allreduce \
     --reset-position-ids \
     --reset-attention-mask \
-    --eod-mask-loss 
-
-# When using (4 and 8) microbatch with (32 and 64) global batch
-#     --train-iters 3 \
-#     --eval-iters 1 \
-#     --seq-length 512 \
-#     --max-position-embeddings 1024 \
-#     --hidden-size 768 \
-#     --num-layers 96 \
-#     --num-attention-heads 8 \
-#     --vocab-size 40478 \
-
-# When using 16 mb with 128 gb
-#     --train-iters 3 \
-#     --eval-iters 1 \
-#     --seq-length 256 \
-#     --max-position-embeddings 512 \
-#     --hidden-size 768 \
-#     --num-layers 96 \
-#     --num-attention-heads 8 \
-#     --vocab-size 20239 \
-#     --lr 0.0001 \
+    --eod-mask-loss

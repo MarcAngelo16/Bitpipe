@@ -213,7 +213,9 @@ def print_rank_last(message):
         print(message, flush=True)
 
 def is_pipeline_stage_containing_loss():
-    if get_args().enable_bitpipe_schedule:
+    if get_args().enable_bitpipe_schedule or (hasattr(get_args(), 'enable_chimera_schedule') and get_args().enable_chimera_schedule):
+        # Both BitPipe and Chimera have bidirectional pipelines:
+        # VR0 ends at rank N-1, VR1 ends at rank 0 — both compute loss
         return mpu.is_pipeline_first_stage(ignore_virtual=True) or mpu.is_pipeline_last_stage(ignore_virtual=True)
     else:
         return mpu.is_pipeline_last_stage(ignore_virtual=True)

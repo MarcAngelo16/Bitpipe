@@ -81,6 +81,61 @@ def load_and_validate_asymmetric_config(config_path, pipeline_size, total_layers
     
     return full_config
 
+def load_and_validate_chimera_asymmetric_config(config_path, pipeline_size, total_layers):
+    """Load and validate Chimera asymmetric configuration from JSON file.
+
+    Expected JSON format::
+
+        { "vr0_layers": [24, 12, 12, 16] }
+
+    The list must have exactly ``pipeline_size`` entries that sum to ``total_layers``.
+    VR1 is automatically derived as the reverse of VR0.
+    """
+    try:
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+    except Exception as e:
+        raise ValueError(f"Failed to load Chimera asymmetric config from {config_path}: {e}")
+
+    if 'vr0_layers' not in config:
+        raise ValueError("Chimera asymmetric config JSON must contain 'vr0_layers' key")
+
+    vr0_layers = config['vr0_layers']
+
+    if len(vr0_layers) != pipeline_size:
+        raise ValueError(
+            f"'vr0_layers' must have exactly {pipeline_size} entries (one per rank), "
+            f"got {len(vr0_layers)}"
+        )
+
+    if not all(isinstance(v, int) for v in vr0_layers):
+        raise ValueError(f"All entries in 'vr0_layers' must be integers, got: {vr0_layers}")
+
+    if any(v < 1 for v in vr0_layers):
+        raise ValueError(
+            f"Each rank must have at least 1 layer in 'vr0_layers', got: {vr0_layers}"
+        )
+
+    total_input = sum(vr0_layers)
+    if total_input != total_layers:
+        raise ValueError(
+            f"Sum of 'vr0_layers' ({total_input}) != --num-layers ({total_layers})"
+        )
+
+    from megatron.core.pipeline_parallel.asymmetric import generate_chimera_asymmetric_config
+    full_config = generate_chimera_asymmetric_config(vr0_layers)
+
+    print(f"✓ Chimera Asymmetric Configuration Loaded:")
+    print(f"  Config file: {config_path}")
+    print(f"  Pipeline size: {pipeline_size}, Total layers: {total_layers}")
+    print(f"  {'Rank':<6} {'VR0':>6} {'VR1':>6}")
+    for r, (vr0, vr1) in enumerate(full_config):
+        paired = pipeline_size - 1 - r
+        print(f"  R{r:<5} {vr0:>6} {vr1:>6}  (VR1 mirrors R{paired}'s VR0)")
+
+    return full_config
+
+
 def parse_args(extra_args_provider=None, ignore_unknown_args=False):
     """Parse all arguments."""
     parser = argparse.ArgumentParser(description='Megatron-LM Arguments',
@@ -264,10 +319,13 @@ def validate_args(args, defaults={}):
                 raise ValueError("--chimera-asymmetric-config must be specified when "
                                "--enable-chimera-asymmetric is set")
 
-            # TODO: Load and validate asymmetric configuration for Chimera
-            # For now, just note that asymmetric is not yet implemented
-            raise NotImplementedError("Chimera asymmetric mode is not yet implemented. "
-                                    "Please use symmetric mode (remove --enable-chimera-asymmetric)")
+            # Load and validate Chimera asymmetric configuration
+            args.chimera_asymmetric_layers_config = \
+                load_and_validate_chimera_asymmetric_config(
+                    args.chimera_asymmetric_config,
+                    args.transformer_pipeline_model_parallel_size,
+                    args.num_layers,
+                )
         else:
             # Symmetric mode validations
             assert (
@@ -560,7 +618,7 @@ def core_transformer_config_from_args(args):
             kw_args[f.name] = getattr(args, f.name)
     kw_args['persist_layer_norm'] = not args.no_persist_layer_norm
     kw_args['layernorm_zero_centered_gamma'] = args.apply_layernorm_1p
-    kw_args['deallocate_pipeline_outputs'] = True
+    kw_args['deallocate_pipeline_outputs'] = False  # TEST: Try without custom_backward
     kw_args['pipeline_dtype'] = args.params_dtype
     kw_args['batch_p2p_comm'] = not args.overlap_p2p_comm
     if args.swiglu:
@@ -1203,19 +1261,19 @@ def _add_distributed_args(parser):
     group.add_argument('--enable-bitpipe-schedule', action='store_true',
                        help='Use bitpipe pipeline.',
                        dest='enable_bitpipe_schedule')
-    group.add_argument('--enable-bitpipe-profiling', action='store_true',
-                       help='Enable detailed profiling for BitPipe schedule.',
-                       dest='enable_bitpipe_profiling')
-    group.add_argument('--bitpipe-profile-train-iters', nargs='*', type=int, default=[],
+    group.add_argument('--enable-profiling', action='store_true',
+                       help='Enable detailed profiling for BitPipe/Chimera schedule.',
+                       dest='enable_profiling')
+    group.add_argument('--profile-train-iters', nargs='*', type=int, default=[],
                        help='Training iterations to profile (numbering starts from 1). '
-                            'If empty while --enable-bitpipe-profiling is set, defaults to iteration 1. '
-                            'Example: --bitpipe-profile-train-iters 2 3 5',
-                       dest='bitpipe_profile_train_iters')
-    group.add_argument('--bitpipe-profile-eval-iters', nargs='*', type=int, default=[],
+                            'If empty while --enable-profiling is set, defaults to iteration 1. '
+                            'Example: --profile-train-iters 2 3 5',
+                       dest='profile_train_iters')
+    group.add_argument('--profile-eval-iters', nargs='*', type=int, default=[],
                        help='Evaluation iterations to profile (numbering starts from 1). '
-                            'If empty while --enable-bitpipe-profiling is set, defaults to iteration 1. '
-                            'Example: --bitpipe-profile-eval-iters 1 2',
-                       dest='bitpipe_profile_eval_iters')
+                            'If empty while --enable-profiling is set, defaults to iteration 1. '
+                            'Example: --profile-eval-iters 1 2',
+                       dest='profile_eval_iters')
     group.add_argument('--enable-bitpipe-asymmetric', action='store_true',
                        help='Enable asymmetric layer distribution for BitPipe',
                        dest='enable_bitpipe_asymmetric')

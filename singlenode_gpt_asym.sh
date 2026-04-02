@@ -60,8 +60,8 @@ torchrun \
     --master_port $MASTER_PORT \
     asymmetric_bitpipe/scripts/examples/gpt_dummy.py \
     --enable-bitpipe-schedule \
-    --enable-bitpipe-profiling \
-    --bitpipe-profile-train-iters  3\
+    --enable-profiling \
+    --profile-train-iters  3\
     --enable-bitpipe-asymmetric \
     --bitpipe-asymmetric-config asymmetric_bitpipe/configs/12_devices/asymmetric_12devices_48layers.json \
     --pipeline-model-parallel-size 12 \

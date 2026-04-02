@@ -268,6 +268,13 @@ def backward_step(input_tensor, output_tensor, output_tensor_grad, model_type, c
     if output_tensor_grad[0] is None and config.grad_scale_func is not None:
         output_tensor[0] = config.grad_scale_func(output_tensor[0])
 
+    # DEBUG: Check which backward path is taken
+    import os
+    if os.environ.get('CHIMERA_DEBUG', '0') == '1':
+        output_numel = output_tensor[0].numel() if output_tensor[0] is not None else 0
+        print(f"[backward_step DEBUG] deallocate_pipeline_outputs={config.deallocate_pipeline_outputs}, "
+              f"output_tensor.numel={output_numel}, will_use_custom_backward={config.deallocate_pipeline_outputs}", flush=True)
+
     if config.deallocate_pipeline_outputs:
         custom_backward(output_tensor[0], output_tensor_grad[0])
     else:

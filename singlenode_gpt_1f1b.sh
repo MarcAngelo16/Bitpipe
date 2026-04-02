@@ -63,8 +63,8 @@ torchrun \
     --master_addr $MASTER_ADDR \
     --master_port $MASTER_PORT \
     asymmetric_bitpipe/scripts/examples/gpt_dummy.py \
-    --enable-bitpipe-profiling \
-    --bitpipe-profile-train-iters  3\
+    --enable-profiling \
+    --profile-train-iters  3\
     --pipeline-model-parallel-size 12 \
     --micro-batch-size $MICRO_BATCH_SIZE \
     --global-batch-size $GLOBAL_BATCH_SIZE \

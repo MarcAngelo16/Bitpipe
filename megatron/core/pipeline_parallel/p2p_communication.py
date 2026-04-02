@@ -1,6 +1,7 @@
 # Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
 
 import operator
+import os
 from functools import reduce
 from typing import Callable, List, Optional, Tuple, Union
 
@@ -125,6 +126,24 @@ def _batched_p2p_ops(
     tensor_recv_next: Optional[torch.Tensor],
     group: torch.distributed.ProcessGroup
 ):
+    # DEBUG: Log actual P2P operations with ACTUAL ranks if CHIMERA_DEBUG is set
+    import os
+    if os.environ.get('CHIMERA_DEBUG', '0') == '1':
+        my_rank = torch.distributed.get_rank() if torch.distributed.is_initialized() else 0
+        prev_rank = get_pipeline_model_parallel_prev_rank()
+        next_rank = get_pipeline_model_parallel_next_rank()
+        ops_desc = []
+        if tensor_send_prev is not None:
+            ops_desc.append(f"send→R{prev_rank}")
+        if tensor_send_next is not None:
+            ops_desc.append(f"send→R{next_rank}")
+        if tensor_recv_prev is not None:
+            ops_desc.append(f"recv←R{prev_rank}")
+        if tensor_recv_next is not None:
+            ops_desc.append(f"recv←R{next_rank}")
+        if ops_desc:
+            print(f"[P2P ACTUAL] R{my_rank}: {', '.join(ops_desc)}", flush=True)
+
     ops = []
     if tensor_send_prev is not None:
         send_prev_op = torch.distributed.P2POp(
@@ -1521,3 +1540,110 @@ def chimera_grad_recv_prev_only(
     if config.timers is not None:
         config.timers('chimera-grad-recv-prev-only').stop()
     return output_tensor_grad
+
+
+def chimera_communicate(
+    tensor_send_prev: Optional[torch.Tensor],
+    tensor_send_next: Optional[torch.Tensor],
+    recv_prev: bool,
+    recv_next: bool,
+    tensor_shape: Shape,
+    config: ModelParallelConfig,
+) -> Tuple[Optional[torch.Tensor], Optional[torch.Tensor]]:
+    """
+    Unified Chimera communication with flags (BitPipe-style).
+
+    Handles all combinations of send/recv in a single function.
+    Uses _communicate() directly to bypass stage checks.
+
+    Args:
+        tensor_send_prev: Tensor to send to previous rank (None = no send)
+        tensor_send_next: Tensor to send to next rank (None = no send)
+        recv_prev: Whether to receive from previous rank
+        recv_next: Whether to receive from next rank
+        tensor_shape: Shape for receiving tensors
+        config: Model config
+        dtype: Data type for received tensors (optional)
+
+    Returns:
+        (recv_prev_tensor, recv_next_tensor)
+        - recv_prev_tensor: Tensor received from prev (None if recv_prev=False)
+        - recv_next_tensor: Tensor received from next (None if recv_next=False)
+
+    Examples:
+        # VR0 grad: send_prev + recv_next
+        _, grad_in = chimera_communicate(
+            tensor_send_prev=grad_out, tensor_send_next=None,
+            recv_prev=False, recv_next=True, ...
+        )
+
+        # VR1 grad: send_next + recv_prev
+        grad_in, _ = chimera_communicate(
+            tensor_send_prev=None, tensor_send_next=grad_out,
+            recv_prev=True, recv_next=False, ...
+        )
+
+        # Send only (no recv)
+        _, _ = chimera_communicate(
+            tensor_send_prev=grad_out, tensor_send_next=None,
+            recv_prev=False, recv_next=False, ...
+        )
+
+        # Recv only (no send)
+        _, grad_in = chimera_communicate(
+            tensor_send_prev=None, tensor_send_next=None,
+            recv_prev=False, recv_next=True, ...
+        )
+    """
+    # Debug logging
+    if os.environ.get('CHIMERA_DEBUG', '0') == '1':
+        import torch.distributed as dist
+        rank = dist.get_rank() if dist.is_initialized() else 0
+
+        send_str = []
+        if tensor_send_prev is not None:
+            send_str.append("send_prev")
+        if tensor_send_next is not None:
+            send_str.append("send_next")
+
+        recv_str = []
+        if recv_prev:
+            recv_str.append("recv_prev")
+        if recv_next:
+            recv_str.append("recv_next")
+
+        ops = " + ".join(send_str + recv_str) if (send_str or recv_str) else "NO-OP"
+        print(f"[Chimera P2P Rank {rank}] chimera_communicate: {ops}", flush=True)
+
+    if config.timers is not None:
+        config.timers('chimera-communicate', log_level=2).start()
+
+    # Use _communicate directly (bypasses stage checks)
+    recv_prev_tensor, recv_next_tensor, _ = _communicate(
+        tensor_send_next=tensor_send_next,
+        tensor_send_prev=tensor_send_prev,
+        recv_prev=recv_prev,
+        recv_next=recv_next,
+        tensor_shape=tensor_shape,
+        wait_on_reqs=True,
+        config=config,
+    )
+
+    if config.timers is not None:
+        config.timers('chimera-communicate').stop()
+
+    # Debug logging for results
+    if os.environ.get('CHIMERA_DEBUG', '0') == '1':
+        import torch.distributed as dist
+        rank = dist.get_rank() if dist.is_initialized() else 0
+
+        result_str = []
+        if recv_prev_tensor is not None:
+            result_str.append(f"recv_prev: shape={recv_prev_tensor.shape}")
+        if recv_next_tensor is not None:
+            result_str.append(f"recv_next: shape={recv_next_tensor.shape}")
+
+        if result_str:
+            print(f"[Chimera P2P Rank {rank}] chimera_communicate result: {', '.join(result_str)}", flush=True)
+
+    return recv_prev_tensor, recv_next_tensor

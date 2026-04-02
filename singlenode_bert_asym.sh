@@ -73,8 +73,8 @@ torchrun \
     --master_port $MASTER_PORT \
     asymmetric_bitpipe/scripts/examples/bert_dummy.py \
     --enable-bitpipe-schedule \
-    --enable-bitpipe-profiling \
-    --bitpipe-profile-train-iters  2\
+    --enable-profiling \
+    --profile-train-iters  2\
     --enable-bitpipe-asymmetric \
     --bitpipe-asymmetric-config asymmetric_bitpipe/configs/4_devices/asymmetric_4devices_24layers.json \
     --pipeline-model-parallel-size 4 \
@@ -114,8 +114,8 @@ torchrun \
 echo "BERT pipeline training completed!"
 
 # Optional: Add profiling flags if you want to use your custom profiling
-# --enable-bitpipe-profiling \
-# --bitpipe-profile-train-iters 5 \
+# --enable-profiling \
+# --profile-train-iters 5 \
 
 # Best config
     # [5, 4, 5, 4],

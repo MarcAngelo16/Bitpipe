@@ -1637,51 +1637,56 @@ class ParallelTransformer(MegatronModule):
                 assert config.virtual_pipeline_model_parallel_size == 2, \
                     f"Chimera requires virtual_pipeline_model_parallel_size=2, got {config.virtual_pipeline_model_parallel_size}"
 
-                from megatron.core.pipeline_parallel.schedule_impl.chimera.chimera_2vr import get_chimera_offset
+                if getattr(args, 'enable_chimera_asymmetric', False):
+                    # ----------------------------------------------------------
+                    # CHIMERA ASYMMETRIC MODE: custom VR0 partition, VR1 derived
+                    # ----------------------------------------------------------
+                    # Config format: [[vr0, vr1], ...] per rank, where
+                    # vr1[r] == vr0[N-1-r] (mirror of VR0 in reverse rank order)
+                    from megatron.core.pipeline_parallel.asymmetric import get_chimera_asymmetric_offset
+                    offset, self.num_layers = get_chimera_asymmetric_offset(
+                        mpu.get_pipeline_model_parallel_rank(),
+                        mpu.get_virtual_pipeline_model_parallel_rank(),
+                        args.chimera_asymmetric_layers_config,
+                    )
+                    print(
+                        f"[CHIMERA ASYM] Device {mpu.get_pipeline_model_parallel_rank()} | "
+                        f"VR {mpu.get_virtual_pipeline_model_parallel_rank()} | "
+                        f"Offset: {offset} | Layers: {self.num_layers} | "
+                        f"Range: [{offset+1}..{offset+self.num_layers}]",
+                        flush=True,
+                    )
+                else:
+                    # ----------------------------------------------------------
+                    # CHIMERA SYMMETRIC MODE
+                    # ----------------------------------------------------------
+                    from megatron.core.pipeline_parallel.schedule_impl.chimera.chimera_2vr import get_chimera_offset
 
-                # DEBUG: Log inputs before offset calculation
-                if args.rank == 0:
-                    print(f"[CHIMERA OFFSET] Device {mpu.get_pipeline_model_parallel_rank()} - Input:")
-                    print(f"  self.num_layers = {self.num_layers} (total for both VRs, will be used for offset calc)")
-                    print(f"  VR = {mpu.get_virtual_pipeline_model_parallel_rank()}")
-                    print(f"  pipeline_size = {mpu.get_pipeline_model_parallel_world_size()}")
+                    # DEBUG: Log inputs before offset calculation
+                    if args.rank == 0:
+                        print(f"[CHIMERA OFFSET] Device {mpu.get_pipeline_model_parallel_rank()} - Input:")
+                        print(f"  self.num_layers = {self.num_layers} (total for both VRs, will be used for offset calc)")
+                        print(f"  VR = {mpu.get_virtual_pipeline_model_parallel_rank()}")
+                        print(f"  pipeline_size = {mpu.get_pipeline_model_parallel_world_size()}")
 
-                # CRITICAL: At this point, self.num_layers is the TOTAL for BOTH VRs combined
-                # (after doubling in STEP 2, then dividing by 2 VRs in STEP 3).
-                # The get_chimera_offset() function receives this as 'num_layers_total' parameter
-                # and internally calculates the per-VR breakdown.
-                #
-                # After this call, self.num_layers is updated to the per-VR value.
-                #
-                # LAYER ASSIGNMENT PATTERN:
-                # VR0: Sequential forward direction
-                #   Device 0: layers 0 through (num_devices-1)*num_per_vr
-                #   Device 1: layers num_per_vr through num_per_vr*(num_devices-1)
-                #   ...
-                # VR1: Device-swapped (paired with opposite device)
-                #   Device 0: takes Device (N-1-0)'s VR0 layers
-                #   Device 1: takes Device (N-1-1)'s VR0 layers
-                #   etc.
+                    offset_1based, num_layers_per_vr = get_chimera_offset(
+                        mpu.get_pipeline_model_parallel_rank(),
+                        mpu.get_virtual_pipeline_model_parallel_rank(),
+                        self.num_layers,  # Total for both VRs
+                        mpu.get_pipeline_model_parallel_world_size()
+                    )
 
-                offset_1based, num_layers_per_vr = get_chimera_offset(
-                    mpu.get_pipeline_model_parallel_rank(),
-                    mpu.get_virtual_pipeline_model_parallel_rank(),
-                    self.num_layers,  # Total for both VRs
-                    mpu.get_pipeline_model_parallel_world_size()
-                )
+                    # Convert from 1-based indexing (human-readable) to 0-based (Python indexing)
+                    offset = offset_1based - 1
+                    self.num_layers = num_layers_per_vr
 
-                # Convert from 1-based indexing (human-readable) to 0-based (Python indexing)
-                # Chimera functions use 1-based for clarity in examples, but PyTorch uses 0-based
-                offset = offset_1based - 1
-                self.num_layers = num_layers_per_vr
-
-                # DEBUG: Log computed offset and layer assignment
-                if args.rank == 0 or True:
-                    print(f"[CHIMERA OFFSET] Device {mpu.get_pipeline_model_parallel_rank()} | "
-                          f"VR {mpu.get_virtual_pipeline_model_parallel_rank()} | "
-                          f"Layers: {self.num_layers} | "
-                          f"Offset: {offset} (0-based) → Creating layers [{offset+1}..{offset+self.num_layers}] (1-based)",
-                          flush=True)
+                    # DEBUG: Log computed offset and layer assignment
+                    if args.rank == 0 or True:
+                        print(f"[CHIMERA OFFSET] Device {mpu.get_pipeline_model_parallel_rank()} | "
+                              f"VR {mpu.get_virtual_pipeline_model_parallel_rank()} | "
+                              f"Layers: {self.num_layers} | "
+                              f"Offset: {offset} (0-based) → Creating layers [{offset+1}..{offset+self.num_layers}] (1-based)",
+                              flush=True)
         else:
             # Each stage gets a contiguous set of layers.
             if args.model_type == ModelType.encoder_and_decoder and \

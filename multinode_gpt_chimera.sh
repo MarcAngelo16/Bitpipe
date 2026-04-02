@@ -53,8 +53,8 @@ torchrun \
     --master-port $MASTER_PORT \
     gpt_dummy.py \
     --enable-chimera-schedule \
-    --enable-bitpipe-profiling \
-    --bitpipe-profile-train-iters  3\
+    --enable-profiling \
+    --profile-train-iters  3\
     --pipeline-model-parallel-size 4 \
     --micro-batch-size $MICRO_BATCH_SIZE \
     --global-batch-size $GLOBAL_BATCH_SIZE \
