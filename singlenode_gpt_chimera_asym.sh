@@ -18,7 +18,7 @@ export NCCL_SOCKET_IFNAME=eth0
 # Paths
 CHECKPOINT_PATH=/tmp/bitpipe_8gpu_test
 DATA_PATH=/tmp/dummy_data
-CHIMERA_ASYM_CONFIG=asymmetric_bitpipe/configs/chimera_4devices_64layers.json
+CHIMERA_ASYM_CONFIG=asymmetric_bitpipe/configs/chimera/4_devices/chimera_4devices_64layers.json
 
 # Create checkpoint directory
 mkdir -p $CHECKPOINT_PATH
@@ -56,7 +56,6 @@ torchrun \
     --enable-chimera-schedule \
     --enable-chimera-asymmetric \
     --chimera-asymmetric-config $CHIMERA_ASYM_CONFIG \
-    --enable-profiling \
     --profile-train-iters  3\
     --pipeline-model-parallel-size 4 \
     --micro-batch-size $MICRO_BATCH_SIZE \

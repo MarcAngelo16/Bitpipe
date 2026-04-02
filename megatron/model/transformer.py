@@ -1492,8 +1492,10 @@ class ParallelTransformer(MegatronModule):
             # - config.virtual_pipeline_model_parallel_size = number of VRs per device (1, 2, or 4)
             # =====================================================================
 
-            # Skip divisibility check for asymmetric BitPipe
-            if not getattr(args, 'enable_bitpipe_asymmetric', False):
+            # Skip divisibility check for asymmetric modes (layers per device may differ)
+            is_asymmetric = (getattr(args, 'enable_bitpipe_asymmetric', False) or
+                             getattr(args, 'enable_chimera_asymmetric', False))
+            if not is_asymmetric:
                 assert config.num_layers % config.virtual_pipeline_model_parallel_size == 0, \
                     'num_layers_per_stage must be divisible by ' \
                     'virtual_pipeline_model_parallel_size'

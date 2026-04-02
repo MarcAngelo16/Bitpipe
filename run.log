@@ -1,0 +1,1876 @@
+Running Single-node BitPipe Pipeline Parallelism...
+==================================
+Total GPUs: 4 (1 node x 4 GPUs/node)
+Pipeline stages: 4 (BitPipe enabled)
+Node rank: 0
+Master addr: 172.17.0.4
+BitPipe: ENABLED
+==================================
+Micro batch size: 16
+Global batch size: 64
+Estimated microbatches: 4
+[2026-04-02 08:44:34,947] torch.distributed.run: [WARNING] 
+[2026-04-02 08:44:34,947] torch.distributed.run: [WARNING] *****************************************
+[2026-04-02 08:44:34,947] torch.distributed.run: [WARNING] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+[2026-04-02 08:44:34,947] torch.distributed.run: [WARNING] *****************************************
+Zarr-based strategies will not be registered because of missing packages
+Zarr-based strategies will not be registered because of missing packages
+Zarr-based strategies will not be registered because of missing packages
+Zarr-based strategies will not be registered because of missing packages
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.1.0
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.1.0
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.1.0
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.1.0
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+✓ Chimera Asymmetric Configuration Loaded:
+  Config file: asymmetric_bitpipe/configs/chimera/4_devices/chimera_4devices_64layers.json
+  Pipeline size: 4, Total layers: 64
+  Rank      VR0    VR1
+  R0         24     16  (VR1 mirrors R3's VR0)
+  R1         12     12  (VR1 mirrors R2's VR0)
+  R2         12     12  (VR1 mirrors R1's VR0)
+  R3         16     24  (VR1 mirrors R0's VR0)
+✓ Chimera Asymmetric Configuration Loaded:
+  Config file: asymmetric_bitpipe/configs/chimera/4_devices/chimera_4devices_64layers.json
+  Pipeline size: 4, Total layers: 64
+  Rank      VR0    VR1
+  R0         24     16  (VR1 mirrors R3's VR0)
+  R1         12     12  (VR1 mirrors R2's VR0)
+  R2         12     12  (VR1 mirrors R1's VR0)
+  R3         16     24  (VR1 mirrors R0's VR0)
+using world size: 4, data-parallel-size: 1, tensor-model-parallel size: 1, pipeline-model-parallel size: 4 
+WARNING: overriding default arguments for train_synthetic:True                        with train_synthetic:True
+WARNING: overriding default arguments for seq_length:128                        with seq_length:256
+WARNING: overriding default arguments for max_position_embeddings:128                        with max_position_embeddings:512
+WARNING: overriding default arguments for hidden_size:512                        with hidden_size:400
+WARNING: overriding default arguments for num_layers:16                        with num_layers:64
+WARNING: overriding default arguments for num_attention_heads:8                        with num_attention_heads:16
+WARNING: overriding default arguments for vocab_size:1000                        with vocab_size:1600
+WARNING: overriding default arguments for micro_batch_size:2                        with micro_batch_size:16
+WARNING: overriding default arguments for global_batch_size:16                        with global_batch_size:64
+WARNING: overriding default arguments for enable_bitpipe_schedule:True                        with enable_bitpipe_schedule:False
+[CHIMERA INIT] Setting virtual_pipeline_model_parallel_size = 2
+✓ Chimera Asymmetric Configuration Loaded:
+  Config file: asymmetric_bitpipe/configs/chimera/4_devices/chimera_4devices_64layers.json
+  Pipeline size: 4, Total layers: 64
+  Rank      VR0    VR1
+  R0         24     16  (VR1 mirrors R3's VR0)
+  R1         12     12  (VR1 mirrors R2's VR0)
+  R2         12     12  (VR1 mirrors R1's VR0)
+  R3         16     24  (VR1 mirrors R0's VR0)
+using torch.float16 for parameters ...
+------------------------ arguments ------------------------
+  accumulate_allreduce_grads_in_fp32 .............. False
+  adam_beta1 ...................................... 0.9
+  adam_beta2 ...................................... 0.999
+  adam_eps ........................................ 1e-08
+  add_bias_linear ................................. True
+  add_position_embedding .......................... True
+  adlr_autoresume ................................. False
+  adlr_autoresume_interval ........................ 1000
+  apply_layernorm_1p .............................. False
+  apply_query_key_layer_scaling ................... True
+  apply_residual_connection_post_layernorm ........ False
+  async_tensor_model_parallel_allreduce ........... False
+  attention_dropout ............................... 0.1
+  attention_softmax_in_fp32 ....................... False
+  barrier_with_L1_time ............................ True
+  bert_binary_head ................................ True
+  bert_embedder_type .............................. megatron
+  bert_load ....................................... None
+  bf16 ............................................ False
+  bias_dropout_fusion ............................. True
+  bias_gelu_fusion ................................ True
+  biencoder_projection_dim ........................ 0
+  biencoder_shared_query_context_model ............ False
+  bitpipe_asymmetric_config ....................... None
+  block_data_path ................................. None
+  chimera_asymmetric_config ....................... asymmetric_bitpipe/configs/chimera/4_devices/chimera_4devices_64layers.json
+  chimera_asymmetric_layers_config ................ [[24, 16], [12, 12], [12, 12], [16, 24]]
+  classes_fraction ................................ 1.0
+  clip_grad ....................................... 1.0
+  consumed_train_samples .......................... 0
+  consumed_valid_samples .......................... 0
+  data_cache_path ................................. None
+  data_impl ....................................... infer
+  data_parallel_random_init ....................... False
+  data_parallel_size .............................. 1
+  data_path ....................................... ['/tmp/dummy_data']
+  data_per_class_fraction ......................... 1.0
+  data_sharding ................................... True
+  dataloader_type ................................. single
+  DDP_impl ........................................ local
+  decoder_num_layers .............................. None
+  decoder_seq_length .............................. None
+  dino_bottleneck_size ............................ 256
+  dino_freeze_last_layer .......................... 1
+  dino_head_hidden_size ........................... 2048
+  dino_local_crops_number ......................... 10
+  dino_local_img_size ............................. 96
+  dino_norm_last_layer ............................ False
+  dino_teacher_temp ............................... 0.07
+  dino_warmup_teacher_temp ........................ 0.04
+  dino_warmup_teacher_temp_epochs ................. 30
+  distribute_saved_activations .................... False
+  distributed_backend ............................. nccl
+  distributed_timeout_minutes ..................... 10
+  embedding_path .................................. None
+  embedding_weights_in_fp32 ....................... False
+  empty_unused_memory_level ....................... 0
+  enable_bitpipe_asymmetric ....................... False
+  enable_bitpipe_schedule ......................... False
+  enable_chimera_asymmetric ....................... True
+  enable_chimera_schedule ......................... True
+  enable_profiling ................................ False
+  encoder_num_layers .............................. 64
+  encoder_seq_length .............................. 256
+  end_weight_decay ................................ 0.01
+  eod_mask_loss ................................... True
+  eval_interval ................................... 1000
+  eval_iters ...................................... 1
+  evidence_data_path .............................. None
+  exit_duration_in_mins ........................... None
+  exit_interval ................................... None
+  exit_on_missing_checkpoint ...................... False
+  exit_signal_handler ............................. False
+  ffn_hidden_size ................................. 1600
+  finetune ........................................ False
+  fp16 ............................................ True
+  fp16_lm_cross_entropy ........................... False
+  fp32_residual_connection ........................ False
+  fp8 ............................................. None
+  fp8_amax_compute_algo ........................... most_recent
+  fp8_amax_history_len ............................ 1
+  fp8_interval .................................... 1
+  fp8_margin ...................................... 0
+  fp8_wgrad ....................................... True
+  global_batch_size ............................... 64
+  gradient_accumulation_fusion .................... True
+  group_query_attention ........................... False
+  head_lr_mult .................................... 1.0
+  hidden_dropout .................................. 0.1
+  hidden_size ..................................... 400
+  hysteresis ...................................... 2
+  ict_head_size ................................... None
+  ict_load ........................................ None
+  img_h ........................................... 224
+  img_w ........................................... 224
+  indexer_batch_size .............................. 128
+  indexer_log_interval ............................ 1000
+  inference_batch_times_seqlen_threshold .......... 512
+  init_method_std ................................. 0.02
+  init_method_xavier_uniform ...................... False
+  initial_loss_scale .............................. 4294967296
+  iter_per_epoch .................................. 1250
+  kv_channels ..................................... 25
+  layernorm_epsilon ............................... 1e-05
+  lazy_mpu_init ................................... None
+  load ............................................ None
+  local_rank ...................................... None
+  log_batch_size_to_tensorboard ................... False
+  log_interval .................................... 5
+  log_learning_rate_to_tensorboard ................ True
+  log_loss_scale_to_tensorboard ................... True
+  log_memory_to_tensorboard ....................... False
+  log_num_zeros_in_grad ........................... False
+  log_params_norm ................................. False
+  log_timers_to_tensorboard ....................... False
+  log_validation_ppl_to_tensorboard ............... False
+  log_world_size_to_tensorboard ................... False
+  loss_scale ...................................... None
+  loss_scale_window ............................... 1000
+  lr .............................................. 0.0001
+  lr_decay_iters .................................. None
+  lr_decay_samples ................................ None
+  lr_decay_style .................................. cosine
+  lr_warmup_fraction .............................. 0.01
+  lr_warmup_init .................................. 0.0
+  lr_warmup_iters ................................. 0
+  lr_warmup_samples ............................... 0
+  make_vocab_size_divisible_by .................... 128
+  mask_factor ..................................... 1.0
+  mask_prob ....................................... 0.15
+  mask_type ....................................... random
+  masked_softmax_fusion ........................... True
+  max_position_embeddings ......................... 512
+  max_tokens_to_oom ............................... 12000
+  merge_file ...................................... None
+  micro_batch_size ................................ 16
+  min_loss_scale .................................. 1.0
+  min_lr .......................................... 1e-05
+  mmap_warmup ..................................... False
+  no_load_optim ................................... True
+  no_load_rng ..................................... True
+  no_persist_layer_norm ........................... False
+  no_save_optim ................................... None
+  no_save_rng ..................................... None
+  normalization ................................... LayerNorm
+  num_attention_heads ............................. 16
+  num_channels .................................... 3
+  num_classes ..................................... 1000
+  num_experts ..................................... None
+  num_layers ...................................... 64
+  num_layers_per_virtual_pipeline_stage ........... None
+  num_query_groups ................................ 1
+  num_workers ..................................... 2
+  onnx_safe ....................................... None
+  openai_gelu ..................................... False
+  optimizer ....................................... adam
+  output_bert_embeddings .......................... False
+  overlap_p2p_comm ................................ False
+  override_opt_param_scheduler .................... False
+  params_dtype .................................... torch.float16
+  patch_dim ....................................... 16
+  perform_initialization .......................... True
+  pipeline_model_parallel_size .................... 4
+  pipeline_model_parallel_split_rank .............. None
+  position_embedding_type ......................... learned_absolute
+  profile ......................................... False
+  profile_eval_iters .............................. []
+  profile_ranks ................................... [0]
+  profile_step_end ................................ 12
+  profile_step_start .............................. 10
+  profile_train_iters ............................. [3]
+  query_in_block_prob ............................. 0.1
+  rampup_batch_size ............................... None
+  rank ............................................ 0
+  recompute_granularity ........................... None
+  recompute_method ................................ None
+  recompute_num_layers ............................ None
+  reset_attention_mask ............................ True
+  reset_position_ids .............................. True
+  retriever_report_topk_accuracies ................ []
+  retriever_score_scaling ......................... False
+  retriever_seq_length ............................ 256
+  retro_add_retriever ............................. False
+  retro_cyclic_train_iters ........................ None
+  retro_encoder_attention_dropout ................. 0.1
+  retro_encoder_hidden_dropout .................... 0.1
+  retro_encoder_layers ............................ 2
+  retro_num_neighbors ............................. 2
+  retro_num_retrieved_chunks ...................... 2
+  retro_return_doc_ids ............................ False
+  retro_workdir ................................... None
+  rotary_percent .................................. 1.0
+  rotary_seq_len_interpolation_factor ............. None
+  sample_rate ..................................... 1.0
+  save ............................................ None
+  save_interval ................................... None
+  scatter_gather_tensors_in_pipeline .............. True
+  seed ............................................ 1234
+  seq_length ...................................... 256
+  sequence_parallel ............................... False
+  sgd_momentum .................................... 0.9
+  short_seq_prob .................................. 0.1
+  skip_train ...................................... False
+  split ........................................... 100,0,0
+  squared_relu .................................... False
+  standalone_embedding_stage ...................... False
+  start_weight_decay .............................. 0.01
+  swiglu .......................................... False
+  swin_backbone_type .............................. tiny
+  tensor_model_parallel_size ...................... 1
+  tensorboard_dir ................................. None
+  tensorboard_log_interval ........................ 1
+  tensorboard_queue_size .......................... 1000
+  test_data_path .................................. None
+  timing_log_level ................................ 0
+  timing_log_option ............................... minmax
+  titles_data_path ................................ None
+  tokenizer_model ................................. None
+  tokenizer_type .................................. NullTokenizer
+  train_data_path ................................. None
+  train_iters ..................................... 3
+  train_samples ................................... None
+  train_synthetic ................................. True
+  transformer_impl ................................ local
+  transformer_pipeline_model_parallel_size ........ 4
+  untie_embeddings_and_output_weights ............. False
+  use_checkpoint_args ............................. False
+  use_checkpoint_opt_param_scheduler .............. False
+  use_contiguous_buffers_in_local_ddp ............. True
+  use_cpu_initialization .......................... None
+  use_distributed_optimizer ....................... False
+  use_flash_attn .................................. False
+  use_one_sent_docs ............................... False
+  use_ring_exchange_p2p ........................... False
+  use_rotary_position_embeddings .................. False
+  valid_data_path ................................. None
+  variable_seq_lengths ............................ False
+  virtual_pipeline_model_parallel_size ............ 2
+  vision_backbone_type ............................ vit
+  vision_pretraining .............................. False
+  vision_pretraining_type ......................... classify
+  vocab_extra_ids ................................. 0
+  vocab_file ...................................... None
+  vocab_size ...................................... 1600
+  weight_decay .................................... 0.01
+  weight_decay_incr_style ......................... constant
+  world_size ...................................... 4
+-------------------- end of arguments ---------------------
+setting number of micro-batches to constant 4
+> building NullTokenizer tokenizer ...
+ > padded vocab (size: 1601) with 63 dummy tokens (new size: 1664)
+✓ Chimera Asymmetric Configuration Loaded:
+  Config file: asymmetric_bitpipe/configs/chimera/4_devices/chimera_4devices_64layers.json
+  Pipeline size: 4, Total layers: 64
+  Rank      VR0    VR1
+  R0         24     16  (VR1 mirrors R3's VR0)
+  R1         12     12  (VR1 mirrors R2's VR0)
+  R2         12     12  (VR1 mirrors R1's VR0)
+  R3         16     24  (VR1 mirrors R0's VR0)
+> initializing torch distributed ...
+[Chimera BD Group] Rank 0 assigned to BD group 0: [0, 1]
+[Chimera BD Groups Summary] Total 2 BD groups created:
+[Chimera BD Groups Summary]   BD Group 0: [0, 1]
+[Chimera BD Groups Summary]   BD Group 1: [3, 2]
+> initialized tensor model parallel with size 1
+> initialized pipeline model parallel with size 4
+> setting random seeds to 1234 ...
+> compiling dataset index builder ...
+make: Entering directory '/root/Bitpipe/megatron/data'
+make: Nothing to be done for 'default'.
+make: Leaving directory '/root/Bitpipe/megatron/data'
+>>> done with dataset index builder. Compilation time: 0.057 seconds
+> compiling and loading fused kernels ...
+[Chimera BD Group] Rank 1 assigned to BD group 0: [0, 1]
+[Chimera BD Group] Rank 3 assigned to BD group 1: [3, 2]
+[Chimera BD Group] Rank 2 assigned to BD group 1: [3, 2]
+>>> done with compiling and loading fused kernels. Compilation time: 0.462 seconds
+/root/Bitpipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
+  output = bias_gelu(bias, input)
+/root/Bitpipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
+  output = bias_gelu(bias, input)
+/root/Bitpipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
+  output = bias_gelu(bias, input)
+/root/Bitpipe/megatron/initialize.py:316: UserWarning: nvfuser integration in TorchScript is deprecated. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/jit/codegen/cuda/interface.cpp:235.)
+  output = bias_gelu(bias, input)
+/root/Bitpipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
+  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
+/root/Bitpipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
+  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
+/root/Bitpipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
+  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
+/root/Bitpipe/megatron/training.py:100: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1695392067780/work/torch/csrc/tensor/python_tensor.cpp:83.)
+  start_time_tensor = torch.cuda.DoubleTensor([_TRAIN_START_TIME])
+time to initialize megatron (seconds): 3.635
+[after megatron is initialized] datetime: 2026-04-02 08:44:41 [SETUP DEBUG] Rank 3 passed barrier A (after megatron init)
+
+[SETUP DEBUG] Rank 1 passed barrier A (after megatron init)
+[SETUP DEBUG] Rank 0 passed barrier A (after megatron init)
+[SETUP DEBUG] Rank 3 reaching barrier B (model-setup timer start)
+[SETUP DEBUG] Rank 1 reaching barrier B (model-setup timer start)
+[SETUP DEBUG] Rank 0 reaching barrier B (model-setup timer start)
+[SETUP DEBUG] Rank 2 passed barrier A (after megatron init)
+[SETUP DEBUG] Rank 2 reaching barrier B (model-setup timer start)
+[SETUP DEBUG] Rank 1 passed barrier B[SETUP DEBUG] Rank 0 passed barrier B
+
+[SETUP DEBUG] Rank 3 passed barrier B
+[VR_INIT] Chimera 2-VR | Device 0 | VR 0 | pre_process=True  | post_process=False[VR_INIT] Chimera 2-VR | Device 3 | VR 0 | pre_process=False | post_process=True 
+
+[VR_INIT] Chimera 2-VR | Device 1 | VR 0 | pre_process=False | post_process=FalseBuilding BitPipe GPT model ...
+
+[SETUP DEBUG] Rank 2 passed barrier B
+[VR_INIT] Chimera 2-VR | Device 2 | VR 0 | pre_process=False | post_process=False
+[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
+[LAYER_CALC] Result: Each device gets 16 base layers
+[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
+[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
+[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
+[LAYER_CALC] Result: Each device gets 16 base layers
+[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
+[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
+[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
+[LAYER_CALC] Result: Each device gets 16 base layers
+[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
+[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
+[CHIMERA ASYM] Device 2 | VR 0 | Offset: 36 | Layers: 12 | Range: [37..48]
+[CHIMERA ASYM] Device 3 | VR 0 | Offset: 48 | Layers: 16 | Range: [49..64]
+[CHIMERA ASYM] Device 1 | VR 0 | Offset: 24 | Layers: 12 | Range: [25..36]
+[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
+[LAYER_CALC] Result: Each device gets 16 base layers
+[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
+[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
+[CHIMERA ASYM] Device 0 | VR 0 | Offset: 0 | Layers: 24 | Range: [1..24]
+[BITPIPE LOG] Device 2 | Virtual Rank 0 | Created layers: [37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48]
+[VR_INIT] Chimera 2-VR | Device 2 | VR 1 | pre_process=False | post_process=False
+[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
+[LAYER_CALC] Result: Each device gets 16 base layers
+[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
+[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
+[CHIMERA ASYM] Device 2 | VR 1 | Offset: 24 | Layers: 12 | Range: [25..36]
+[BITPIPE LOG] Device 1 | Virtual Rank 0 | Created layers: [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36]
+[VR_INIT] Chimera 2-VR | Device 1 | VR 1 | pre_process=False | post_process=False
+[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
+[LAYER_CALC] Result: Each device gets 16 base layers
+[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
+[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
+[CHIMERA ASYM] Device 1 | VR 1 | Offset: 36 | Layers: 12 | Range: [37..48]
+[BITPIPE LOG] Device 3 | Virtual Rank 0 | Created layers: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+[BITPIPE LOG] Device 2 | Virtual Rank 1 | Created layers: [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36]
+[BITPIPE LOG] Device 1 | Virtual Rank 1 | Created layers: [37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48]
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 2): 46204800
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 1): 46204800
+[BITPIPE LOG] Device 0 | Virtual Rank 0 | Created layers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+[VR_INIT] Chimera 2-VR | Device 0 | VR 1 | pre_process=False | post_process=True [VR_INIT] Chimera 2-VR | Device 3 | VR 1 | pre_process=True  | post_process=False
+
+Building BitPipe GPT model ...
+[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
+[LAYER_CALC] Result: Each device gets 16 base layers
+[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
+[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
+[CHIMERA ASYM] Device 0 | VR 1 | Offset: 48 | Layers: 16 | Range: [49..64]
+[LAYER_CALC] Input: args.num_layers=64, pipeline_stages=4
+[LAYER_CALC] Result: Each device gets 16 base layers
+[LAYER_CALC] Chimera enabled: doubled to 32 layers per device
+[LAYER_CALC]   → Will be divided into 2 VRs: 16 layers per VR
+[CHIMERA ASYM] Device 3 | VR 1 | Offset: 0 | Layers: 24 | Range: [1..24]
+[BITPIPE LOG] Device 0 | Virtual Rank 1 | Created layers: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 0): 78544800
+[BITPIPE LOG] Device 3 | Virtual Rank 1 | Created layers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 3): 78544800
+[SETUP DEBUG] Rank 3 finished setup_model_and_optimizer
+[SETUP DEBUG] Rank 3 reaching barrier C (after model built)
+[SETUP DEBUG] Rank 2 finished setup_model_and_optimizer
+[SETUP DEBUG] Rank 2 reaching barrier C (after model built)
+[SETUP DEBUG] Rank 1 finished setup_model_and_optimizer
+[SETUP DEBUG] Rank 1 reaching barrier C (after model built)
+> learning rate decay style: cosine
+[SETUP DEBUG] Rank 0 finished setup_model_and_optimizer
+[SETUP DEBUG] Rank 0 reaching barrier C (after model built)
+[SETUP DEBUG] Rank 1 passed barrier C
+[after model, optimizer, and learning rate scheduler are built] datetime: 2026-04-02 08:44:42 [SETUP DEBUG] Rank 2 passed barrier C
+
+[SETUP DEBUG] Rank 0 passed barrier C
+[SETUP DEBUG] Rank 1 reaching barrier D (data-iterators timer start)
+[SETUP DEBUG] Rank 2 reaching barrier D (data-iterators timer start)
+[SETUP DEBUG] Rank 0 reaching barrier D (data-iterators timer start)
+[SETUP DEBUG] Rank 3 passed barrier C
+[SETUP DEBUG] Rank 3 reaching barrier D (data-iterators timer start)
+[SETUP DEBUG] Rank 1 passed barrier D[SETUP DEBUG] Rank 2 passed barrier D[SETUP DEBUG] Rank 0 passed barrier D
+
+
+> building train, validation, and test datasets ...
+[SETUP DEBUG] Rank 3 passed barrier D > datasets target sizes (minimum size):
+
+    train:      192
+    validation: 64
+    test:       64
+> building dummy datasets for BitPipe...
+> created dummy datasets: train=192, valid=64, test=64
+> building train, validation, and test datasets ...
+ > datasets target sizes (minimum size):
+    train:      192
+    validation: 64
+    test:       64
+> building dummy datasets for BitPipe...
+> created dummy datasets: train=192, valid=64, test=64
+[SETUP DEBUG] Rank 1 reaching barrier E (after dataloaders)
+[SETUP DEBUG] Rank 0 reaching barrier E (after dataloaders)
+[SETUP DEBUG] Rank 3 reaching barrier E (after dataloaders)
+[SETUP DEBUG] Rank 2 reaching barrier E (after dataloaders)
+[after dataloaders are built] datetime: 2026-04-02 08:44:42 [SETUP DEBUG] Rank 1 passed barrier E
+
+[SETUP DEBUG] Rank 1 reaching barrier F (timers.log)
+[SETUP DEBUG] Rank 0 passed barrier E
+done with setup ...
+[SETUP DEBUG] Rank 0 reaching barrier F (timers.log)
+[SETUP DEBUG] Rank 3 passed barrier E
+[SETUP DEBUG] Rank 3 reaching barrier F (timers.log)
+[SETUP DEBUG] Rank 2 passed barrier E
+[SETUP DEBUG] Rank 2 reaching barrier F (timers.log)
+[SETUP DEBUG] Rank 1 passed barrier F — entering training loop
+[SETUP DEBUG] Rank 0 passed barrier F — entering training loop
+training ...
+[SETUP DEBUG] Rank 2 passed barrier F — entering training loop
+(min, max) time across ranks (ms):
+    model-and-optimizer-setup ......................: (212.99, 377.66)
+    train/valid/test-data-iterators-setup ..........: (326.32, 382.13)
+[SETUP DEBUG] Rank 3 passed barrier F — entering training loop
+[before the start of training step] datetime: 2026-04-02 08:44:42 
+[DEBUG] Chimera 2-VR schedule ENABLED
+[DEBUG] Chimera 2-VR schedule ENABLED
+[DEBUG] Chimera 2-VR schedule ENABLED
+[DEBUG] Chimera 2-VR schedule ENABLED
+[Chimera G1/P3]  Chimera Config: pipeline_size=4, rank=3
+[Chimera G1/P3]  Microbatches: user=4, total=4 (NO doubling)
+[Chimera G1/P3]  [PHASE CALC] warmup=2, 1f1b=2, cooldown=3
+[Chimera G1/P3]  Forward schedule: [2, 3, 0, 1]
+[Chimera G1/P3]  Backward schedule: [0, 1, 2, 3, -1]
+[Chimera G1/P3]  [INIT] Rank 3/4 ready for execution
+[Chimera G1/P3]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
+[Chimera G1/P3]  Forward schedule: [2, 3, 0, 1]
+[Chimera G1/P3]  Backward schedule: [0, 1, 2, 3, -1]
+[Chimera G1/P3]  === WARMUP PHASE (2 forwards) ===
+[Chimera G1/P3]  [PRE-RECV] Rank3 is first stage for VR1, no pre-recv needed
+[Chimera G1/P3]  [WARMUP k=0] FWD MB2, VR1
+[Chimera G1/P3]  [Rank3] First stage for VR1 - no input needed
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>]
+[forward_step] set_input_tensor done
+[Chimera G3/P1]  Chimera Config: pipeline_size=4, rank=1
+[Chimera G3/P1]  Microbatches: user=4, total=4 (NO doubling)
+[Chimera G3/P1]  [PHASE CALC] warmup=3, 1f1b=1, cooldown=4
+[Chimera G3/P1]  Forward schedule: [0, 2, 1, 3]
+[Chimera G3/P1]  Backward schedule: [2, 0, 3, 1, -1]
+[Chimera G3/P1]  [INIT] Rank 1/4 ready for execution
+[Chimera G3/P1]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
+[Chimera G3/P1]  Forward schedule: [0, 2, 1, 3]
+[Chimera G3/P1]  Backward schedule: [2, 0, 3, 1, -1]
+[Chimera G3/P1]  === WARMUP PHASE (3 forwards) ===
+[Chimera G3/P1]  [PRE-RECV] Rank1 receiving VR0 input from prev rank
+[P2P ACTUAL] R3: recv←R0
+[Chimera G0/P0]  Chimera Config: pipeline_size=4, rank=0
+[Chimera G0/P0]  Microbatches: user=4, total=4 (NO doubling)
+[Chimera G0/P0]  [PHASE CALC] warmup=2, 1f1b=2, cooldown=3
+[Chimera G0/P0]  Forward schedule: [0, 1, 2, 3]
+[Chimera G2/P2]  Chimera Config: pipeline_size=4, rank=2
+[Chimera G0/P0]  Backward schedule: [2, 3, 0, 1, -1]
+[Chimera G2/P2]  Microbatches: user=4, total=4 (NO doubling)
+[Chimera G0/P0]  [INIT] Rank 0/4 ready for execution
+[Chimera G2/P2]  [PHASE CALC] warmup=3, 1f1b=1, cooldown=4
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[Chimera G2/P2]  Forward schedule: [2, 0, 3, 1][Chimera G0/P0]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
+
+[Chimera G0/P0]  Forward schedule: [0, 1, 2, 3]
+[Chimera G2/P2]  Backward schedule: [0, 2, 1, 3, -1]
+[Chimera G0/P0]  Backward schedule: [2, 3, 0, 1, -1]
+[Chimera G2/P2]  [INIT] Rank 2/4 ready for execution
+[Chimera G0/P0]  === WARMUP PHASE (2 forwards) ===
+[Chimera G0/P0]  [PRE-RECV] Rank0 is first stage for VR0, no pre-recv needed
+[Chimera G2/P2]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
+[Chimera G0/P0]  [WARMUP k=0] FWD MB0, VR0
+[Chimera G2/P2]  Forward schedule: [2, 0, 3, 1]
+[Chimera G0/P0]  [Rank0] First stage for VR0 - no input needed
+[Chimera G2/P2]  Backward schedule: [0, 2, 1, 3, -1]
+[Chimera G2/P2]  === WARMUP PHASE (3 forwards) ===
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>]
+[Chimera G2/P2]  [PRE-RECV] Rank2 receiving VR1 input from next rank
+[forward_step] set_input_tensor done
+[P2P ACTUAL] R2: recv←R1
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G1/P3]  [WARMUP STORE] Rank3 MB2, VR1: input_id=None, output_id=140383088788400
+[Chimera G1/P3]  [Rank3] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
+[Chimera G1/P3]  [Rank3] Send only VR1
+[P2P ACTUAL] R1: send→R2
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[Chimera G0/P0]  [WARMUP STORE] Rank0 MB0, VR0: input_id=None, output_id=139750722986496
+[Chimera G0/P0]  [Rank0] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
+[Chimera G0/P0]  [Rank0] Send only VR0
+[P2P ACTUAL] R0: send→R3
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[Chimera G0/P0]  [Rank0] Sent VR0
+[Chimera G0/P0]  [WARMUP k=1] FWD MB1, VR0
+[Chimera G0/P0]  [Rank0] First stage for VR0 - no input needed
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>]
+[forward_step] set_input_tensor done
+[Chimera G3/P1]  [PRE-RECV] Rank1 received initial input for VR0
+[Chimera G3/P1]  [WARMUP k=0] FWD MB0, VR0
+[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB0, VR0 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G1/P3]  [Rank3] Sent VR1
+[Chimera G1/P3]  [WARMUP k=1] FWD MB3, VR1
+[Chimera G1/P3]  [Rank3] First stage for VR1 - no input needed
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>]
+[Chimera G2/P2]  [PRE-RECV] Rank2 received initial input for VR1
+[Chimera G2/P2]  [WARMUP k=0] FWD MB2, VR1[forward_step] set_input_tensor done
+
+[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB2, VR1 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G0/P0]  [WARMUP STORE] Rank0 MB1, VR0: input_id=None, output_id=139750722631328
+[Chimera G0/P0]  [Rank0] Stored output for MB1, VR0 (input_queue=2, output_queue=2)
+[Chimera G0/P0]  [Rank0] Combined send VR0 + recv VR1
+[P2P ACTUAL] R0: send→R3, recv←R3
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[Chimera G1/P3]  [WARMUP STORE] Rank3 MB3, VR1: input_id=None, output_id=140383089004352
+[Chimera G1/P3]  [Rank3] Stored output for MB3, VR1 (input_queue=2, output_queue=2)
+[Chimera G1/P3]  [Rank3] Combined send VR1 + recv VR0
+[P2P ACTUAL] R1: send→R2, recv←R2
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[Chimera G3/P1]  [WARMUP STORE] Rank1 MB0, VR0: input_id=140613875880544, output_id=140613874279392
+[Chimera G3/P1]  [Rank1] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
+[Chimera G3/P1]  [Rank1] Combined send VR0 + recv VR1
+[P2P ACTUAL] R3: send→R2, recv←R2
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[Chimera G2/P2]  [WARMUP STORE] Rank2 MB2, VR1: input_id=140513227661504, output_id=140512877728752
+[Chimera G2/P2]  [Rank2] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
+[Chimera G2/P2]  [Rank2] Combined send VR1 + recv VR0
+[P2P ACTUAL] R2: send→R3, recv←R3
+[W ProcessGroupNCCL.cpp:1849] Warning: 0NCCL_AVOID_RECORD_STREAMS=1 has no effect for point-to-point collectives. (function operator())
+[Chimera G2/P2]  [Rank2] Sent VR1, received VR0 input
+[Chimera G2/P2]  [WARMUP k=1] FWD MB0, VR0
+[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB0, VR0 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[Chimera G3/P1]  [Rank1] Sent VR0, received VR1 input
+[forward_step] set_input_tensor done[Chimera G3/P1]  [WARMUP k=1] FWD MB2, VR1
+
+[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB2, VR1 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G2/P2]  [WARMUP STORE] Rank2 MB0, VR0: input_id=140512877350880, output_id=140512877857184
+[Chimera G2/P2]  [Rank2] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
+[Chimera G2/P2]  [Rank2] Combined send VR0 + recv VR1
+[P2P ACTUAL] R2: send→R1, recv←R1
+[Chimera G3/P1]  [WARMUP STORE] Rank1 MB2, VR1: input_id=140613874087744, output_id=140613874371616
+[Chimera G3/P1]  [Rank1] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
+[Chimera G3/P1]  [Rank1] Combined send VR1 + recv VR0
+[P2P ACTUAL] R3: send→R0, recv←R0
+[Chimera G0/P0]  [Rank0] Sent VR0, received VR1 input
+[Chimera G0/P0]  [WARMUP DONE] Processed 2 forwards, fwd_idx now at 2
+[Chimera G0/P0]  === 1F1B PHASE (2 iterations) ===
+[Chimera G0/P0]  [1F1B k=0] FWD MB2, VR1
+[Chimera G0/P0]  [Rank0] Accessing pre-received input for MB2, VR1 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G3/P1]  [Rank1] Sent VR1, received VR0 input
+[Chimera G3/P1]  [WARMUP k=2] FWD MB1, VR0
+[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB1, VR0 (queue_len=2)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G1/P3]  [Rank3] Sent VR1, received VR0 input
+[Chimera G1/P3]  [WARMUP DONE] Processed 2 forwards, fwd_idx now at 2
+[Chimera G1/P3]  === 1F1B PHASE (2 iterations) ===
+[Chimera G2/P2]  [Rank2] Sent VR0, received VR1 input[Chimera G1/P3]  [1F1B k=0] FWD MB0, VR0
+
+[Chimera G1/P3]  [Rank3] Accessing pre-received input for MB0, VR0 (queue_len=1)
+[Chimera G2/P2]  [WARMUP k=2] FWD MB3, VR1
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB3, VR1 (queue_len=2)
+[forward_step] set_input_tensor done
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G3/P1]  [WARMUP STORE] Rank1 MB1, VR0: input_id=140613873923024, output_id=140613874463216
+[Chimera G3/P1]  [Rank1] Stored output for MB1, VR0 (input_queue=2, output_queue=2)
+[Chimera G3/P1]  [Rank1] Combined send VR0 + recv VR1
+[P2P ACTUAL] R3: send→R2, recv←R2
+[Chimera G2/P2]  [WARMUP STORE] Rank2 MB3, VR1: input_id=140512877405392, output_id=140512877916336
+[Chimera G2/P2]  [Rank2] Stored output for MB3, VR1 (input_queue=2, output_queue=2)
+[Chimera G2/P2]  [Rank2] Combined send VR1 + recv VR0
+[P2P ACTUAL] R2: send→R3, recv←R3
+[Chimera G3/P1]  [Rank1] Sent VR0, received VR1 input
+[Chimera G3/P1]  [WARMUP DONE] Processed 3 forwards, fwd_idx now at 3
+[Chimera G3/P1]  === 1F1B PHASE (1 iterations) ===
+[Chimera G3/P1]  [1F1B k=0] FWD MB3, VR1
+[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB3, VR1 (queue_len=2)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G2/P2]  [Rank2] Sent VR1, received VR0 input
+[Chimera G2/P2]  [WARMUP DONE] Processed 3 forwards, fwd_idx now at 3
+[Chimera G2/P2]  === 1F1B PHASE (1 iterations) ===
+[Chimera G2/P2]  [1F1B k=0] FWD MB1, VR0
+[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB1, VR0 (queue_len=2)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G3/P1]  [Rank1] Stored output for MB3, VR1 (input_queue=2, output_queue=2)
+[Chimera G3/P1]  [Rank1] Combined send_fwd VR1 + recv_bwd VR1
+[Chimera G3/P1]  [GRAD TRACK] Rank1 sending FWD_MB3, VR1, will queue received gradient for BWD_MB2, VR1
+[P2P ACTUAL] R3: send→R0, recv←R0
+[Chimera G2/P2]  [Rank2] Stored output for MB1, VR0 (input_queue=2, output_queue=2)
+[Chimera G2/P2]  [Rank2] Combined send_fwd VR0 + recv_bwd VR0
+[Chimera G2/P2]  [GRAD TRACK] Rank2 sending FWD_MB1, VR0, will queue received gradient for BWD_MB0, VR0
+[P2P ACTUAL] R2: send→R1, recv←R1
+[Chimera G1/P3]  [Rank3] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
+[Chimera G1/P3]  [Rank3] Last stage for VR0 - loss collected by forward_step
+[Chimera G1/P3]  [Rank3] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
+[Chimera G1/P3]  [1F1B k=0] BWD MB0, VR0
+[Chimera G1/P3]  [1F1B RETRIEVE] Rank3 MB0, VR0: retrieved input_id=140383605385120, output_id=140383089073168
+[Chimera G1/P3]  [GRAD TRACK] Rank3 popped gradient for BWD_MB0, VR0, queue_before=1, queue_after=0
+[Chimera G1/P3]  [Rank3] Popped tensors and gradient for MB0, VR0
+[Chimera G1/P3]  [Rank3] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
+[Chimera G1/P3]  [Rank3] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7fad7c3af5e0>
+[Chimera G1/P3]  [GRAPH CHECK] Rank3: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G1/P3]  [GRAPH CHECK] Rank3: Called retain_grad() on input_tensor
+[Chimera G1/P3]  [Rank3] CALLING backward_step for BWD_MB0, VR0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
+[Chimera G0/P0]  [Rank0] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
+[Chimera G0/P0]  [Rank0] Last stage for VR1 - loss collected by forward_step
+[Chimera G0/P0]  [Rank0] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
+[Chimera G0/P0]  [1F1B k=0] BWD MB2, VR1
+[Chimera G0/P0]  [1F1B RETRIEVE] Rank0 MB2, VR1: retrieved input_id=139750722711728, output_id=139750723171520
+[Chimera G0/P0]  [GRAD TRACK] Rank0 popped gradient for BWD_MB2, VR1, queue_before=1, queue_after=0
+[Chimera G0/P0]  [Rank0] Popped tensors and gradient for MB2, VR1
+[Chimera G0/P0]  [Rank0] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
+[Chimera G0/P0]  [Rank0] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7f1a402eaa10>
+[Chimera G0/P0]  [GRAPH CHECK] Rank0: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G0/P0]  [GRAPH CHECK] Rank0: Called retain_grad() on input_tensor
+[Chimera G0/P0]  [Rank0] CALLING backward_step for BWD_MB2, VR1
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
+[Chimera G1/P3]  [Rank3] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G1/P3]  [Rank3] Backward step done for MB0, VR0
+[Chimera G1/P3]  [GRAD TRACK] Rank3 about to send gradient for BWD_MB0, VR0
+[Chimera G1/P3]  [Rank3] Combined send_bwd VR0 + recv_fwd VR0
+[P2P ACTUAL] R1: send→R2, recv←R2
+[Chimera G0/P0]  [Rank0] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G0/P0]  [Rank0] Backward step done for MB2, VR1
+[Chimera G0/P0]  [GRAD TRACK] Rank0 about to send gradient for BWD_MB2, VR1
+[Chimera G0/P0]  [Rank0] Combined send_bwd VR1 + recv_fwd VR1
+[P2P ACTUAL] R0: send→R3, recv←R3
+[Chimera G1/P3]  [Rank3] Sent bwd grad, received next fwd input for VR0
+[Chimera G1/P3]  [1F1B k=1] FWD MB1, VR0
+[Chimera G1/P3]  [Rank3] Accessing pre-received input for MB1, VR0 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G2/P2]  [GRAD TRACK] Rank2 received gradient (from some MB's backward), queued for BWD_MB0, VR0, queue_len=1
+[Chimera G2/P2]  [Rank2] Sent fwd, received bwd grad, queued for VR0
+[Chimera G2/P2]  [1F1B k=0] BWD MB0, VR0
+[Chimera G2/P2]  [1F1B RETRIEVE] Rank2 MB0, VR0: retrieved input_id=140512877350880, output_id=140512877857184
+[Chimera G2/P2]  [GRAD TRACK] Rank2 popped gradient for BWD_MB0, VR0, queue_before=1, queue_after=0
+[Chimera G2/P2]  [Rank2] Popped tensors and gradient for MB0, VR0
+[Chimera G2/P2]  [Rank2] 1F1B BEFORE BWD: output_tensor_grad is None? False, shape=torch.Size([256, 16, 400]), bwd_is_grad_first=False
+[Chimera G2/P2]  [Rank2] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<CppFunction object at 0x7fcbb425b520>
+[Chimera G2/P2]  [GRAPH CHECK] Rank2: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G2/P2]  [GRAPH CHECK] Rank2: Called retain_grad() on input_tensor
+[Chimera G2/P2]  [Rank2] CALLING backward_step for BWD_MB0, VR0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G0/P0]  [Rank0] Sent bwd grad, received next fwd input for VR1
+[Chimera G0/P0]  [1F1B k=1] FWD MB3, VR1
+[Chimera G0/P0]  [Rank0] Accessing pre-received input for MB3, VR1 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G3/P1]  [GRAD TRACK] Rank1 received gradient (from some MB's backward), queued for BWD_MB2, VR1, queue_len=1
+[Chimera G3/P1]  [Rank1] Sent fwd, received bwd grad, queued for VR1
+[Chimera G3/P1]  [1F1B k=0] BWD MB2, VR1
+[Chimera G3/P1]  [1F1B RETRIEVE] Rank1 MB2, VR1: retrieved input_id=140613874087744, output_id=140613874371616
+[Chimera G3/P1]  [GRAD TRACK] Rank1 popped gradient for BWD_MB2, VR1, queue_before=1, queue_after=0
+[Chimera G3/P1]  [Rank1] Popped tensors and gradient for MB2, VR1
+[Chimera G3/P1]  [Rank1] 1F1B BEFORE BWD: output_tensor_grad is None? False, shape=torch.Size([256, 16, 400]), bwd_is_grad_first=False
+[Chimera G3/P1]  [Rank1] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<CppFunction object at 0x7fe33801b220>
+[Chimera G3/P1]  [GRAPH CHECK] Rank1: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G3/P1]  [GRAPH CHECK] Rank1: Called retain_grad() on input_tensor
+[Chimera G3/P1]  [Rank1] CALLING backward_step for BWD_MB2, VR1
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G1/P3]  [Rank3] Stored output for MB1, VR0 (input_queue=1, output_queue=1)
+[Chimera G1/P3]  [Rank3] Last stage for VR0 - loss collected by forward_step
+[Chimera G1/P3]  [Rank3] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
+[Chimera G1/P3]  [1F1B k=1] BWD MB1, VR0
+[Chimera G1/P3]  [1F1B RETRIEVE] Rank3 MB1, VR0: retrieved input_id=140383619444752, output_id=140383089081888
+[Chimera G1/P3]  [GRAD TRACK] Rank3 popped gradient for BWD_MB1, VR0, queue_before=1, queue_after=0
+[Chimera G1/P3]  [Rank3] Popped tensors and gradient for MB1, VR0
+[Chimera G1/P3]  [Rank3] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
+[Chimera G1/P3]  [Rank3] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7fad7c3af5e0>
+[Chimera G1/P3]  [GRAPH CHECK] Rank3: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G1/P3]  [GRAPH CHECK] Rank3: Called retain_grad() on input_tensor
+[Chimera G1/P3]  [Rank3] CALLING backward_step for BWD_MB1, VR0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
+[Chimera G0/P0]  [Rank0] Stored output for MB3, VR1 (input_queue=1, output_queue=1)
+[Chimera G0/P0]  [Rank0] Last stage for VR1 - loss collected by forward_step
+[Chimera G0/P0]  [Rank0] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
+[Chimera G0/P0]  [1F1B k=1] BWD MB3, VR1
+[Chimera G0/P0]  [1F1B RETRIEVE] Rank0 MB3, VR1: retrieved input_id=139750722621088, output_id=139750723410640
+[Chimera G0/P0]  [GRAD TRACK] Rank0 popped gradient for BWD_MB3, VR1, queue_before=1, queue_after=0
+[Chimera G0/P0]  [Rank0] Popped tensors and gradient for MB3, VR1
+[Chimera G0/P0]  [Rank0] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
+[Chimera G0/P0]  [Rank0] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7f1a402ebc10>
+[Chimera G0/P0]  [GRAPH CHECK] Rank0: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G0/P0]  [GRAPH CHECK] Rank0: Called retain_grad() on input_tensor
+[Chimera G0/P0]  [Rank0] CALLING backward_step for BWD_MB3, VR1
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
+[Chimera G1/P3]  [Rank3] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G1/P3]  [Rank3] Backward step done for MB1, VR0
+[Chimera G1/P3]  [GRAD TRACK] Rank3 about to send gradient for BWD_MB1, VR0
+[Chimera G1/P3]  [Rank3] BRIDGE: send VR0 bwd grad + recv VR1 cooldown grad (MB2)
+[Chimera G1/P3]  [Rank3] BRIDGE DEBUG: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G1/P3]  [Rank3] BRIDGE FLAGS: send_to_prev=True, send_to_next=False, recv_from_prev=True, recv_from_next=False
+[Chimera P2P Rank 1] chimera_communicate: send_prev + recv_prev
+[P2P ACTUAL] R1: send→R2, recv←R2
+[Chimera G0/P0]  [Rank0] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G0/P0]  [Rank0] Backward step done for MB3, VR1
+[Chimera G0/P0]  [GRAD TRACK] Rank0 about to send gradient for BWD_MB3, VR1
+[Chimera G0/P0]  [Rank0] BRIDGE: send VR1 bwd grad + recv VR0 cooldown grad (MB0)
+[Chimera G0/P0]  [Rank0] BRIDGE DEBUG: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G0/P0]  [Rank0] BRIDGE FLAGS: send_to_prev=False, send_to_next=True, recv_from_prev=False, recv_from_next=True
+[Chimera P2P Rank 0] chimera_communicate: send_next + recv_next
+[P2P ACTUAL] R0: send→R3, recv←R3
+[Chimera G3/P1]  [Rank1] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] Backward step done for MB2, VR1
+[Chimera G3/P1]  [GRAD TRACK] Rank1 about to send gradient for BWD_MB2, VR1
+[Chimera G3/P1]  [Rank1] BRIDGE: send VR1 bwd grad + recv VR0 cooldown grad (MB0)
+[Chimera G3/P1]  [Rank1] BRIDGE DEBUG: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] BRIDGE FLAGS: send_to_prev=False, send_to_next=True, recv_from_prev=False, recv_from_next=True
+[Chimera P2P Rank 3] chimera_communicate: send_next + recv_next
+[P2P ACTUAL] R3: send→R2, recv←R2
+[Chimera G2/P2]  [Rank2] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] Backward step done for MB0, VR0
+[Chimera G2/P2]  [GRAD TRACK] Rank2 about to send gradient for BWD_MB0, VR0
+[Chimera G2/P2]  [Rank2] BRIDGE: send VR0 bwd grad + recv VR1 cooldown grad (MB2)
+[Chimera G2/P2]  [Rank2] BRIDGE DEBUG: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] BRIDGE FLAGS: send_to_prev=True, send_to_next=False, recv_from_prev=True, recv_from_next=False
+[Chimera P2P Rank 2] chimera_communicate: send_prev + recv_prev
+[P2P ACTUAL] R2: send→R3, recv←R3
+[Chimera P2P Rank 2] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] BRIDGE done: pre-fetched VR1 grad for cooldown MB2
+[Chimera G2/P2]  [1F1B DONE] fwd_idx=4, bwd_idx=1
+[Chimera G2/P2]  === COOLDOWN PHASE (3 items remaining) ===
+[Chimera G2/P2]  [COOLDOWN k=0] BWD MB2, VR1
+[Chimera G2/P2]  [Rank2] Popped tensors for MB2, VR1 in k=0, COOLDOWN phase (queues: in=1, out=1)
+[Chimera G2/P2]  [Rank2] CHAIN: Using BRIDGED grad for VR1 MB2
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera P2P Rank 3] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] BRIDGE done: pre-fetched VR0 grad for cooldown MB0
+[Chimera G3/P1]  [1F1B DONE] fwd_idx=4, bwd_idx=1
+[Chimera G3/P1]  === COOLDOWN PHASE (3 items remaining) ===
+[Chimera G3/P1]  [COOLDOWN k=0] BWD MB0, VR0
+[Chimera G3/P1]  [Rank1] Popped tensors for MB0, VR0 in k=0, COOLDOWN phase (queues: in=1, out=1)
+[Chimera G3/P1]  [Rank1] CHAIN: Using BRIDGED grad for VR0 MB0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G3/P1]  [Rank1] Backward step done for MB0, VR0 in k=0, COOLDOWN phase
+[Chimera G3/P1]  [Rank1] Saved grad for VR0 to combine with next recv
+[Chimera G3/P1]  [COOLDOWN k=1] BWD MB3, VR1
+[Chimera G3/P1]  [Rank1] Popped tensors for MB3, VR1 in k=1, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G3/P1]  [Rank1] CHAIN: send VR0 + recv VR1 for MB3
+[Chimera P2P Rank 3] chimera_communicate: send_prev + recv_prev
+[P2P ACTUAL] R3: send→R0, recv←R0
+[Chimera G2/P2]  [Rank2] Backward step done for MB2, VR1 in k=0, COOLDOWN phase
+[Chimera G2/P2]  [Rank2] Saved grad for VR1 to combine with next recv
+[Chimera G2/P2]  [COOLDOWN k=1] BWD MB1, VR0
+[Chimera G2/P2]  [Rank2] Popped tensors for MB1, VR0 in k=1, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G2/P2]  [Rank2] CHAIN: send VR1 + recv VR0 for MB1
+[Chimera P2P Rank 2] chimera_communicate: send_next + recv_next
+[P2P ACTUAL] R2: send→R1, recv←R1
+[Chimera P2P Rank 0] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+[Chimera P2P Rank 3] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] CHAIN: send+recv done for MB3
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G0/P0]  [Rank0] BRIDGE done: pre-fetched VR0 grad for cooldown MB0
+[Chimera G0/P0]  [1F1B DONE] fwd_idx=4, bwd_idx=2
+[Chimera G0/P0]  === COOLDOWN PHASE (2 items remaining) ===[Chimera P2P Rank 2] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+
+[Chimera G2/P2]  [Rank2] CHAIN: send+recv done for MB1
+[Chimera G0/P0]  [COOLDOWN k=0] BWD MB0, VR0[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+
+[Chimera G0/P0]  [Rank0] Popped tensors for MB0, VR0 in k=0, COOLDOWN phase (queues: in=1, out=1)
+[Chimera G0/P0]  [Rank0] CHAIN: Using BRIDGED grad for VR0 MB0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera P2P Rank 1] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+[Chimera G1/P3]  [Rank3] BRIDGE done: pre-fetched VR1 grad for cooldown MB2
+[Chimera G1/P3]  [1F1B DONE] fwd_idx=4, bwd_idx=2
+[Chimera G1/P3]  === COOLDOWN PHASE (2 items remaining) ===
+[Chimera G1/P3]  [COOLDOWN k=0] BWD MB2, VR1
+[Chimera G1/P3]  [Rank3] Popped tensors for MB2, VR1 in k=0, COOLDOWN phase (queues: in=1, out=1)
+[Chimera G1/P3]  [Rank3] CHAIN: Using BRIDGED grad for VR1 MB2
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G3/P1]  [Rank1] Backward step done for MB3, VR1 in k=1, COOLDOWN phase
+[Chimera G3/P1]  [Rank1] Saved grad for VR1 to combine with next recv
+[Chimera G3/P1]  [COOLDOWN k=2] BWD MB1, VR0
+[Chimera G3/P1]  [Rank1] Popped tensors for MB1, VR0 in k=2, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G3/P1]  [Rank1] CHAIN: send VR1 + recv VR0 for MB1
+[Chimera P2P Rank 3] chimera_communicate: send_next + recv_next
+[P2P ACTUAL] R3: send→R2, recv←R2
+[Chimera G2/P2]  [Rank2] Backward step done for MB1, VR0 in k=1, COOLDOWN phase
+[Chimera G2/P2]  [Rank2] Saved grad for VR0 to combine with next recv
+[Chimera G2/P2]  [COOLDOWN k=2] BWD MB3, VR1
+[Chimera G2/P2]  [Rank2] Popped tensors for MB3, VR1 in k=2, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G2/P2]  [Rank2] CHAIN: send VR0 + recv VR1 for MB3
+[Chimera P2P Rank 2] chimera_communicate: send_prev + recv_prev
+[P2P ACTUAL] R2: send→R3, recv←R3
+[Chimera P2P Rank 2] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] CHAIN: send+recv done for MB3
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera P2P Rank 3] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] CHAIN: send+recv done for MB1
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G3/P1]  [Rank1] Backward step done for MB1, VR0 in k=2, COOLDOWN phase
+[Chimera G3/P1]  [Rank1] Saved grad for VR0 to combine with next recv
+[Chimera G3/P1]  [Rank1] PRE-SYNC FLUSH: send VR0 grad before SYNC
+[Chimera P2P Rank 3] chimera_communicate: send_prev
+[P2P ACTUAL] R3: send→R0
+[Chimera G2/P2]  [Rank2] Backward step done for MB3, VR1 in k=2, COOLDOWN phase
+[Chimera G2/P2]  [Rank2] Saved grad for VR1 to combine with next recv
+[Chimera G2/P2]  [Rank2] PRE-SYNC FLUSH: send VR1 grad before SYNC
+[Chimera P2P Rank 2] chimera_communicate: send_next
+[P2P ACTUAL] R2: send→R1
+[Chimera G0/P0]  [Rank0] Backward step done for MB0, VR0 in k=0, COOLDOWN phase
+[Chimera G0/P0]  [Rank0] Gradient last stage for VR0 - no send needed for MB0
+[Chimera G0/P0]  [COOLDOWN k=1] BWD MB1, VR0
+[Chimera G1/P3]  [Rank3] Backward step done for MB2, VR1 in k=0, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Gradient last stage for VR1 - no send needed for MB2
+[Chimera G1/P3]  [COOLDOWN k=1] BWD MB3, VR1
+[Chimera G0/P0]  [Rank0] Popped tensors for MB1, VR0 in k=1, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G0/P0]  [Rank0] CHAIN: standalone recv VR0 for MB1 at k=1 (grad_last rank, partner is sending)
+[Chimera P2P Rank 0] chimera_communicate: recv_next
+[P2P ACTUAL] R0: recv←R3
+[Chimera G1/P3]  [Rank3] Popped tensors for MB3, VR1 in k=1, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G1/P3]  [Rank3] CHAIN: standalone recv VR1 for MB3 at k=1 (grad_last rank, partner is sending)
+[Chimera P2P Rank 1] chimera_communicate: recv_prev
+[Chimera P2P Rank 0] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])[Chimera G3/P1] [1775119484.61] [Rank1] SYNC MARKER at bwd_idx=4, k=3, COOLDOWN phase
+
+[Chimera G3/P1]  [Rank1] Allreduce gradients for VR0 in k=3, COOLDOWN phase
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[P2P ACTUAL] R1: recv←R2
+[Chimera G2/P2] [1775119484.61] [Rank2] SYNC MARKER at bwd_idx=4, k=3, COOLDOWN phase
+[Chimera G2/P2]  [Rank2] Allreduce gradients for VR1 in k=3, COOLDOWN phase
+[Chimera P2P Rank 1] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G3/P1]  [Rank1] Allreduce gradients for VR1 in k=3, COOLDOWN phase
+[Chimera G2/P2]  [Rank2] Allreduce gradients for VR0 in k=3, COOLDOWN phase
+[Chimera G3/P1]  [COOLDOWN DONE] Processed all backwards
+[Chimera G3/P1]  === Chimera schedule completed ===
+[Chimera G2/P2]  [COOLDOWN DONE] Processed all backwards
+[Chimera G2/P2]  === Chimera schedule completed ===
+[Chimera G0/P0]  [Rank0] Backward step done for MB1, VR0 in k=1, COOLDOWN phase
+[Chimera G0/P0]  [Rank0] Gradient last stage for VR0 - no send needed for MB1
+[Chimera G0/P0] [1775119484.66] [Rank0] SYNC MARKER at bwd_idx=4, k=2, COOLDOWN phase
+[Chimera G0/P0]  [Rank0] Allreduce gradients for VR0 in k=2, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Backward step done for MB3, VR1 in k=1, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Gradient last stage for VR1 - no send needed for MB3
+[Chimera G1/P3] [1775119484.67] [Rank3] SYNC MARKER at bwd_idx=4, k=2, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Allreduce gradients for VR1 in k=2, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Allreduce gradients for VR0 in k=2, COOLDOWN phase
+[Chimera G0/P0]  [Rank0] Allreduce gradients for VR1 in k=2, COOLDOWN phase
+[Chimera G0/P0]  [COOLDOWN DONE] Processed all backwards
+[Chimera G1/P3]  [COOLDOWN DONE] Processed all backwards
+[Chimera G0/P0]  === Chimera schedule completed ===
+[Chimera G1/P3]  === Chimera schedule completed ===
+[DEBUG] Chimera 2-VR schedule ENABLED
+[Chimera G2/P2]  Chimera Config: pipeline_size=4, rank=2
+[Chimera G2/P2]  Microbatches: user=4, total=4 (NO doubling)
+[Chimera G2/P2]  [PHASE CALC] warmup=3, 1f1b=1, cooldown=4[DEBUG] Chimera 2-VR schedule ENABLED
+
+[Chimera G2/P2]  Forward schedule: [2, 0, 3, 1]
+[Chimera G2/P2]  Backward schedule: [0, 2, 1, 3, -1]
+[Chimera G2/P2]  [INIT] Rank 2/4 ready for execution
+[Chimera G0/P0]  Chimera Config: pipeline_size=4, rank=0
+[Chimera G0/P0]  Microbatches: user=4, total=4 (NO doubling)
+[Chimera G2/P2]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===[Chimera G0/P0]  [PHASE CALC] warmup=2, 1f1b=2, cooldown=3
+
+[Chimera G2/P2]  Forward schedule: [2, 0, 3, 1]
+[Chimera G0/P0]  Forward schedule: [0, 1, 2, 3]
+[Chimera G2/P2]  Backward schedule: [0, 2, 1, 3, -1]
+[Chimera G0/P0]  Backward schedule: [2, 3, 0, 1, -1]
+[Chimera G2/P2]  === WARMUP PHASE (3 forwards) ===
+[Chimera G0/P0]  [INIT] Rank 0/4 ready for execution
+[Chimera G2/P2]  [PRE-RECV] Rank2 receiving VR1 input from next rank
+[Chimera G0/P0]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
+[Chimera G0/P0]  Forward schedule: [0, 1, 2, 3]
+[Chimera G0/P0]  Backward schedule: [2, 3, 0, 1, -1]
+[Chimera G0/P0]  === WARMUP PHASE (2 forwards) ===
+[Chimera G0/P0]  [PRE-RECV] Rank0 is first stage for VR0, no pre-recv needed
+[Chimera G0/P0]  [WARMUP k=0] FWD MB0, VR0
+[Chimera G0/P0]  [Rank0] First stage for VR0 - no input needed
+[P2P ACTUAL] R2: recv←R1
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>]
+[forward_step] set_input_tensor done
+[DEBUG] Chimera 2-VR schedule ENABLED
+[Chimera G3/P1]  Chimera Config: pipeline_size=4, rank=1
+[Chimera G3/P1]  Microbatches: user=4, total=4 (NO doubling)
+[Chimera G3/P1]  [PHASE CALC] warmup=3, 1f1b=1, cooldown=4
+[Chimera G3/P1]  Forward schedule: [0, 2, 1, 3]
+[Chimera G3/P1]  Backward schedule: [2, 0, 3, 1, -1]
+[Chimera G3/P1]  [INIT] Rank 1/4 ready for execution
+[Chimera G3/P1]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
+[Chimera G3/P1]  Forward schedule: [0, 2, 1, 3]
+[Chimera G3/P1]  Backward schedule: [2, 0, 3, 1, -1]
+[Chimera G3/P1]  === WARMUP PHASE (3 forwards) ===
+[Chimera G3/P1]  [PRE-RECV] Rank1 receiving VR0 input from prev rank
+[DEBUG] Chimera 2-VR schedule ENABLED
+[P2P ACTUAL] R3: recv←R0
+[Chimera G1/P3]  Chimera Config: pipeline_size=4, rank=3
+[Chimera G1/P3]  Microbatches: user=4, total=4 (NO doubling)
+[Chimera G1/P3]  [PHASE CALC] warmup=2, 1f1b=2, cooldown=3
+[Chimera G1/P3]  Forward schedule: [2, 3, 0, 1]
+[Chimera G1/P3]  Backward schedule: [0, 1, 2, 3, -1]
+[Chimera G1/P3]  [INIT] Rank 3/4 ready for execution
+[Chimera G1/P3]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
+[Chimera G1/P3]  Forward schedule: [2, 3, 0, 1]
+[Chimera G1/P3]  Backward schedule: [0, 1, 2, 3, -1]
+[Chimera G1/P3]  === WARMUP PHASE (2 forwards) ===
+[Chimera G1/P3]  [PRE-RECV] Rank3 is first stage for VR1, no pre-recv needed
+[Chimera G1/P3]  [WARMUP k=0] FWD MB2, VR1
+[Chimera G1/P3]  [Rank3] First stage for VR1 - no input needed
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>]
+[forward_step] set_input_tensor done
+[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G0/P0]  [WARMUP STORE] Rank0 MB0, VR0: input_id=None, output_id=139750722845120
+[Chimera G0/P0]  [Rank0] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
+[Chimera G0/P0]  [Rank0] Send only VR0
+[P2P ACTUAL] R0: send→R3
+[Chimera G1/P3]  [WARMUP STORE] Rank3 MB2, VR1: input_id=None, output_id=140383088761792
+[Chimera G1/P3]  [Rank3] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
+[Chimera G1/P3]  [Rank3] Send only VR1
+[P2P ACTUAL] R1: send→R2
+[Chimera G0/P0]  [Rank0] Sent VR0
+[Chimera G0/P0]  [WARMUP k=1] FWD MB1, VR0
+[Chimera G0/P0]  [Rank0] First stage for VR0 - no input needed
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>]
+[forward_step] set_input_tensor done
+[Chimera G3/P1]  [PRE-RECV] Rank1 received initial input for VR0
+[Chimera G3/P1]  [WARMUP k=0] FWD MB0, VR0
+[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB0, VR0 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G1/P3]  [Rank3] Sent VR1
+[Chimera G1/P3]  [WARMUP k=1] FWD MB3, VR1
+[Chimera G1/P3]  [Rank3] First stage for VR1 - no input needed
+[Chimera G2/P2]  [PRE-RECV] Rank2 received initial input for VR1
+[Chimera G2/P2]  [WARMUP k=0] FWD MB2, VR1
+[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB2, VR1 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>]
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[forward_step] set_input_tensor done
+[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G3/P1]  [WARMUP STORE] Rank1 MB0, VR0: input_id=140614225126608, output_id=140613874347888
+[Chimera G3/P1]  [Rank1] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
+[Chimera G3/P1]  [Rank1] Combined send VR0 + recv VR1
+[P2P ACTUAL] R3: send→R2, recv←R2
+[Chimera G2/P2]  [WARMUP STORE] Rank2 MB2, VR1: input_id=140512877919616, output_id=140512877965808
+[Chimera G2/P2]  [Rank2] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
+[Chimera G2/P2]  [Rank2] Combined send VR1 + recv VR0
+[P2P ACTUAL] R2: send→R3, recv←R3
+[Chimera G3/P1]  [Rank1] Sent VR0, received VR1 input
+[Chimera G3/P1]  [WARMUP k=1] FWD MB2, VR1
+[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB2, VR1 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G2/P2]  [Rank2] Sent VR1, received VR0 input
+[Chimera G2/P2]  [WARMUP k=1] FWD MB0, VR0
+[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB0, VR0 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G0/P0]  [WARMUP STORE] Rank0 MB1, VR0: input_id=None, output_id=139750723266224
+[Chimera G0/P0]  [Rank0] Stored output for MB1, VR0 (input_queue=2, output_queue=2)
+[Chimera G0/P0]  [Rank0] Combined send VR0 + recv VR1
+[P2P ACTUAL] R0: send→R3, recv←R3
+[Chimera G1/P3]  [WARMUP STORE] Rank3 MB3, VR1: input_id=None, output_id=140383605384560
+[Chimera G1/P3]  [Rank3] Stored output for MB3, VR1 (input_queue=2, output_queue=2)
+[Chimera G1/P3]  [Rank3] Combined send VR1 + recv VR0
+[P2P ACTUAL] R1: send→R2, recv←R2
+[Chimera G3/P1]  [WARMUP STORE] Rank1 MB2, VR1: input_id=140613874193072, output_id=140613874455696
+[Chimera G3/P1]  [Rank1] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
+[Chimera G3/P1]  [Rank1] Combined send VR1 + recv VR0
+[P2P ACTUAL] R3: send→R0, recv←R0
+[Chimera G2/P2]  [WARMUP STORE] Rank2 MB0, VR0: input_id=140512877918816, output_id=140512877797648
+[Chimera G2/P2]  [Rank2] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
+[Chimera G2/P2]  [Rank2] Combined send VR0 + recv VR1
+[P2P ACTUAL] R2: send→R1, recv←R1
+[Chimera G0/P0]  [Rank0] Sent VR0, received VR1 input
+[Chimera G0/P0]  [WARMUP DONE] Processed 2 forwards, fwd_idx now at 2
+[Chimera G0/P0]  === 1F1B PHASE (2 iterations) ===
+[Chimera G0/P0]  [1F1B k=0] FWD MB2, VR1
+[Chimera G0/P0]  [Rank0] Accessing pre-received input for MB2, VR1 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G3/P1]  [Rank1] Sent VR1, received VR0 input
+[Chimera G3/P1]  [WARMUP k=2] FWD MB1, VR0
+[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB1, VR0 (queue_len=2)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G1/P3]  [Rank3] Sent VR1, received VR0 input
+[Chimera G1/P3]  [WARMUP DONE] Processed 2 forwards, fwd_idx now at 2
+[Chimera G1/P3]  === 1F1B PHASE (2 iterations) ===
+[Chimera G1/P3]  [1F1B k=0] FWD MB0, VR0
+[Chimera G1/P3]  [Rank3] Accessing pre-received input for MB0, VR0 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G2/P2]  [Rank2] Sent VR0, received VR1 input
+[Chimera G2/P2]  [WARMUP k=2] FWD MB3, VR1
+[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB3, VR1 (queue_len=2)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G3/P1]  [WARMUP STORE] Rank1 MB1, VR0: input_id=140613874352048, output_id=140613874278992
+[Chimera G3/P1]  [Rank1] Stored output for MB1, VR0 (input_queue=2, output_queue=2)
+[Chimera G3/P1]  [Rank1] Combined send VR0 + recv VR1
+[P2P ACTUAL] R3: send→R2, recv←R2
+[Chimera G2/P2]  [WARMUP STORE] Rank2 MB3, VR1: input_id=140512878263840, output_id=140512877726432
+[Chimera G2/P2]  [Rank2] Stored output for MB3, VR1 (input_queue=2, output_queue=2)
+[Chimera G2/P2]  [Rank2] Combined send VR1 + recv VR0
+[P2P ACTUAL] R2: send→R3, recv←R3
+[Chimera G0/P0]  [Rank0] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
+[Chimera G0/P0]  [Rank0] Last stage for VR1 - loss collected by forward_step
+[Chimera G0/P0]  [Rank0] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
+[Chimera G0/P0]  [1F1B k=0] BWD MB2, VR1
+[Chimera G0/P0]  [1F1B RETRIEVE] Rank0 MB2, VR1: retrieved input_id=139750722834880, output_id=139750722843360
+[Chimera G0/P0]  [GRAD TRACK] Rank0 popped gradient for BWD_MB2, VR1, queue_before=1, queue_after=0
+[Chimera G0/P0]  [Rank0] Popped tensors and gradient for MB2, VR1
+[Chimera G0/P0]  [Rank0] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
+[Chimera G0/P0]  [Rank0] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7f1a402eb310>
+[Chimera G0/P0]  [GRAPH CHECK] Rank0: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G0/P0]  [GRAPH CHECK] Rank0: Called retain_grad() on input_tensor
+[Chimera G0/P0]  [Rank0] CALLING backward_step for BWD_MB2, VR1
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
+[Chimera G1/P3]  [Rank3] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
+[Chimera G1/P3]  [Rank3] Last stage for VR0 - loss collected by forward_step
+[Chimera G1/P3]  [Rank3] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
+[Chimera G1/P3]  [1F1B k=0] BWD MB0, VR0
+[Chimera G1/P3]  [1F1B RETRIEVE] Rank3 MB0, VR0: retrieved input_id=140383088765552, output_id=140383089038800
+[Chimera G1/P3]  [GRAD TRACK] Rank3 popped gradient for BWD_MB0, VR0, queue_before=1, queue_after=0
+[Chimera G1/P3]  [Rank3] Popped tensors and gradient for MB0, VR0
+[Chimera G1/P3]  [Rank3] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
+[Chimera G1/P3]  [Rank3] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7fad7c3f7970>
+[Chimera G1/P3]  [GRAPH CHECK] Rank3: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G1/P3]  [GRAPH CHECK] Rank3: Called retain_grad() on input_tensor
+[Chimera G1/P3]  [Rank3] CALLING backward_step for BWD_MB0, VR0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
+[Chimera G3/P1]  [Rank1] Sent VR0, received VR1 input
+[Chimera G3/P1]  [WARMUP DONE] Processed 3 forwards, fwd_idx now at 3
+[Chimera G3/P1]  === 1F1B PHASE (1 iterations) ===
+[Chimera G3/P1]  [1F1B k=0] FWD MB3, VR1
+[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB3, VR1 (queue_len=2)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G2/P2]  [Rank2] Sent VR1, received VR0 input
+[Chimera G2/P2]  [WARMUP DONE] Processed 3 forwards, fwd_idx now at 3
+[Chimera G2/P2]  === 1F1B PHASE (1 iterations) ===
+[Chimera G2/P2]  [1F1B k=0] FWD MB1, VR0
+[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB1, VR0 (queue_len=2)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G3/P1]  [Rank1] Stored output for MB3, VR1 (input_queue=2, output_queue=2)
+[Chimera G3/P1]  [Rank1] Combined send_fwd VR1 + recv_bwd VR1
+[Chimera G3/P1]  [GRAD TRACK] Rank1 sending FWD_MB3, VR1, will queue received gradient for BWD_MB2, VR1
+[P2P ACTUAL] R3: send→R0, recv←R0
+[Chimera G2/P2]  [Rank2] Stored output for MB1, VR0 (input_queue=2, output_queue=2)
+[Chimera G2/P2]  [Rank2] Combined send_fwd VR0 + recv_bwd VR0
+[Chimera G2/P2]  [GRAD TRACK] Rank2 sending FWD_MB1, VR0, will queue received gradient for BWD_MB0, VR0
+[P2P ACTUAL] R2: send→R1, recv←R1
+[Chimera G0/P0]  [Rank0] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G0/P0]  [Rank0] Backward step done for MB2, VR1
+[Chimera G0/P0]  [GRAD TRACK] Rank0 about to send gradient for BWD_MB2, VR1
+[Chimera G0/P0]  [Rank0] Combined send_bwd VR1 + recv_fwd VR1
+[P2P ACTUAL] R0: send→R3, recv←R3
+[Chimera G1/P3]  [Rank3] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G1/P3]  [Rank3] Backward step done for MB0, VR0
+[Chimera G1/P3]  [GRAD TRACK] Rank3 about to send gradient for BWD_MB0, VR0
+[Chimera G1/P3]  [Rank3] Combined send_bwd VR0 + recv_fwd VR0
+[P2P ACTUAL] R1: send→R2, recv←R2
+[Chimera G0/P0]  [Rank0] Sent bwd grad, received next fwd input for VR1
+[Chimera G0/P0]  [1F1B k=1] FWD MB3, VR1
+[Chimera G0/P0]  [Rank0] Accessing pre-received input for MB3, VR1 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G3/P1]  [GRAD TRACK] Rank1 received gradient (from some MB's backward), queued for BWD_MB2, VR1, queue_len=1
+[Chimera G3/P1]  [Rank1] Sent fwd, received bwd grad, queued for VR1
+[Chimera G3/P1]  [1F1B k=0] BWD MB2, VR1
+[Chimera G3/P1]  [1F1B RETRIEVE] Rank1 MB2, VR1: retrieved input_id=140613874193072, output_id=140613874455696
+[Chimera G3/P1]  [GRAD TRACK] Rank1 popped gradient for BWD_MB2, VR1, queue_before=1, queue_after=0
+[Chimera G3/P1]  [Rank1] Popped tensors and gradient for MB2, VR1
+[Chimera G3/P1]  [Rank1] 1F1B BEFORE BWD: output_tensor_grad is None? False, shape=torch.Size([256, 16, 400]), bwd_is_grad_first=False
+[Chimera G3/P1]  [Rank1] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<CppFunction object at 0x7fe3381ef550>
+[Chimera G3/P1]  [GRAPH CHECK] Rank1: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G3/P1]  [GRAPH CHECK] Rank1: Called retain_grad() on input_tensor
+[Chimera G3/P1]  [Rank1] CALLING backward_step for BWD_MB2, VR1
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G1/P3]  [Rank3] Sent bwd grad, received next fwd input for VR0
+[Chimera G1/P3]  [1F1B k=1] FWD MB1, VR0
+[Chimera G1/P3]  [Rank3] Accessing pre-received input for MB1, VR0 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G2/P2]  [GRAD TRACK] Rank2 received gradient (from some MB's backward), queued for BWD_MB0, VR0, queue_len=1
+[Chimera G2/P2]  [Rank2] Sent fwd, received bwd grad, queued for VR0
+[Chimera G2/P2]  [1F1B k=0] BWD MB0, VR0
+[Chimera G2/P2]  [1F1B RETRIEVE] Rank2 MB0, VR0: retrieved input_id=140512877918816, output_id=140512877797648
+[Chimera G2/P2]  [GRAD TRACK] Rank2 popped gradient for BWD_MB0, VR0, queue_before=1, queue_after=0
+[Chimera G2/P2]  [Rank2] Popped tensors and gradient for MB0, VR0
+[Chimera G2/P2]  [Rank2] 1F1B BEFORE BWD: output_tensor_grad is None? False, shape=torch.Size([256, 16, 400]), bwd_is_grad_first=False
+[Chimera G2/P2]  [Rank2] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<CppFunction object at 0x7fcbb4244c70>
+[Chimera G2/P2]  [GRAPH CHECK] Rank2: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G2/P2]  [GRAPH CHECK] Rank2: Called retain_grad() on input_tensor
+[Chimera G2/P2]  [Rank2] CALLING backward_step for BWD_MB0, VR0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G3/P1]  [Rank1] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] Backward step done for MB2, VR1
+[Chimera G3/P1]  [GRAD TRACK] Rank1 about to send gradient for BWD_MB2, VR1
+[Chimera G3/P1]  [Rank1] BRIDGE: send VR1 bwd grad + recv VR0 cooldown grad (MB0)
+[Chimera G3/P1]  [Rank1] BRIDGE DEBUG: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] BRIDGE FLAGS: send_to_prev=False, send_to_next=True, recv_from_prev=False, recv_from_next=True
+[Chimera P2P Rank 3] chimera_communicate: send_next + recv_next
+[P2P ACTUAL] R3: send→R2, recv←R2
+[Chimera G1/P3]  [Rank3] Stored output for MB1, VR0 (input_queue=1, output_queue=1)
+[Chimera G1/P3]  [Rank3] Last stage for VR0 - loss collected by forward_step
+[Chimera G1/P3]  [Rank3] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
+[Chimera G1/P3]  [1F1B k=1] BWD MB1, VR0
+[Chimera G1/P3]  [1F1B RETRIEVE] Rank3 MB1, VR0: retrieved input_id=140383090529824, output_id=140383088789440
+[Chimera G1/P3]  [GRAD TRACK] Rank3 popped gradient for BWD_MB1, VR0, queue_before=1, queue_after=0
+[Chimera G1/P3]  [Rank3] Popped tensors and gradient for MB1, VR0
+[Chimera G1/P3]  [Rank3] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
+[Chimera G1/P3]  [Rank3] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7fad7c3f5300>
+[Chimera G1/P3]  [GRAPH CHECK] Rank3: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G1/P3]  [GRAPH CHECK] Rank3: Called retain_grad() on input_tensor
+[Chimera G1/P3]  [Rank3] CALLING backward_step for BWD_MB1, VR0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
+[Chimera G0/P0]  [Rank0] Stored output for MB3, VR1 (input_queue=1, output_queue=1)
+[Chimera G0/P0]  [Rank0] Last stage for VR1 - loss collected by forward_step
+[Chimera G0/P0]  [Rank0] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
+[Chimera G0/P0]  [1F1B k=1] BWD MB3, VR1
+[Chimera G0/P0]  [1F1B RETRIEVE] Rank0 MB3, VR1: retrieved input_id=139750722894672, output_id=139750723269824
+[Chimera G0/P0]  [GRAD TRACK] Rank0 popped gradient for BWD_MB3, VR1, queue_before=1, queue_after=0
+[Chimera G0/P0]  [Rank0] Popped tensors and gradient for MB3, VR1
+[Chimera G0/P0]  [Rank0] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
+[Chimera G0/P0]  [Rank0] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7f1a500b1810>
+[Chimera G0/P0]  [GRAPH CHECK] Rank0: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G0/P0]  [GRAPH CHECK] Rank0: Called retain_grad() on input_tensor
+[Chimera G0/P0]  [Rank0] CALLING backward_step for BWD_MB3, VR1
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
+[Chimera G2/P2]  [Rank2] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] Backward step done for MB0, VR0
+[Chimera G2/P2]  [GRAD TRACK] Rank2 about to send gradient for BWD_MB0, VR0
+[Chimera G2/P2]  [Rank2] BRIDGE: send VR0 bwd grad + recv VR1 cooldown grad (MB2)
+[Chimera G2/P2]  [Rank2] BRIDGE DEBUG: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] BRIDGE FLAGS: send_to_prev=True, send_to_next=False, recv_from_prev=True, recv_from_next=False
+[Chimera P2P Rank 2] chimera_communicate: send_prev + recv_prev
+[P2P ACTUAL] R2: send→R3, recv←R3
+[Chimera P2P Rank 3] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] BRIDGE done: pre-fetched VR0 grad for cooldown MB0
+[Chimera G3/P1]  [1F1B DONE] fwd_idx=4, bwd_idx=1
+[Chimera G3/P1]  === COOLDOWN PHASE (3 items remaining) ===
+[Chimera G3/P1]  [COOLDOWN k=0] BWD MB0, VR0
+[Chimera G3/P1]  [Rank1] Popped tensors for MB0, VR0 in k=0, COOLDOWN phase (queues: in=1, out=1)
+[Chimera G3/P1]  [Rank1] CHAIN: Using BRIDGED grad for VR0 MB0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera P2P Rank 2] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] BRIDGE done: pre-fetched VR1 grad for cooldown MB2
+[Chimera G2/P2]  [1F1B DONE] fwd_idx=4, bwd_idx=1
+[Chimera G2/P2]  === COOLDOWN PHASE (3 items remaining) ===
+[Chimera G2/P2]  [COOLDOWN k=0] BWD MB2, VR1
+[Chimera G2/P2]  [Rank2] Popped tensors for MB2, VR1 in k=0, COOLDOWN phase (queues: in=1, out=1)
+[Chimera G2/P2]  [Rank2] CHAIN: Using BRIDGED grad for VR1 MB2
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G3/P1]  [Rank1] Backward step done for MB0, VR0 in k=0, COOLDOWN phase
+[Chimera G3/P1]  [Rank1] Saved grad for VR0 to combine with next recv
+[Chimera G3/P1]  [COOLDOWN k=1] BWD MB3, VR1
+[Chimera G3/P1]  [Rank1] Popped tensors for MB3, VR1 in k=1, COOLDOWN phase (queues: in=0, out=0)[Chimera G1/P3]  [Rank3] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+
+[Chimera G3/P1]  [Rank1] CHAIN: send VR0 + recv VR1 for MB3[Chimera G1/P3]  [Rank3] Backward step done for MB1, VR0
+
+[Chimera G1/P3]  [GRAD TRACK] Rank3 about to send gradient for BWD_MB1, VR0[Chimera P2P Rank 3] chimera_communicate: send_prev + recv_prev
+
+[Chimera G1/P3]  [Rank3] BRIDGE: send VR0 bwd grad + recv VR1 cooldown grad (MB2)
+[Chimera G1/P3]  [Rank3] BRIDGE DEBUG: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G1/P3]  [Rank3] BRIDGE FLAGS: send_to_prev=True, send_to_next=False, recv_from_prev=True, recv_from_next=False[P2P ACTUAL] R3: send→R0, recv←R0
+
+[Chimera P2P Rank 1] chimera_communicate: send_prev + recv_prev
+[P2P ACTUAL] R1: send→R2, recv←R2
+[Chimera G0/P0]  [Rank0] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G0/P0]  [Rank0] Backward step done for MB3, VR1
+[Chimera G0/P0]  [GRAD TRACK] Rank0 about to send gradient for BWD_MB3, VR1
+[Chimera G0/P0]  [Rank0] BRIDGE: send VR1 bwd grad + recv VR0 cooldown grad (MB0)
+[Chimera G0/P0]  [Rank0] BRIDGE DEBUG: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G0/P0]  [Rank0] BRIDGE FLAGS: send_to_prev=False, send_to_next=True, recv_from_prev=False, recv_from_next=True
+[Chimera P2P Rank 0] chimera_communicate: send_next + recv_next
+[P2P ACTUAL] R0: send→R3, recv←R3
+[Chimera G2/P2]  [Rank2] Backward step done for MB2, VR1 in k=0, COOLDOWN phase
+[Chimera G2/P2]  [Rank2] Saved grad for VR1 to combine with next recv
+[Chimera G2/P2]  [COOLDOWN k=1] BWD MB1, VR0
+[Chimera G2/P2]  [Rank2] Popped tensors for MB1, VR0 in k=1, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G2/P2]  [Rank2] CHAIN: send VR1 + recv VR0 for MB1
+[Chimera P2P Rank 2] chimera_communicate: send_next + recv_next
+[P2P ACTUAL] R2: send→R1, recv←R1
+[Chimera P2P Rank 0] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+[Chimera G0/P0]  [Rank0] BRIDGE done: pre-fetched VR0 grad for cooldown MB0
+[Chimera G0/P0]  [1F1B DONE] fwd_idx=4, bwd_idx=2
+[Chimera G0/P0]  === COOLDOWN PHASE (2 items remaining) ===
+[Chimera G0/P0]  [COOLDOWN k=0] BWD MB0, VR0
+[Chimera G0/P0]  [Rank0] Popped tensors for MB0, VR0 in k=0, COOLDOWN phase (queues: in=1, out=1)
+[Chimera G0/P0]  [Rank0] CHAIN: Using BRIDGED grad for VR0 MB0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera P2P Rank 3] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] CHAIN: send+recv done for MB3
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera P2P Rank 1] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+[Chimera G1/P3]  [Rank3] BRIDGE done: pre-fetched VR1 grad for cooldown MB2
+[Chimera G1/P3]  [1F1B DONE] fwd_idx=4, bwd_idx=2
+[Chimera G1/P3]  === COOLDOWN PHASE (2 items remaining) ===
+[Chimera G1/P3]  [COOLDOWN k=0] BWD MB2, VR1
+[Chimera G1/P3]  [Rank3] Popped tensors for MB2, VR1 in k=0, COOLDOWN phase (queues: in=1, out=1)
+[Chimera G1/P3]  [Rank3] CHAIN: Using BRIDGED grad for VR1 MB2
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera P2P Rank 2] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] CHAIN: send+recv done for MB1
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G3/P1]  [Rank1] Backward step done for MB3, VR1 in k=1, COOLDOWN phase
+[Chimera G3/P1]  [Rank1] Saved grad for VR1 to combine with next recv
+[Chimera G3/P1]  [COOLDOWN k=2] BWD MB1, VR0
+[Chimera G3/P1]  [Rank1] Popped tensors for MB1, VR0 in k=2, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G3/P1]  [Rank1] CHAIN: send VR1 + recv VR0 for MB1
+[Chimera P2P Rank 3] chimera_communicate: send_next + recv_next
+[P2P ACTUAL] R3: send→R2, recv←R2
+[Chimera G2/P2]  [Rank2] Backward step done for MB1, VR0 in k=1, COOLDOWN phase
+[Chimera G2/P2]  [Rank2] Saved grad for VR0 to combine with next recv
+[Chimera G2/P2]  [COOLDOWN k=2] BWD MB3, VR1
+[Chimera G2/P2]  [Rank2] Popped tensors for MB3, VR1 in k=2, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G2/P2]  [Rank2] CHAIN: send VR0 + recv VR1 for MB3
+[Chimera P2P Rank 2] chimera_communicate: send_prev + recv_prev
+[P2P ACTUAL] R2: send→R3, recv←R3
+[Chimera G1/P3]  [Rank3] Backward step done for MB2, VR1 in k=0, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Gradient last stage for VR1 - no send needed for MB2
+[Chimera G1/P3]  [COOLDOWN k=1] BWD MB3, VR1
+[Chimera G1/P3]  [Rank3] Popped tensors for MB3, VR1 in k=1, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G1/P3]  [Rank3] CHAIN: standalone recv VR1 for MB3 at k=1 (grad_last rank, partner is sending)
+[Chimera P2P Rank 1] chimera_communicate: recv_prev
+[P2P ACTUAL] R1: recv←R2
+[Chimera P2P Rank 2] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] CHAIN: send+recv done for MB3
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera P2P Rank 3] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] CHAIN: send+recv done for MB1
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G0/P0]  [Rank0] Backward step done for MB0, VR0 in k=0, COOLDOWN phase
+[Chimera G0/P0]  [Rank0] Gradient last stage for VR0 - no send needed for MB0
+[Chimera G0/P0]  [COOLDOWN k=1] BWD MB1, VR0
+[Chimera G0/P0]  [Rank0] Popped tensors for MB1, VR0 in k=1, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G0/P0]  [Rank0] CHAIN: standalone recv VR0 for MB1 at k=1 (grad_last rank, partner is sending)
+[Chimera P2P Rank 0] chimera_communicate: recv_next
+[P2P ACTUAL] R0: recv←R3
+[Chimera G3/P1]  [Rank1] Backward step done for MB1, VR0 in k=2, COOLDOWN phase
+[Chimera G3/P1]  [Rank1] Saved grad for VR0 to combine with next recv
+[Chimera G3/P1]  [Rank1] PRE-SYNC FLUSH: send VR0 grad before SYNC
+[Chimera P2P Rank 3] chimera_communicate: send_prev
+[P2P ACTUAL] R3: send→R0
+[Chimera G2/P2]  [Rank2] Backward step done for MB3, VR1 in k=2, COOLDOWN phase
+[Chimera G2/P2]  [Rank2] Saved grad for VR1 to combine with next recv
+[Chimera G2/P2]  [Rank2] PRE-SYNC FLUSH: send VR1 grad before SYNC
+[Chimera P2P Rank 2] chimera_communicate: send_next
+[P2P ACTUAL] R2: send→R1
+[Chimera P2P Rank 0] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G3/P1] [1775119485.30] [Rank1] SYNC MARKER at bwd_idx=4, k=3, COOLDOWN phase
+[Chimera G3/P1]  [Rank1] Allreduce gradients for VR0 in k=3, COOLDOWN phase
+[Chimera G2/P2] [1775119485.30] [Rank2] SYNC MARKER at bwd_idx=4, k=3, COOLDOWN phase[Chimera P2P Rank 1] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G2/P2]  [Rank2] Allreduce gradients for VR1 in k=3, COOLDOWN phase
+[Chimera G3/P1]  [Rank1] Allreduce gradients for VR1 in k=3, COOLDOWN phase
+[Chimera G2/P2]  [Rank2] Allreduce gradients for VR0 in k=3, COOLDOWN phase
+[Chimera G3/P1]  [COOLDOWN DONE] Processed all backwards
+[Chimera G3/P1]  === Chimera schedule completed ===
+[Chimera G2/P2]  [COOLDOWN DONE] Processed all backwards
+[Chimera G2/P2]  === Chimera schedule completed ===
+[Chimera G0/P0]  [Rank0] Backward step done for MB1, VR0 in k=1, COOLDOWN phase
+[Chimera G0/P0]  [Rank0] Gradient last stage for VR0 - no send needed for MB1
+[Chimera G0/P0] [1775119485.35] [Rank0] SYNC MARKER at bwd_idx=4, k=2, COOLDOWN phase
+[Chimera G0/P0]  [Rank0] Allreduce gradients for VR0 in k=2, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Backward step done for MB3, VR1 in k=1, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Gradient last stage for VR1 - no send needed for MB3
+[Chimera G1/P3] [1775119485.36] [Rank3] SYNC MARKER at bwd_idx=4, k=2, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Allreduce gradients for VR1 in k=2, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Allreduce gradients for VR0 in k=2, COOLDOWN phase
+[Chimera G0/P0]  [Rank0] Allreduce gradients for VR1 in k=2, COOLDOWN phase
+[Chimera G0/P0]  [COOLDOWN DONE] Processed all backwards
+[Chimera G0/P0]  === Chimera schedule completed ===
+[Chimera G1/P3]  [COOLDOWN DONE] Processed all backwards
+[Chimera G1/P3]  === Chimera schedule completed ===
+[DEBUG] Chimera 2-VR schedule ENABLED
+[Chimera G3/P1]  Chimera Config: pipeline_size=4, rank=1
+[Chimera G3/P1]  Microbatches: user=4, total=4 (NO doubling)
+[Chimera G3/P1]  [PHASE CALC] warmup=3, 1f1b=1, cooldown=4
+[Chimera G3/P1]  Forward schedule: [0, 2, 1, 3]
+[Chimera G3/P1]  Backward schedule: [2, 0, 3, 1, -1]
+[Chimera G3/P1]  [INIT] Rank 1/4 ready for execution
+[Chimera G3/P1]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
+[Chimera G3/P1]  Forward schedule: [0, 2, 1, 3]
+[Chimera G3/P1]  Backward schedule: [2, 0, 3, 1, -1]
+[Chimera G3/P1]  === WARMUP PHASE (3 forwards) ===
+[Chimera G3/P1]  [PRE-RECV] Rank1 receiving VR0 input from prev rank
+[P2P ACTUAL] R3: recv←R0
+[DEBUG] Chimera 2-VR schedule ENABLED[DEBUG] Chimera 2-VR schedule ENABLED
+
+[Chimera G0/P0]  Chimera Config: pipeline_size=4, rank=0
+[Chimera G1/P3]  Chimera Config: pipeline_size=4, rank=3
+[Chimera G0/P0]  Microbatches: user=4, total=4 (NO doubling)
+[Chimera G1/P3]  Microbatches: user=4, total=4 (NO doubling)
+[Chimera G0/P0]  [PHASE CALC] warmup=2, 1f1b=2, cooldown=3
+[Chimera G1/P3]  [PHASE CALC] warmup=2, 1f1b=2, cooldown=3
+[Chimera G0/P0]  Forward schedule: [0, 1, 2, 3]
+[Chimera G0/P0]  Backward schedule: [2, 3, 0, 1, -1][Chimera G1/P3]  Forward schedule: [2, 3, 0, 1]
+
+[Chimera G0/P0]  [INIT] Rank 0/4 ready for execution
+[Chimera G1/P3]  Backward schedule: [0, 1, 2, 3, -1]
+[Chimera G1/P3]  [INIT] Rank 3/4 ready for execution
+[Chimera G0/P0]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
+[Chimera G0/P0]  Forward schedule: [0, 1, 2, 3]
+[Chimera G1/P3]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
+[Chimera G0/P0]  Backward schedule: [2, 3, 0, 1, -1]
+[Chimera G0/P0]  === WARMUP PHASE (2 forwards) ===
+[Chimera G1/P3]  Forward schedule: [2, 3, 0, 1]
+[Chimera G0/P0]  [PRE-RECV] Rank0 is first stage for VR0, no pre-recv needed
+[Chimera G1/P3]  Backward schedule: [0, 1, 2, 3, -1]
+[Chimera G0/P0]  [WARMUP k=0] FWD MB0, VR0
+[Chimera G1/P3]  === WARMUP PHASE (2 forwards) ===
+[Chimera G0/P0]  [Rank0] First stage for VR0 - no input needed
+[Chimera G1/P3]  [PRE-RECV] Rank3 is first stage for VR1, no pre-recv needed
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>][Chimera G1/P3]  [WARMUP k=0] FWD MB2, VR1
+
+[Chimera G1/P3]  [Rank3] First stage for VR1 - no input needed
+[forward_step] set_input_tensor done
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>]
+[DEBUG] Chimera 2-VR schedule ENABLED[forward_step] set_input_tensor done
+
+[Chimera G2/P2]  Chimera Config: pipeline_size=4, rank=2
+[Chimera G2/P2]  Microbatches: user=4, total=4 (NO doubling)
+[Chimera G2/P2]  [PHASE CALC] warmup=3, 1f1b=1, cooldown=4
+[Chimera G2/P2]  Forward schedule: [2, 0, 3, 1]
+[Chimera G2/P2]  Backward schedule: [0, 2, 1, 3, -1]
+[Chimera G2/P2]  [INIT] Rank 2/4 ready for execution
+[Chimera G2/P2]  === Starting CHIMERA Warmup/1F1B/Cooldown Execution ===
+[Chimera G2/P2]  Forward schedule: [2, 0, 3, 1]
+[Chimera G2/P2]  Backward schedule: [0, 2, 1, 3, -1]
+[Chimera G2/P2]  === WARMUP PHASE (3 forwards) ===
+[Chimera G2/P2]  [PRE-RECV] Rank2 receiving VR1 input from next rank
+[P2P ACTUAL] R2: recv←R1
+[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G1/P3]  [WARMUP STORE] Rank3 MB2, VR1: input_id=None, output_id=140383089010192
+[Chimera G1/P3]  [Rank3] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
+[Chimera G1/P3]  [Rank3] Send only VR1
+[P2P ACTUAL] R1: send→R2
+[Chimera G0/P0]  [WARMUP STORE] Rank0 MB0, VR0: input_id=None, output_id=139750723037088
+[Chimera G0/P0]  [Rank0] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
+[Chimera G0/P0]  [Rank0] Send only VR0
+[P2P ACTUAL] R0: send→R3
+[Chimera G0/P0]  [Rank0] Sent VR0[Chimera G1/P3]  [Rank3] Sent VR1
+
+[Chimera G0/P0]  [WARMUP k=1] FWD MB1, VR0
+[Chimera G1/P3]  [WARMUP k=1] FWD MB3, VR1
+[Chimera G0/P0]  [Rank0] First stage for VR0 - no input needed
+[Chimera G1/P3]  [Rank3] First stage for VR1 - no input needed
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>]
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'NoneType'>]
+[forward_step] set_input_tensor done
+[forward_step] set_input_tensor done
+[Chimera G3/P1]  [PRE-RECV] Rank1 received initial input for VR0
+[Chimera G3/P1]  [WARMUP k=0] FWD MB0, VR0
+[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB0, VR0 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>][Chimera G2/P2]  [PRE-RECV] Rank2 received initial input for VR1
+
+[Chimera G2/P2]  [WARMUP k=0] FWD MB2, VR1
+[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB2, VR1 (queue_len=1)
+[forward_step] set_input_tensor done
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] First stage: using function parameter, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G3/P1]  [WARMUP STORE] Rank1 MB0, VR0: input_id=140613874377856, output_id=140613874280992
+[Chimera G3/P1]  [Rank1] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
+[Chimera G3/P1]  [Rank1] Combined send VR0 + recv VR1
+[P2P ACTUAL] R3: send→R2, recv←R2
+[Chimera G2/P2]  [WARMUP STORE] Rank2 MB2, VR1: input_id=140513224860240, output_id=140512877965648
+[Chimera G2/P2]  [Rank2] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
+[Chimera G2/P2]  [Rank2] Combined send VR1 + recv VR0
+[P2P ACTUAL] R2: send→R3, recv←R3
+[Chimera G3/P1]  [Rank1] Sent VR0, received VR1 input
+[Chimera G3/P1]  [WARMUP k=1] FWD MB2, VR1
+[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB2, VR1 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G2/P2]  [Rank2] Sent VR1, received VR0 input
+[Chimera G2/P2]  [WARMUP k=1] FWD MB0, VR0
+[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB0, VR0 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G1/P3]  [WARMUP STORE] Rank3 MB3, VR1: input_id=None, output_id=140383089080928
+[Chimera G1/P3]  [Rank3] Stored output for MB3, VR1 (input_queue=2, output_queue=2)
+[Chimera G1/P3]  [Rank3] Combined send VR1 + recv VR0
+[P2P ACTUAL] R1: send→R2, recv←R2
+[Chimera G0/P0]  [WARMUP STORE] Rank0 MB1, VR0: input_id=None, output_id=139750723408000
+[Chimera G0/P0]  [Rank0] Stored output for MB1, VR0 (input_queue=2, output_queue=2)
+[Chimera G0/P0]  [Rank0] Combined send VR0 + recv VR1
+[P2P ACTUAL] R0: send→R3, recv←R3
+[Chimera G3/P1]  [WARMUP STORE] Rank1 MB2, VR1: input_id=140613874369936, output_id=140613874346608
+[Chimera G3/P1]  [Rank1] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
+[Chimera G3/P1]  [Rank1] Combined send VR1 + recv VR0
+[P2P ACTUAL] R3: send→R0, recv←R0
+[Chimera G2/P2]  [WARMUP STORE] Rank2 MB0, VR0: input_id=140512879004944, output_id=140512877791088
+[Chimera G2/P2]  [Rank2] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
+[Chimera G2/P2]  [Rank2] Combined send VR0 + recv VR1
+[P2P ACTUAL] R2: send→R1, recv←R1
+[Chimera G0/P0]  [Rank0] Sent VR0, received VR1 input
+[Chimera G0/P0]  [WARMUP DONE] Processed 2 forwards, fwd_idx now at 2
+[Chimera G0/P0]  === 1F1B PHASE (2 iterations) ===
+[Chimera G0/P0]  [1F1B k=0] FWD MB2, VR1
+[Chimera G0/P0]  [Rank0] Accessing pre-received input for MB2, VR1 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G1/P3]  [Rank3] Sent VR1, received VR0 input
+[Chimera G3/P1]  [Rank1] Sent VR1, received VR0 input[Chimera G1/P3]  [WARMUP DONE] Processed 2 forwards, fwd_idx now at 2
+
+[Chimera G1/P3]  === 1F1B PHASE (2 iterations) ===
+[Chimera G3/P1]  [WARMUP k=2] FWD MB1, VR0
+[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB1, VR0 (queue_len=2)
+[Chimera G1/P3]  [1F1B k=0] FWD MB0, VR0
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>][Chimera G1/P3]  [Rank3] Accessing pre-received input for MB0, VR0 (queue_len=1)
+
+[forward_step] set_input_tensor done
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G2/P2]  [Rank2] Sent VR0, received VR1 input
+[Chimera G2/P2]  [WARMUP k=2] FWD MB3, VR1
+[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB3, VR1 (queue_len=2)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G3/P1]  [WARMUP STORE] Rank1 MB1, VR0: input_id=140614225837120, output_id=140613874465456
+[Chimera G3/P1]  [Rank1] Stored output for MB1, VR0 (input_queue=2, output_queue=2)
+[Chimera G3/P1]  [Rank1] Combined send VR0 + recv VR1
+[P2P ACTUAL] R3: send→R2, recv←R2
+[Chimera G2/P2]  [WARMUP STORE] Rank2 MB3, VR1: input_id=140512877870304, output_id=140512877907216
+[Chimera G2/P2]  [Rank2] Stored output for MB3, VR1 (input_queue=2, output_queue=2)
+[Chimera G2/P2]  [Rank2] Combined send VR1 + recv VR0
+[P2P ACTUAL] R2: send→R3, recv←R3
+[Chimera G0/P0]  [Rank0] Stored output for MB2, VR1 (input_queue=1, output_queue=1)
+[Chimera G0/P0]  [Rank0] Last stage for VR1 - loss collected by forward_step
+[Chimera G0/P0]  [Rank0] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
+[Chimera G0/P0]  [1F1B k=0] BWD MB2, VR1
+[Chimera G0/P0]  [1F1B RETRIEVE] Rank0 MB2, VR1: retrieved input_id=139750722769664, output_id=139750723543232
+[Chimera G0/P0]  [GRAD TRACK] Rank0 popped gradient for BWD_MB2, VR1, queue_before=1, queue_after=0
+[Chimera G0/P0]  [Rank0] Popped tensors and gradient for MB2, VR1
+[Chimera G0/P0]  [Rank0] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
+[Chimera G0/P0]  [Rank0] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7f1a40329960>
+[Chimera G0/P0]  [GRAPH CHECK] Rank0: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G0/P0]  [GRAPH CHECK] Rank0: Called retain_grad() on input_tensor
+[Chimera G0/P0]  [Rank0] CALLING backward_step for BWD_MB2, VR1
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
+[Chimera G1/P3]  [Rank3] Stored output for MB0, VR0 (input_queue=1, output_queue=1)
+[Chimera G1/P3]  [Rank3] Last stage for VR0 - loss collected by forward_step
+[Chimera G1/P3]  [Rank3] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
+[Chimera G1/P3]  [1F1B k=0] BWD MB0, VR0
+[Chimera G1/P3]  [1F1B RETRIEVE] Rank3 MB0, VR0: retrieved input_id=140383088695776, output_id=140383088919072
+[Chimera G1/P3]  [GRAD TRACK] Rank3 popped gradient for BWD_MB0, VR0, queue_before=1, queue_after=0
+[Chimera G1/P3]  [Rank3] Popped tensors and gradient for MB0, VR0
+[Chimera G1/P3]  [Rank3] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
+[Chimera G1/P3]  [Rank3] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7fad7c3f52d0>
+[Chimera G1/P3]  [GRAPH CHECK] Rank3: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G1/P3]  [GRAPH CHECK] Rank3: Called retain_grad() on input_tensor
+[Chimera G1/P3]  [Rank3] CALLING backward_step for BWD_MB0, VR0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
+[Chimera G3/P1]  [Rank1] Sent VR0, received VR1 input
+[Chimera G3/P1]  [WARMUP DONE] Processed 3 forwards, fwd_idx now at 3
+[Chimera G3/P1]  === 1F1B PHASE (1 iterations) ===
+[Chimera G3/P1]  [1F1B k=0] FWD MB3, VR1
+[Chimera G3/P1]  [Rank1] Accessing pre-received input for MB3, VR1 (queue_len=2)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G2/P2]  [Rank2] Sent VR1, received VR0 input
+[Chimera G2/P2]  [WARMUP DONE] Processed 3 forwards, fwd_idx now at 3
+[Chimera G2/P2]  === 1F1B PHASE (1 iterations) ===
+[Chimera G2/P2]  [1F1B k=0] FWD MB1, VR0
+[Chimera G2/P2]  [Rank2] Accessing pre-received input for MB1, VR0 (queue_len=2)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G3/P1]  [Rank1] Stored output for MB3, VR1 (input_queue=2, output_queue=2)
+[Chimera G3/P1]  [Rank1] Combined send_fwd VR1 + recv_bwd VR1
+[Chimera G3/P1]  [GRAD TRACK] Rank1 sending FWD_MB3, VR1, will queue received gradient for BWD_MB2, VR1
+[P2P ACTUAL] R3: send→R0, recv←R0
+[Chimera G2/P2]  [Rank2] Stored output for MB1, VR0 (input_queue=2, output_queue=2)
+[Chimera G2/P2]  [Rank2] Combined send_fwd VR0 + recv_bwd VR0
+[Chimera G2/P2]  [GRAD TRACK] Rank2 sending FWD_MB1, VR0, will queue received gradient for BWD_MB0, VR0
+[P2P ACTUAL] R2: send→R1, recv←R1
+[Chimera G0/P0]  [Rank0] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G0/P0]  [Rank0] Backward step done for MB2, VR1
+[Chimera G0/P0]  [GRAD TRACK] Rank0 about to send gradient for BWD_MB2, VR1
+[Chimera G0/P0]  [Rank0] Combined send_bwd VR1 + recv_fwd VR1
+[P2P ACTUAL] R0: send→R3, recv←R3
+[Chimera G1/P3]  [Rank3] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G1/P3]  [Rank3] Backward step done for MB0, VR0
+[Chimera G1/P3]  [GRAD TRACK] Rank3 about to send gradient for BWD_MB0, VR0
+[Chimera G1/P3]  [Rank3] Combined send_bwd VR0 + recv_fwd VR0
+[P2P ACTUAL] R1: send→R2, recv←R2
+[Chimera G0/P0]  [Rank0] Sent bwd grad, received next fwd input for VR1
+[Chimera G0/P0]  [1F1B k=1] FWD MB3, VR1
+[Chimera G0/P0]  [Rank0] Accessing pre-received input for MB3, VR1 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G3/P1]  [GRAD TRACK] Rank1 received gradient (from some MB's backward), queued for BWD_MB2, VR1, queue_len=1
+[Chimera G3/P1]  [Rank1] Sent fwd, received bwd grad, queued for VR1
+[Chimera G3/P1]  [1F1B k=0] BWD MB2, VR1
+[Chimera G3/P1]  [1F1B RETRIEVE] Rank1 MB2, VR1: retrieved input_id=140613874369936, output_id=140613874346608
+[Chimera G3/P1]  [GRAD TRACK] Rank1 popped gradient for BWD_MB2, VR1, queue_before=1, queue_after=0
+[Chimera G3/P1]  [Rank1] Popped tensors and gradient for MB2, VR1
+[Chimera G3/P1]  [Rank1] 1F1B BEFORE BWD: output_tensor_grad is None? False, shape=torch.Size([256, 16, 400]), bwd_is_grad_first=False
+[Chimera G3/P1]  [Rank1] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<CppFunction object at 0x7fe338031900>
+[Chimera G3/P1]  [GRAPH CHECK] Rank1: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G3/P1]  [GRAPH CHECK] Rank1: Called retain_grad() on input_tensor
+[Chimera G1/P3]  [Rank3] Sent bwd grad, received next fwd input for VR0
+[Chimera G3/P1]  [Rank1] CALLING backward_step for BWD_MB2, VR1
+[Chimera G1/P3]  [1F1B k=1] FWD MB1, VR0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G1/P3]  [Rank3] Accessing pre-received input for MB1, VR0 (queue_len=1)
+[forward_step] Calling set_input_tensor with: type=<class 'list'>, is_list=True, content=[<class 'torch.Tensor'>]
+[forward_step] set_input_tensor done
+[Chimera G2/P2]  [GRAD TRACK] Rank2 received gradient (from some MB's backward), queued for BWD_MB0, VR0, queue_len=1
+[Chimera G2/P2]  [Rank2] Sent fwd, received bwd grad, queued for VR0
+[Chimera G2/P2]  [1F1B k=0] BWD MB0, VR0
+[Chimera G2/P2]  [1F1B RETRIEVE] Rank2 MB0, VR0: retrieved input_id=140512879004944, output_id=140512877791088
+[Chimera G2/P2]  [GRAD TRACK] Rank2 popped gradient for BWD_MB0, VR0, queue_before=1, queue_after=0
+[Chimera G2/P2]  [Rank2] Popped tensors and gradient for MB0, VR0
+[Chimera G2/P2]  [Rank2] 1F1B BEFORE BWD: output_tensor_grad is None? False, shape=torch.Size([256, 16, 400]), bwd_is_grad_first=False
+[Chimera G2/P2]  [Rank2] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<CppFunction object at 0x7fcbb42ba9b0>
+[Chimera G2/P2]  [GRAPH CHECK] Rank2: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G2/P2]  [GRAPH CHECK] Rank2: Called retain_grad() on input_tensor
+[Chimera G2/P2]  [Rank2] CALLING backward_step for BWD_MB0, VR0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Transformer] Non-first stage: direct input_tensor, hidden_states type=<class 'torch.Tensor'>
+[Transformer] Before make_viewless_tensor: hidden_states type=<class 'torch.Tensor'>, is_tensor=True, value=tensor
+[Chimera G3/P1]  [Rank1] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] Backward step done for MB2, VR1
+[Chimera G3/P1]  [GRAD TRACK] Rank1 about to send gradient for BWD_MB2, VR1
+[Chimera G3/P1]  [Rank1] BRIDGE: send VR1 bwd grad + recv VR0 cooldown grad (MB0)
+[Chimera G3/P1]  [Rank1] BRIDGE DEBUG: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] BRIDGE FLAGS: send_to_prev=False, send_to_next=True, recv_from_prev=False, recv_from_next=True
+[Chimera P2P Rank 3] chimera_communicate: send_next + recv_next
+[P2P ACTUAL] R3: send→R2, recv←R2
+[Chimera G2/P2]  [Rank2] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] Backward step done for MB0, VR0
+[Chimera G2/P2]  [GRAD TRACK] Rank2 about to send gradient for BWD_MB0, VR0
+[Chimera G2/P2]  [Rank2] BRIDGE: send VR0 bwd grad + recv VR1 cooldown grad (MB2)
+[Chimera G2/P2]  [Rank2] BRIDGE DEBUG: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] BRIDGE FLAGS: send_to_prev=True, send_to_next=False, recv_from_prev=True, recv_from_next=False
+[Chimera P2P Rank 2] chimera_communicate: send_prev + recv_prev
+[P2P ACTUAL] R2: send→R3, recv←R3
+[Chimera G1/P3]  [Rank3] Stored output for MB1, VR0 (input_queue=1, output_queue=1)
+[Chimera G1/P3]  [Rank3] Last stage for VR0 - loss collected by forward_step
+[Chimera G1/P3]  [Rank3] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
+[Chimera G1/P3]  [1F1B k=1] BWD MB1, VR0
+[Chimera G0/P0]  [Rank0] Stored output for MB3, VR1 (input_queue=1, output_queue=1)
+[Chimera G0/P0]  [Rank0] Last stage for VR1 - loss collected by forward_step
+[Chimera G0/P0]  [Rank0] No fwd send, no bwd recv (last fwd stage, first grad stage), queued None
+[Chimera G0/P0]  [1F1B k=1] BWD MB3, VR1
+[Chimera G1/P3]  [1F1B RETRIEVE] Rank3 MB1, VR0: retrieved input_id=140383090463248, output_id=140383090356640
+[Chimera G1/P3]  [GRAD TRACK] Rank3 popped gradient for BWD_MB1, VR0, queue_before=1, queue_after=0
+[Chimera G1/P3]  [Rank3] Popped tensors and gradient for MB1, VR0
+[Chimera G1/P3]  [Rank3] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
+[Chimera G1/P3]  [Rank3] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7fad7c259d50>
+[Chimera G1/P3]  [GRAPH CHECK] Rank3: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G1/P3]  [GRAPH CHECK] Rank3: Called retain_grad() on input_tensor
+[Chimera G1/P3]  [Rank3] CALLING backward_step for BWD_MB1, VR0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
+[Chimera G0/P0]  [1F1B RETRIEVE] Rank0 MB3, VR1: retrieved input_id=139750989056416, output_id=139750723617312
+[Chimera G0/P0]  [GRAD TRACK] Rank0 popped gradient for BWD_MB3, VR1, queue_before=1, queue_after=0
+[Chimera G0/P0]  [Rank0] Popped tensors and gradient for MB3, VR1
+[Chimera G0/P0]  [Rank0] 1F1B BEFORE BWD: output_tensor_grad is None? True, shape=None, bwd_is_grad_first=True
+[Chimera G0/P0]  [Rank0] TENSOR CHECK: input.requires_grad=True, input.is_leaf=True, output.requires_grad=True, output.is_leaf=False, output.grad_fn=<DivBackward0 object at 0x7f1a40396ec0>
+[Chimera G0/P0]  [GRAPH CHECK] Rank0: input_will_get_grad=True (requires_grad=True, is_leaf=True, output_has_grad_fn=True)
+[Chimera G0/P0]  [GRAPH CHECK] Rank0: Called retain_grad() on input_tensor
+[Chimera G0/P0]  [Rank0] CALLING backward_step for BWD_MB3, VR1
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1, will_use_custom_backward=False
+[Chimera P2P Rank 3] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] BRIDGE done: pre-fetched VR0 grad for cooldown MB0
+[Chimera G3/P1]  [1F1B DONE] fwd_idx=4, bwd_idx=1
+[Chimera G3/P1]  === COOLDOWN PHASE (3 items remaining) ===
+[Chimera G3/P1]  [COOLDOWN k=0] BWD MB0, VR0
+[Chimera G3/P1]  [Rank1] Popped tensors for MB0, VR0 in k=0, COOLDOWN phase (queues: in=1, out=1)
+[Chimera G3/P1]  [Rank1] CHAIN: Using BRIDGED grad for VR0 MB0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera P2P Rank 2] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] BRIDGE done: pre-fetched VR1 grad for cooldown MB2
+[Chimera G2/P2]  [1F1B DONE] fwd_idx=4, bwd_idx=1
+[Chimera G2/P2]  === COOLDOWN PHASE (3 items remaining) ===
+[Chimera G2/P2]  [COOLDOWN k=0] BWD MB2, VR1
+[Chimera G2/P2]  [Rank2] Popped tensors for MB2, VR1 in k=0, COOLDOWN phase (queues: in=1, out=1)
+[Chimera G2/P2]  [Rank2] CHAIN: Using BRIDGED grad for VR1 MB2
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G1/P3]  [Rank3] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G1/P3]  [Rank3] Backward step done for MB1, VR0
+[Chimera G1/P3]  [GRAD TRACK] Rank3 about to send gradient for BWD_MB1, VR0
+[Chimera G1/P3]  [Rank3] BRIDGE: send VR0 bwd grad + recv VR1 cooldown grad (MB2)
+[Chimera G1/P3]  [Rank3] BRIDGE DEBUG: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G1/P3]  [Rank3] BRIDGE FLAGS: send_to_prev=True, send_to_next=False, recv_from_prev=True, recv_from_next=False
+[Chimera P2P Rank 1] chimera_communicate: send_prev + recv_prev
+[P2P ACTUAL] R1: send→R2, recv←R2
+[Chimera G2/P2]  [Rank2] Backward step done for MB2, VR1 in k=0, COOLDOWN phase
+[Chimera G2/P2]  [Rank2] Saved grad for VR1 to combine with next recv
+[Chimera G2/P2]  [COOLDOWN k=1] BWD MB1, VR0
+[Chimera G2/P2]  [Rank2] Popped tensors for MB1, VR0 in k=1, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G2/P2]  [Rank2] CHAIN: send VR1 + recv VR0 for MB1
+[Chimera P2P Rank 2] chimera_communicate: send_next + recv_next
+[P2P ACTUAL] R2: send→R1, recv←R1
+[Chimera G3/P1]  [Rank1] Backward step done for MB0, VR0 in k=0, COOLDOWN phase
+[Chimera G3/P1]  [Rank1] Saved grad for VR0 to combine with next recv
+[Chimera G3/P1]  [COOLDOWN k=1] BWD MB3, VR1
+[Chimera G3/P1]  [Rank1] Popped tensors for MB3, VR1 in k=1, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G3/P1]  [Rank1] CHAIN: send VR0 + recv VR1 for MB3
+[Chimera P2P Rank 3] chimera_communicate: send_prev + recv_prev
+[P2P ACTUAL] R3: send→R0, recv←R0
+[Chimera G0/P0]  [Rank0] 1F1B AFTER BWD: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G0/P0]  [Rank0] Backward step done for MB3, VR1
+[Chimera G0/P0]  [GRAD TRACK] Rank0 about to send gradient for BWD_MB3, VR1
+[Chimera G0/P0]  [Rank0] BRIDGE: send VR1 bwd grad + recv VR0 cooldown grad (MB0)
+[Chimera G0/P0]  [Rank0] BRIDGE DEBUG: input_tensor_grad is None? False, shape=torch.Size([256, 16, 400])
+[Chimera G0/P0]  [Rank0] BRIDGE FLAGS: send_to_prev=False, send_to_next=True, recv_from_prev=False, recv_from_next=True
+[Chimera P2P Rank 0] chimera_communicate: send_next + recv_next
+[P2P ACTUAL] R0: send→R3, recv←R3
+[Chimera P2P Rank 0] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+[Chimera G0/P0]  [Rank0] BRIDGE done: pre-fetched VR0 grad for cooldown MB0
+[Chimera G0/P0]  [1F1B DONE] fwd_idx=4, bwd_idx=2
+[Chimera G0/P0]  === COOLDOWN PHASE (2 items remaining) ===
+[Chimera G0/P0]  [COOLDOWN k=0] BWD MB0, VR0
+[Chimera G0/P0]  [Rank0] Popped tensors for MB0, VR0 in k=0, COOLDOWN phase (queues: in=1, out=1)
+[Chimera G0/P0]  [Rank0] CHAIN: Using BRIDGED grad for VR0 MB0
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera P2P Rank 3] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] CHAIN: send+recv done for MB3
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera P2P Rank 1] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+[Chimera G1/P3]  [Rank3] BRIDGE done: pre-fetched VR1 grad for cooldown MB2
+[Chimera G1/P3]  [1F1B DONE] fwd_idx=4, bwd_idx=2
+[Chimera G1/P3]  === COOLDOWN PHASE (2 items remaining) ===
+[Chimera G1/P3]  [COOLDOWN k=0] BWD MB2, VR1
+[Chimera G1/P3]  [Rank3] Popped tensors for MB2, VR1 in k=0, COOLDOWN phase (queues: in=1, out=1)
+[Chimera G1/P3]  [Rank3] CHAIN: Using BRIDGED grad for VR1 MB2
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera P2P Rank 2] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] CHAIN: send+recv done for MB1
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G3/P1]  [Rank1] Backward step done for MB3, VR1 in k=1, COOLDOWN phase
+[Chimera G3/P1]  [Rank1] Saved grad for VR1 to combine with next recv
+[Chimera G3/P1]  [COOLDOWN k=2] BWD MB1, VR0
+[Chimera G3/P1]  [Rank1] Popped tensors for MB1, VR0 in k=2, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G3/P1]  [Rank1] CHAIN: send VR1 + recv VR0 for MB1
+[Chimera P2P Rank 3] chimera_communicate: send_next + recv_next
+[P2P ACTUAL] R3: send→R2, recv←R2
+[Chimera G2/P2]  [Rank2] Backward step done for MB1, VR0 in k=1, COOLDOWN phase
+[Chimera G2/P2]  [Rank2] Saved grad for VR0 to combine with next recv
+[Chimera G2/P2]  [COOLDOWN k=2] BWD MB3, VR1
+[Chimera G2/P2]  [Rank2] Popped tensors for MB3, VR1 in k=2, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G2/P2]  [Rank2] CHAIN: send VR0 + recv VR1 for MB3
+[Chimera P2P Rank 2] chimera_communicate: send_prev + recv_prev
+[P2P ACTUAL] R2: send→R3, recv←R3
+[Chimera P2P Rank 3] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+[Chimera G3/P1]  [Rank1] CHAIN: send+recv done for MB1
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera P2P Rank 2] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+[Chimera G2/P2]  [Rank2] CHAIN: send+recv done for MB3
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G0/P0]  [Rank0] Backward step done for MB0, VR0 in k=0, COOLDOWN phase
+[Chimera G0/P0]  [Rank0] Gradient last stage for VR0 - no send needed for MB0
+[Chimera G0/P0]  [COOLDOWN k=1] BWD MB1, VR0
+[Chimera G1/P3]  [Rank3] Backward step done for MB2, VR1 in k=0, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Gradient last stage for VR1 - no send needed for MB2
+[Chimera G1/P3]  [COOLDOWN k=1] BWD MB3, VR1
+[Chimera G0/P0]  [Rank0] Popped tensors for MB1, VR0 in k=1, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G0/P0]  [Rank0] CHAIN: standalone recv VR0 for MB1 at k=1 (grad_last rank, partner is sending)
+[Chimera P2P Rank 0] chimera_communicate: recv_next
+[P2P ACTUAL] R0: recv←R3
+[Chimera G1/P3]  [Rank3] Popped tensors for MB3, VR1 in k=1, COOLDOWN phase (queues: in=0, out=0)
+[Chimera G1/P3]  [Rank3] CHAIN: standalone recv VR1 for MB3 at k=1 (grad_last rank, partner is sending)
+[Chimera P2P Rank 1] chimera_communicate: recv_prev
+[P2P ACTUAL] R1: recv←R2
+[Chimera G2/P2]  [Rank2] Backward step done for MB3, VR1 in k=2, COOLDOWN phase
+[Chimera G2/P2]  [Rank2] Saved grad for VR1 to combine with next recv
+[Chimera G2/P2]  [Rank2] PRE-SYNC FLUSH: send VR1 grad before SYNC
+[Chimera P2P Rank 2] chimera_communicate: send_next
+[P2P ACTUAL] R2: send→R1
+[Chimera G3/P1]  [Rank1] Backward step done for MB1, VR0 in k=2, COOLDOWN phase
+[Chimera G3/P1]  [Rank1] Saved grad for VR0 to combine with next recv
+[Chimera G3/P1]  [Rank1] PRE-SYNC FLUSH: send VR0 grad before SYNC
+[Chimera P2P Rank 3] chimera_communicate: send_prev
+[P2P ACTUAL] R3: send→R0
+[Chimera G2/P2] [1775119485.89] [Rank2] SYNC MARKER at bwd_idx=4, k=3, COOLDOWN phase[Chimera P2P Rank 1] chimera_communicate result: recv_prev: shape=torch.Size([256, 16, 400])
+
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False
+[Chimera G2/P2]  [Rank2] Allreduce gradients for VR1 in k=3, COOLDOWN phase
+[Chimera G3/P1] [1775119485.89] [Rank1] SYNC MARKER at bwd_idx=4, k=3, COOLDOWN phase
+[Chimera P2P Rank 0] chimera_communicate result: recv_next: shape=torch.Size([256, 16, 400])
+[backward_step DEBUG] deallocate_pipeline_outputs=False, output_tensor.numel=1638400, will_use_custom_backward=False[Chimera G3/P1]  [Rank1] Allreduce gradients for VR0 in k=3, COOLDOWN phase
+
+[Chimera G3/P1]  [Rank1] Allreduce gradients for VR1 in k=3, COOLDOWN phase
+[Chimera G2/P2]  [Rank2] Allreduce gradients for VR0 in k=3, COOLDOWN phase
+[Chimera G3/P1]  [COOLDOWN DONE] Processed all backwards
+[Chimera G3/P1]  === Chimera schedule completed ===
+[Chimera G2/P2]  [COOLDOWN DONE] Processed all backwards
+[Chimera G2/P2]  === Chimera schedule completed ===
+[Chimera G1/P3]  [Rank3] Backward step done for MB3, VR1 in k=1, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Gradient last stage for VR1 - no send needed for MB3
+[Chimera G1/P3] [1775119485.94] [Rank3] SYNC MARKER at bwd_idx=4, k=2, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Allreduce gradients for VR1 in k=2, COOLDOWN phase
+[Chimera G0/P0]  [Rank0] Backward step done for MB1, VR0 in k=1, COOLDOWN phase
+[Chimera G0/P0]  [Rank0] Gradient last stage for VR0 - no send needed for MB1
+[Chimera G0/P0] [1775119485.95] [Rank0] SYNC MARKER at bwd_idx=4, k=2, COOLDOWN phase
+[Chimera G0/P0]  [Rank0] Allreduce gradients for VR0 in k=2, COOLDOWN phase
+[Chimera G1/P3]  [Rank3] Allreduce gradients for VR0 in k=2, COOLDOWN phase
+[Chimera G0/P0]  [Rank0] Allreduce gradients for VR1 in k=2, COOLDOWN phase
+[Chimera G0/P0]  [COOLDOWN DONE] Processed all backwards
+[Chimera G0/P0]  === Chimera schedule completed ===
+[Chimera G1/P3]  [COOLDOWN DONE] Processed all backwards
+[Chimera G1/P3]  === Chimera schedule completed ===
+[after training is done] datetime: 2026-04-02 08:44:46 

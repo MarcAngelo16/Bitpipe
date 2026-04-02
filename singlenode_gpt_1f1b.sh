@@ -7,9 +7,9 @@ export CUDA_DEVICE_MAX_CONNECTIONS=1
 export SKIP_CUDA_EXTENSIONS=1
 
 # Single node configuration
-GPUS_PER_NODE=12
+GPUS_PER_NODE=4
 NNODES=1
-MASTER_ADDR="172.17.0.2"  # localhost for single node
+MASTER_ADDR="172.17.0.4"  # localhost for single node
 MASTER_PORT=6000
 NODE_RANK=0
 
@@ -48,7 +48,7 @@ echo "=================================="
 
 # Calculate microbatches - Increased for longer duration
 MICRO_BATCH_SIZE=16    # Larger microbatches = more computation per batch
-GLOBAL_BATCH_SIZE=384  # Must be divisible by pipeline_parallel_size for BitPipe
+GLOBAL_BATCH_SIZE=64  # Must be divisible by pipeline_parallel_size for BitPipe
 NUM_MICROBATCHES=$((GLOBAL_BATCH_SIZE / MICRO_BATCH_SIZE)) 
 
 echo "Micro batch size: $MICRO_BATCH_SIZE"
@@ -62,7 +62,7 @@ torchrun \
     --node_rank $NODE_RANK \
     --master_addr $MASTER_ADDR \
     --master_port $MASTER_PORT \
-    asymmetric_bitpipe/scripts/examples/gpt_dummy.py \
+    gpt_dummy.py \
     --enable-profiling \
     --profile-train-iters  3\
     --pipeline-model-parallel-size 12 \
@@ -72,10 +72,10 @@ torchrun \
     --eval-iters 1 \
     --seq-length 256 \
     --max-position-embeddings 512 \
-    --hidden-size 1600 \
-    --num-layers 48 \
-    --num-attention-heads 25 \
-    --vocab-size 30552 \
+    --hidden-size 400 \
+    --num-layers 64 \
+    --num-attention-heads 16 \
+    --vocab-size 1600 \
     --lr 0.0001 \
     --lr-decay-style cosine \
     --min-lr 1.0e-5 \

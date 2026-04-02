@@ -7,7 +7,7 @@ export SKIP_CUDA_EXTENSIONS=1
 # Single node configuration
 GPUS_PER_NODE=4
 NNODES=1
-MASTER_ADDR="172.17.0.2"  # localhost for single node
+MASTER_ADDR="172.17.0.4"  # localhost for single node
 MASTER_PORT=6000
 NODE_RANK=0
 
@@ -62,7 +62,6 @@ torchrun \
     --master_port $MASTER_PORT \
     gpt_dummy.py \
     --enable-bitpipe-schedule \
-    --enable-profiling \
     --profile-train-iters  3\
     --pipeline-model-parallel-size 12 \
     --micro-batch-size $MICRO_BATCH_SIZE \

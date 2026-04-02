@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
-BitPipe Profile Analysis and Visualization Tool
+Profile Analysis and Visualization Tool
 
-This script analyzes and visualizes BitPipe profiling data to understand:
+This script analyzes and visualizes BitPipe/Chimera profiling data to understand:
 - Pipeline execution timeline (including BD allreduce sync blocks)
 - Communication patterns
 - Performance bottlenecks
@@ -58,7 +58,7 @@ def identify_profile_type(profile, filename=""):
     return "training" if num_backward > 0 else "validation"
 
 def get_schedule_type(profile):
-    """Get the schedule type (bitpipe, bitpipe_asym, chimera, or 1f1b)"""
+    """Get the schedule type (bitpipe, bitpipe_asym, chimera, chimera_asym, or 1f1b)"""
     return profile['metadata'].get('schedule_type', 'unknown')
 
 def get_timing_method(profile):
@@ -77,7 +77,7 @@ def get_summary_value(profile, key, default=0.0):
 # Timeline visualization
 # ─────────────────────────────────────────────────────────────────────────────
 
-def create_timeline_visualization(profiles, output_file="bitpipe_timeline.png"):
+def create_timeline_visualization(profiles, output_file="timeline.png"):
     """Create a timeline visualization of microbatch execution and sync blocks"""
 
     training_profiles = [p for p in profiles if p.get('profile_type', 'validation') == "training"]
@@ -86,14 +86,18 @@ def create_timeline_visualization(profiles, output_file="bitpipe_timeline.png"):
         print("No training profiles found!")
         return
 
-    bitpipe_profiles     = {p['metadata']['rank']: p for p in training_profiles if get_schedule_type(p) == "bitpipe"}
+    bitpipe_profiles      = {p['metadata']['rank']: p for p in training_profiles if get_schedule_type(p) == "bitpipe"}
     bitpipe_asym_profiles = {p['metadata']['rank']: p for p in training_profiles if get_schedule_type(p) == "bitpipe_asym"}
-    chimera_profiles     = {p['metadata']['rank']: p for p in training_profiles if get_schedule_type(p) == "chimera"}
-    f1b_profiles         = {p['metadata']['rank']: p for p in training_profiles if get_schedule_type(p) == "1f1b"}
+    chimera_profiles      = {p['metadata']['rank']: p for p in training_profiles if get_schedule_type(p) == "chimera"}
+    chimera_asym_profiles = {p['metadata']['rank']: p for p in training_profiles if get_schedule_type(p) == "chimera_asym"}
+    f1b_profiles          = {p['metadata']['rank']: p for p in training_profiles if get_schedule_type(p) == "1f1b"}
 
     if bitpipe_asym_profiles:
         rank_profiles = bitpipe_asym_profiles
         schedule_type = "BitPipe Asymmetric"
+    elif chimera_asym_profiles:
+        rank_profiles = chimera_asym_profiles
+        schedule_type = "Chimera 2-VR Asymmetric"
     elif chimera_profiles:
         rank_profiles = chimera_profiles
         schedule_type = "Chimera 2-VR"
@@ -107,7 +111,7 @@ def create_timeline_visualization(profiles, output_file="bitpipe_timeline.png"):
     fig, ax = plt.subplots(figsize=(18, 10))
 
     # Color scheme
-    if schedule_type in ["BitPipe", "BitPipe Asymmetric", "Chimera 2-VR"]:
+    if schedule_type in ["BitPipe", "BitPipe Asymmetric", "Chimera 2-VR", "Chimera 2-VR Asymmetric"]:
         forward_colors  = {0: '#1f77b4', 1: '#ff7f0e'}
         backward_colors = {0: '#2ca02c', 1: '#d62728'}
     else:
@@ -229,7 +233,7 @@ def create_timeline_visualization(profiles, output_file="bitpipe_timeline.png"):
         ax.set_ylim(-0.3, max(y_positions.values()) + row_height + 0.5)
 
     # Legend
-    if schedule_type in ["BitPipe", "BitPipe Asymmetric", "Chimera 2-VR"]:
+    if schedule_type in ["BitPipe", "BitPipe Asymmetric", "Chimera 2-VR", "Chimera 2-VR Asymmetric"]:
         legend_elements = [
             patches.Patch(facecolor=forward_colors[0],  alpha=0.7, label='Pipeline 0 Forward'),
             patches.Patch(facecolor=forward_colors[1],  alpha=0.7, label='Pipeline 1 Forward'),
@@ -253,6 +257,7 @@ def create_timeline_visualization(profiles, output_file="bitpipe_timeline.png"):
         "BitPipe": "bitpipe",
         "BitPipe Asymmetric": "bitpipe_asym",
         "Chimera 2-VR": "chimera",
+        "Chimera 2-VR Asymmetric": "chimera_asym",
         "Standard 1F1B": "1f1b",
     }.get(schedule_type, 'unknown')
     final_output_file = f"{base_name}_{schedule_suffix}.png"
@@ -425,11 +430,13 @@ def analyze_pipeline_efficiency(profiles):
     bitpipe_profiles      = [p for p in training_profiles if get_schedule_type(p) == "bitpipe"]
     bitpipe_asym_profiles = [p for p in training_profiles if get_schedule_type(p) == "bitpipe_asym"]
     chimera_profiles      = [p for p in training_profiles if get_schedule_type(p) == "chimera"]
+    chimera_asym_profiles = [p for p in training_profiles if get_schedule_type(p) == "chimera_asym"]
     f1b_profiles          = [p for p in training_profiles if get_schedule_type(p) == "1f1b"]
 
     print(f"\nFound {len(training_profiles)} training profiles and {len(validation_profiles)} validation profiles")
     print(f"BitPipe: {len(bitpipe_profiles)}, BitPipe Asym: {len(bitpipe_asym_profiles)}, "
-          f"Chimera: {len(chimera_profiles)}, 1F1B: {len(f1b_profiles)}")
+          f"Chimera: {len(chimera_profiles)}, Chimera Asym: {len(chimera_asym_profiles)}, "
+          f"1F1B: {len(f1b_profiles)}")
 
     if training_profiles:
         print("\n--- TRAINING PERFORMANCE ---")
@@ -501,10 +508,12 @@ def analyze_pipeline_efficiency(profiles):
         available_schedules.append(('1F1B', f1b_profiles))
     if bitpipe_profiles:
         available_schedules.append(('BitPipe', bitpipe_profiles))
-    if chimera_profiles:
-        available_schedules.append(('Chimera', chimera_profiles))
     if bitpipe_asym_profiles:
         available_schedules.append(('BitPipe Asym', bitpipe_asym_profiles))
+    if chimera_profiles:
+        available_schedules.append(('Chimera', chimera_profiles))
+    if chimera_asym_profiles:
+        available_schedules.append(('Chimera Asym', chimera_asym_profiles))
 
     if len(available_schedules) >= 2:
         print("\n--- SCHEDULE COMPARISON ---")
@@ -734,7 +743,7 @@ def print_microbatch_execution_order(profiles):
                 pip_id    = e['pipeline_id']
                 chunk_id  = e.get('model_chunk_id', 'N/A')
 
-                if schedule_type in ["bitpipe", "bitpipe_asym", "chimera"]:
+                if schedule_type in ["bitpipe", "bitpipe_asym", "chimera", "chimera_asym"]:
                     print(f"{i+1:3d}. MB{mb_id:2d}  {phase:8s}  VR{chunk_id}  P{pip_id}  "
                           f"[{start:7.4f}s – {end:7.4f}s]  {duration*1000:6.1f}ms")
                 else:
@@ -778,10 +787,11 @@ def create_visualizations_by_schedule_type(profiles):
         return []
 
     schedule_groups = {
-        '1f1b':        [p for p in training_profiles if get_schedule_type(p) == "1f1b"],
-        'bitpipe':     [p for p in training_profiles if get_schedule_type(p) == "bitpipe"],
-        'chimera':     [p for p in training_profiles if get_schedule_type(p) == "chimera"],
-        'bitpipe_asym':[p for p in training_profiles if get_schedule_type(p) == "bitpipe_asym"],
+        '1f1b':         [p for p in training_profiles if get_schedule_type(p) == "1f1b"],
+        'bitpipe':      [p for p in training_profiles if get_schedule_type(p) == "bitpipe"],
+        'bitpipe_asym': [p for p in training_profiles if get_schedule_type(p) == "bitpipe_asym"],
+        'chimera':      [p for p in training_profiles if get_schedule_type(p) == "chimera"],
+        'chimera_asym': [p for p in training_profiles if get_schedule_type(p) == "chimera_asym"],
     }
     available = {name: profs for name, profs in schedule_groups.items() if profs}
 

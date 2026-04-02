@@ -1,11 +1,11 @@
 export CUDA_DEVICE_MAX_CONNECTIONS=1
 export SKIP_CUDA_EXTENSIONS=1
-export CHIMERA_DEBUG=1
+#export CHIMERA_DEBUG=1
 
 # Single node configuration
 GPUS_PER_NODE=4
 NNODES=1
-MASTER_ADDR="172.17.0.3"  # localhost for single node
+MASTER_ADDR="172.17.0.4"  # localhost for single node
 MASTER_PORT=6000
 NODE_RANK=0
 
