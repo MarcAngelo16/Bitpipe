@@ -1,0 +1,244 @@
+{
+  "metadata": {
+    "rank": 0,
+    "world_size": 4,
+    "timestamp": "20260407_112825",
+    "total_time": 0.3205742835998535,
+    "schedule_type": "1f1b",
+    "timing_method": "cuda_event_gpu_aligned",
+    "synchronized": true
+  },
+  "summary": {
+    "total_forward_time": 0.06727266979217529,
+    "total_backward_time": 0.10348646354675292,
+    "total_p2p_time": 0.15047577996680042,
+    "total_sync_time_ms": 0,
+    "num_microbatches": 4,
+    "num_forward_passes": 4,
+    "num_backward_passes": 4,
+    "num_sync_events": 0
+  },
+  "microbatch_events": [
+    {
+      "microbatch_id": 0,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "forward",
+      "start_time": 0.002357248067855835,
+      "end_time": 0.01906790328025818,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 1,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "forward",
+      "start_time": 0.01915088081359863,
+      "end_time": 0.036532224655151366,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 2,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "forward",
+      "start_time": 0.0366110725402832,
+      "end_time": 0.053995519638061526,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 3,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "forward",
+      "start_time": 0.05435391998291016,
+      "end_time": 0.07015014362335205,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 0,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "backward",
+      "start_time": 0.1539287109375,
+      "end_time": 0.17985741424560547,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 1,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "backward",
+      "start_time": 0.2003230743408203,
+      "end_time": 0.22605619430541993,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 2,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "backward",
+      "start_time": 0.24747007751464845,
+      "end_time": 0.27343154907226563,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 3,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "backward",
+      "start_time": 0.2944317321777344,
+      "end_time": 0.320294900894165,
+      "rank": 0
+    }
+  ],
+  "p2p_events": [
+    {
+      "comm_type": "recv_forward",
+      "source_rank": 3,
+      "dest_rank": 0,
+      "start_time": 0.0023060479164123534,
+      "end_time": 0.0023347199168056248,
+      "microbatch_id": -1
+    },
+    {
+      "comm_type": "send_forward",
+      "source_rank": 0,
+      "dest_rank": 1,
+      "start_time": 0.01835212707519531,
+      "end_time": 0.01904742306470871,
+      "microbatch_id": 0
+    },
+    {
+      "comm_type": "recv_forward",
+      "source_rank": 3,
+      "dest_rank": 0,
+      "start_time": 0.019108863830566408,
+      "end_time": 0.01913241583108902,
+      "microbatch_id": 0
+    },
+    {
+      "comm_type": "send_forward",
+      "source_rank": 0,
+      "dest_rank": 1,
+      "start_time": 0.034931713104248044,
+      "end_time": 0.03651072108745575,
+      "microbatch_id": 1
+    },
+    {
+      "comm_type": "recv_forward",
+      "source_rank": 3,
+      "dest_rank": 0,
+      "start_time": 0.03657113647460938,
+      "end_time": 0.03659366447478533,
+      "microbatch_id": 1
+    },
+    {
+      "comm_type": "send_forward",
+      "source_rank": 0,
+      "dest_rank": 1,
+      "start_time": 0.05240115356445312,
+      "end_time": 0.05397196960449219,
+      "microbatch_id": 2
+    },
+    {
+      "comm_type": "recv_forward",
+      "source_rank": 3,
+      "dest_rank": 0,
+      "start_time": 0.054035457611083984,
+      "end_time": 0.05406105761043727,
+      "microbatch_id": 2
+    },
+    {
+      "comm_type": "send_forward_recv_backward",
+      "source_rank": 0,
+      "dest_rank": 1,
+      "start_time": 0.07015219116210937,
+      "end_time": 0.15389389038085938,
+      "microbatch_id": 3
+    },
+    {
+      "comm_type": "send_backward",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.17985945129394532,
+      "end_time": 0.17986149929394013,
+      "microbatch_id": 0
+    },
+    {
+      "comm_type": "recv_backward",
+      "source_rank": 1,
+      "dest_rank": 0,
+      "start_time": 0.17986355590820313,
+      "end_time": 0.2002964515686035,
+      "microbatch_id": 0
+    },
+    {
+      "comm_type": "send_backward",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.22605824279785156,
+      "end_time": 0.2260602907978464,
+      "microbatch_id": 1
+    },
+    {
+      "comm_type": "recv_backward",
+      "source_rank": 1,
+      "dest_rank": 0,
+      "start_time": 0.22606130981445313,
+      "end_time": 0.24744140625,
+      "microbatch_id": 1
+    },
+    {
+      "comm_type": "send_backward",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.27343359375,
+      "end_time": 0.2734346177499974,
+      "microbatch_id": 2
+    },
+    {
+      "comm_type": "recv_backward",
+      "source_rank": 1,
+      "dest_rank": 0,
+      "start_time": 0.2734366760253906,
+      "end_time": 0.2944051246643066,
+      "microbatch_id": 2
+    },
+    {
+      "comm_type": "send_backward",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.32029592895507814,
+      "end_time": 0.32029797695507295,
+      "microbatch_id": 3
+    }
+  ],
+  "sync_events": [],
+  "phase_transitions": [
+    {
+      "phase_name": "warmup_start",
+      "timestamp": 0.0007617473602294922,
+      "memory_allocated": 681185792,
+      "memory_reserved": 3284140032
+    },
+    {
+      "phase_name": "steady_state_start",
+      "timestamp": 0.05443286895751953,
+      "memory_allocated": 2512690688,
+      "memory_reserved": 3284140032
+    },
+    {
+      "phase_name": "cooldown_start",
+      "timestamp": 0.17118287086486816,
+      "memory_allocated": 2521079296,
+      "memory_reserved": 3284140032
+    },
+    {
+      "phase_name": "complete",
+      "timestamp": 0.3111264705657959,
+      "memory_allocated": 689574400,
+      "memory_reserved": 3284140032
+    }
+  ]
+}

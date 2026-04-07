@@ -51,18 +51,18 @@ torchrun \
     --master_port $MASTER_PORT \
     bert_dummy.py \
     --enable-profiling \
-    --profile-train-iters 3 \
+    --profile-train-iters 4 \
     --pipeline-model-parallel-size 4 \
     --micro-batch-size $MICRO_BATCH_SIZE \
     --global-batch-size $GLOBAL_BATCH_SIZE \
-    --train-iters 3 \
+    --train-iters 5 \
     --eval-iters 1 \
-    --seq-length 512 \
-    --max-position-embeddings 512 \
+    --seq-length 128 \
+    --max-position-embeddings 128 \
     --hidden-size 1024 \
     --num-layers 24 \
     --num-attention-heads 16 \
-    --vocab-size 30522 \
+    --vocab-size 6000 \
     --lr 0.0001 \
     --lr-decay-style linear \
     --min-lr 1.0e-5 \
