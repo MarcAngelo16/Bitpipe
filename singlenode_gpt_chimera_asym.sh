@@ -5,7 +5,7 @@ export CHIMERA_DEBUG=1
 # Single node configuration
 GPUS_PER_NODE=4
 NNODES=1
-MASTER_ADDR="172.17.0.4"  # localhost for single node
+MASTER_ADDR="172.17.0.2"  # localhost for single node
 MASTER_PORT=6000
 NODE_RANK=0
 
@@ -53,21 +53,22 @@ torchrun \
     --master-addr $MASTER_ADDR \
     --master-port $MASTER_PORT \
     gpt_dummy.py \
+    --enable-profiling \
     --enable-chimera-schedule \
     --enable-chimera-asymmetric \
     --chimera-asymmetric-config $CHIMERA_ASYM_CONFIG \
-    --profile-train-iters  3\
+    --profile-train-iters  2\
     --pipeline-model-parallel-size 4 \
     --micro-batch-size $MICRO_BATCH_SIZE \
     --global-batch-size $GLOBAL_BATCH_SIZE \
     --train-iters 3 \
     --eval-iters 1 \
-    --seq-length 256 \
-    --max-position-embeddings 512 \
-    --hidden-size 400 \
+    --seq-length 128 \
+    --max-position-embeddings 128 \
+    --hidden-size 512 \
     --num-layers 64 \
     --num-attention-heads 16 \
-    --vocab-size 1600 \
+    --vocab-size 8000 \
     --lr 0.0001 \
     --lr-decay-style cosine \
     --min-lr 1.0e-5 \

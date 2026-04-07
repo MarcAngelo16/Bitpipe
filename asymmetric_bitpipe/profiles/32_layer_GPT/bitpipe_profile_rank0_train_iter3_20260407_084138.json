@@ -1,0 +1,331 @@
+{
+  "metadata": {
+    "rank": 0,
+    "world_size": 4,
+    "timestamp": "20260407_084138",
+    "total_time": 0.8160445690155029,
+    "schedule_type": "bitpipe",
+    "timing_method": "cuda_event_gpu_aligned",
+    "synchronized": true
+  },
+  "summary": {
+    "total_forward_time": 0.2634035186767578,
+    "total_backward_time": 0.3399966697692872,
+    "total_p2p_time": 0.056593471826985424,
+    "total_sync_time_ms": 155.2363510131836,
+    "num_microbatches": 8,
+    "num_forward_passes": 8,
+    "num_backward_passes": 8,
+    "num_sync_events": 2
+  },
+  "microbatch_events": [
+    {
+      "microbatch_id": 0,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "forward",
+      "start_time": 0.0007403519749641419,
+      "end_time": 0.02795417529344559,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 1,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "forward",
+      "start_time": 0.02929971122741699,
+      "end_time": 0.055608318328857424,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 2,
+      "pipeline_id": 1,
+      "model_chunk_id": 1,
+      "phase": "forward",
+      "start_time": 0.08643993377685547,
+      "end_time": 0.1131356143951416,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 6,
+      "pipeline_id": 1,
+      "model_chunk_id": 3,
+      "phase": "forward",
+      "start_time": 0.11313766479492188,
+      "end_time": 0.1383864326477051,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 3,
+      "pipeline_id": 1,
+      "model_chunk_id": 1,
+      "phase": "forward",
+      "start_time": 0.14314802551269531,
+      "end_time": 0.16882277679443358,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 7,
+      "pipeline_id": 1,
+      "model_chunk_id": 3,
+      "phase": "forward",
+      "start_time": 0.1688248291015625,
+      "end_time": 0.19403673362731932,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 4,
+      "pipeline_id": 0,
+      "model_chunk_id": 2,
+      "phase": "forward",
+      "start_time": 0.19905535888671874,
+      "end_time": 0.25259622192382813,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 4,
+      "pipeline_id": 0,
+      "model_chunk_id": 2,
+      "phase": "backward",
+      "start_time": 0.2525982666015625,
+      "end_time": 0.31186943435668946,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 5,
+      "pipeline_id": 0,
+      "model_chunk_id": 2,
+      "phase": "forward",
+      "start_time": 0.31402188110351564,
+      "end_time": 0.36753100204467776,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 5,
+      "pipeline_id": 0,
+      "model_chunk_id": 2,
+      "phase": "backward",
+      "start_time": 0.3675320434570313,
+      "end_time": 0.4267950210571289,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 6,
+      "pipeline_id": 1,
+      "model_chunk_id": 3,
+      "phase": "backward",
+      "start_time": 0.42932122802734374,
+      "end_time": 0.4657285232543945,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 2,
+      "pipeline_id": 1,
+      "model_chunk_id": 1,
+      "phase": "backward",
+      "start_time": 0.46573056030273435,
+      "end_time": 0.5017333755493164,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 7,
+      "pipeline_id": 1,
+      "model_chunk_id": 3,
+      "phase": "backward",
+      "start_time": 0.5067335815429688,
+      "end_time": 0.5434204292297363,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 3,
+      "pipeline_id": 1,
+      "model_chunk_id": 1,
+      "phase": "backward",
+      "start_time": 0.5434224853515625,
+      "end_time": 0.5794171104431153,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 0,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "backward",
+      "start_time": 0.5839462280273438,
+      "end_time": 0.6222141304016113,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 1,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "backward",
+      "start_time": 0.7009443969726562,
+      "end_time": 0.739047435760498,
+      "rank": 0
+    }
+  ],
+  "p2p_events": [
+    {
+      "comm_type": "recv_forward",
+      "source_rank": 1,
+      "dest_rank": 0,
+      "start_time": 0.00042495998740196226,
+      "end_time": 0.00045465598814189436,
+      "microbatch_id": -1
+    },
+    {
+      "comm_type": "send_forward_recv_forward",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.02795622444152832,
+      "end_time": 0.029275136470794678,
+      "microbatch_id": 0
+    },
+    {
+      "comm_type": "send_forward_recv_forward_bd0",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.055610366821289066,
+      "end_time": 0.08641023826599122,
+      "microbatch_id": 1
+    },
+    {
+      "comm_type": "send_forward_recv_forward_bd0",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.138387451171875,
+      "end_time": 0.14311525917053222,
+      "microbatch_id": 6
+    },
+    {
+      "comm_type": "send_forward_recv_forward_bd0",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.1940377655029297,
+      "end_time": 0.19867648553848266,
+      "microbatch_id": 7
+    },
+    {
+      "comm_type": "send_backward_recv_forward",
+      "source_rank": 0,
+      "dest_rank": 1,
+      "start_time": 0.31187045288085935,
+      "end_time": 0.31399422883987427,
+      "microbatch_id": 4
+    },
+    {
+      "comm_type": "send_backward_recv_backward_bd",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.4267960205078125,
+      "end_time": 0.4289064846038818,
+      "microbatch_id": 5
+    },
+    {
+      "comm_type": "send_backward_recv_backward_bd",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.5017354125976563,
+      "end_time": 0.5066916046142578,
+      "microbatch_id": 2
+    },
+    {
+      "comm_type": "send_backward_recv_backward_bd",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.5794180908203125,
+      "end_time": 0.5839226670265197,
+      "microbatch_id": 3
+    },
+    {
+      "comm_type": "send_backward_recv_backward",
+      "source_rank": 0,
+      "dest_rank": 1,
+      "start_time": 0.6222151489257812,
+      "end_time": 0.6222417729254812,
+      "microbatch_id": 0
+    },
+    {
+      "comm_type": "recv_backward",
+      "source_rank": 3,
+      "dest_rank": 0,
+      "start_time": 0.6995701904296875,
+      "end_time": 0.7008973264694214,
+      "microbatch_id": 0
+    },
+    {
+      "comm_type": "send_backward_recv_backward",
+      "source_rank": 0,
+      "dest_rank": 1,
+      "start_time": 0.7390494995117187,
+      "end_time": 0.7390791955124587,
+      "microbatch_id": 1
+    }
+  ],
+  "sync_events": [
+    {
+      "sync_index": 0,
+      "phase": "cooldown",
+      "wall_clock_start": 0.6222960815429688,
+      "wall_clock_end": 0.7009177780151368,
+      "chunk_durations_ms": [
+        {
+          "chunk_id": 2,
+          "duration_ms": 48.723968505859375
+        },
+        {
+          "chunk_id": 3,
+          "duration_ms": 28.528640747070312
+        }
+      ],
+      "total_duration_ms": 78.62169647216797,
+      "rank": 0,
+      "num_chunks": 2
+    },
+    {
+      "sync_index": 1,
+      "phase": "cooldown",
+      "wall_clock_start": 0.7391016845703124,
+      "wall_clock_end": 0.8157163391113281,
+      "chunk_durations_ms": [
+        {
+          "chunk_id": 0,
+          "duration_ms": 47.142913818359375
+        },
+        {
+          "chunk_id": 1,
+          "duration_ms": 29.452320098876953
+        }
+      ],
+      "total_duration_ms": 76.61465454101562,
+      "rank": 0,
+      "num_chunks": 2
+    }
+  ],
+  "phase_transitions": [
+    {
+      "phase_name": "warmup_start",
+      "timestamp": 0.0008454322814941406,
+      "memory_allocated": 2243474432,
+      "memory_reserved": 10655629312
+    },
+    {
+      "phase_name": "steady_state_start",
+      "timestamp": 0.19915437698364258,
+      "memory_allocated": 8100426752,
+      "memory_reserved": 10655629312
+    },
+    {
+      "phase_name": "cooldown_start",
+      "timestamp": 0.42942023277282715,
+      "memory_allocated": 8100427776,
+      "memory_reserved": 10655629312
+    },
+    {
+      "phase_name": "complete",
+      "timestamp": 0.7877261638641357,
+      "memory_allocated": 2243475456,
+      "memory_reserved": 10655629312
+    }
+  ]
+}

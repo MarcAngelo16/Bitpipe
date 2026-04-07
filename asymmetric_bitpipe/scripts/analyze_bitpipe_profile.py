@@ -28,6 +28,22 @@ _DEFAULT_PROFILE_DIR = os.path.join(_SCRIPT_DIR, "..", "profiles", "raw")
 _DEFAULT_VIZ_DIR     = os.path.join(_SCRIPT_DIR, "..", "visualizations")
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Iteration selection for cross-schedule comparison
+# Set a specific iteration number per schedule type to pin which profile is
+# used in the comparison table, or None to average all available iterations.
+#
+# Example — compare chimera iter 3 vs 1f1b iter 5:
+#   COMPARE_ITERS = {'chimera': 3, '1f1b': 5, ...}
+# ─────────────────────────────────────────────────────────────────────────────
+COMPARE_ITERS = {
+    'bitpipe':      None,
+    'bitpipe_asym': None,
+    'chimera':      None,
+    'chimera_asym': None,
+    '1f1b':         None,
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Data loading
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -72,6 +88,44 @@ def get_sync_events(profile):
 def get_summary_value(profile, key, default=0.0):
     """Safely get a summary value with fallback for old profiles"""
     return profile['summary'].get(key, default)
+
+def get_iteration(profile):
+    """Extract iteration number from profile filename, or None if not present."""
+    import re
+    filename = profile.get('filename', '')
+    m = re.search(r'_iter(\d+)_', filename)
+    return int(m.group(1)) if m else None
+
+def filter_profiles_for_comparison(profiles_by_schedule, iter_map):
+    """
+    Filter each schedule's profile list to a specific iteration when requested.
+
+    Args:
+        profiles_by_schedule: dict of {schedule_name: [profile, ...]}
+        iter_map: COMPARE_ITERS dict — {schedule_name: int | None}
+
+    Returns:
+        dict of {schedule_name: [profile, ...]} with iteration filtering applied.
+        Prints a note for each schedule showing which iteration is being used.
+    """
+    result = {}
+    for name, profs in profiles_by_schedule.items():
+        target_iter = iter_map.get(name, None)
+        if target_iter is None:
+            result[name] = profs
+            iters = sorted(set(i for p in profs if (i := get_iteration(p)) is not None))
+            iter_label = f"all iters {iters}" if iters else "unknown iter"
+        else:
+            filtered = [p for p in profs if get_iteration(p) == target_iter]
+            if not filtered:
+                available = sorted(set(i for p in profs if (i := get_iteration(p)) is not None))
+                print(f"  [WARNING] {name}: iter {target_iter} not found "
+                      f"(available: {available}). Using all.")
+                filtered = profs
+            result[name] = filtered
+            iter_label = f"iter {target_iter}"
+        print(f"  {name}: using {iter_label} ({len(result[name])} profiles)")
+    return result
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Timeline visualization
@@ -441,12 +495,11 @@ def analyze_pipeline_efficiency(profiles):
     if training_profiles:
         print("\n--- TRAINING PERFORMANCE ---")
 
-        total_time  = []
+        total_time   = []
         forward_time = []
         backward_time = []
-        p2p_time    = []
+        p2p_time     = []
         sync_time_ms = []
-        throughput_values = []
 
         for p in training_profiles:
             rank    = p['metadata']['rank']
@@ -459,6 +512,8 @@ def analyze_pipeline_efficiency(profiles):
             t_sync  = get_summary_value(p, 'total_sync_time_ms', 0.0)  # ms
             n_sync  = int(get_summary_value(p, 'num_sync_events', 0))
             timing  = get_timing_method(p)
+            it      = get_iteration(p)
+            iter_tag = f"  iter={it}" if it is not None else ""
 
             total_time.append(t_total)
             forward_time.append(t_fwd)
@@ -466,31 +521,30 @@ def analyze_pipeline_efficiency(profiles):
             p2p_time.append(t_p2p)
             sync_time_ms.append(t_sync)
 
-            compute_time    = t_fwd + t_bwd
-            efficiency      = compute_time / t_total * 100
-            comm_overhead   = t_p2p / t_total * 100
-            sync_overhead   = (t_sync / 1000.0) / t_total * 100
+            schedule      = get_schedule_type(p)
+            t_sync_s      = t_sync / 1000.0
+            needs_sync    = schedule in ('chimera', 'chimera_asym', 'bitpipe', 'bitpipe_asym')
+            useful_time   = t_fwd + t_bwd + (t_sync_s if needs_sync else 0.0)
+            efficiency    = useful_time / t_total * 100
+            comm_overhead = t_p2p / t_total * 100
+            sync_overhead = t_sync_s / t_total * 100
 
-            n_mb = summary['num_forward_passes'] + summary['num_backward_passes']
-            throughput = n_mb / t_total
-            throughput_values.append(throughput)
-
-            print(f"\nRank {rank}  [{timing} timing]:")
-            print(f"  Total time:        {t_total:.3f}s")
-            print(f"  Forward time:      {t_fwd:.3f}s")
-            print(f"  Backward time:     {t_bwd:.3f}s")
-            print(f"  P2P comm time:     {t_p2p:.3f}s")
+            print(f"\nRank {rank}  [{timing} timing{iter_tag}]:")
+            print(f"  Total time:           {t_total:.3f}s")
+            print(f"  Forward time:         {t_fwd:.3f}s")
+            print(f"  Backward time:        {t_bwd:.3f}s")
+            print(f"  P2P comm time:        {t_p2p:.3f}s")
             if n_sync > 0:
-                print(f"  BD Sync time:      {t_sync:.1f}ms  ({n_sync} sync event(s), overhead {sync_overhead:.1f}%)")
-            print(f"  Pipeline efficiency:  {efficiency:.1f}%")
+                print(f"  BD Sync time:         {t_sync:.1f}ms  ({n_sync} sync event(s), {sync_overhead:.1f}% of total)")
+            print(f"  Pipeline efficiency:  {efficiency:.1f}%  "
+                  f"({'fwd+bwd+sync' if needs_sync else 'fwd+bwd'} / total)")
             print(f"  Comm overhead:        {comm_overhead:.1f}%")
-            print(f"  Throughput:           {throughput:.2f} microbatches/s")
 
             transitions = p['phase_transitions']
             if transitions:
                 start_mem = transitions[0]['memory_allocated'] / 1024**2
                 peak_mem  = max(t['memory_allocated'] for t in transitions) / 1024**2
-                print(f"  Memory:            {start_mem:.1f}MB → {peak_mem:.1f}MB (peak)")
+                print(f"  Memory:               {start_mem:.1f}MB → {peak_mem:.1f}MB (peak)")
 
         print(f"\nOverall Statistics (across {len(training_profiles)} ranks):")
         print(f"  Pipeline duration (max):  {max(total_time):.3f}s")
@@ -500,7 +554,6 @@ def analyze_pipeline_efficiency(profiles):
         print(f"  Avg P2P time:             {np.mean(p2p_time):.3f}s")
         if any(ms > 0 for ms in sync_time_ms):
             print(f"  Avg BD Sync time:         {np.mean(sync_time_ms):.1f}ms (±{np.std(sync_time_ms):.1f}ms)")
-        print(f"  Avg throughput:           {np.mean(throughput_values):.2f} mb/s (±{np.std(throughput_values):.2f})")
 
     # Schedule comparison table
     available_schedules = []
@@ -516,67 +569,85 @@ def analyze_pipeline_efficiency(profiles):
         available_schedules.append(('Chimera Asym', chimera_asym_profiles))
 
     if len(available_schedules) >= 2:
-        print("\n--- SCHEDULE COMPARISON ---")
+        print("\n--- SCHEDULE COMPARISON (one column per iteration) ---")
 
-        metrics = {}
-        for name, profs in available_schedules:
-            avg_time  = np.mean([p['metadata']['total_time'] for p in profs])
-            duration  = max([p['metadata']['total_time'] for p in profs])
-            avg_fwd   = np.mean([p['summary']['total_forward_time'] for p in profs])
-            avg_bwd   = np.mean([p['summary']['total_backward_time'] for p in profs])
-            avg_p2p   = np.mean([p['summary']['total_p2p_time'] for p in profs])
-            avg_sync  = np.mean([get_summary_value(p, 'total_sync_time_ms', 0.0) for p in profs])
-            efficiency = (avg_fwd + avg_bwd) / avg_time * 100
-
-            throughputs = []
+        # Build columns: one per (schedule_display_name, iteration) pair,
+        # preserving schedule order and sorting iterations within each schedule.
+        columns = []  # list of (col_name, schedule_key, profs_for_this_iter)
+        for display_name, profs in available_schedules:
+            iter_groups = {}
             for p in profs:
-                n_mb = p['summary']['num_forward_passes'] + p['summary']['num_backward_passes']
-                throughputs.append(n_mb / p['metadata']['total_time'])
+                it = get_iteration(p)
+                key = it if it is not None else 'unknown'
+                iter_groups.setdefault(key, []).append(p)
+            for it in sorted(iter_groups.keys(), key=lambda x: (x == 'unknown', x)):
+                col_name = f"{display_name} iter{it}" if it != 'unknown' else display_name
+                columns.append((col_name, display_name, iter_groups[it]))
 
-            metrics[name] = {
-                'duration': duration,
-                'avg_time': avg_time,
-                'forward':  avg_fwd,
-                'backward': avg_bwd,
-                'p2p':      avg_p2p,
-                'sync_ms':  avg_sync,
-                'efficiency': efficiency,
-                'throughput': np.mean(throughputs)
+        # Compute metrics per column
+        metrics = {}
+        for col_name, schedule_name, profs in columns:
+            avg_time     = np.mean([p['metadata']['total_time'] for p in profs])
+            duration     = max([p['metadata']['total_time'] for p in profs])
+            avg_fwd      = np.mean([p['summary']['total_forward_time'] for p in profs])
+            avg_bwd      = np.mean([p['summary']['total_backward_time'] for p in profs])
+            avg_p2p      = np.mean([p['summary']['total_p2p_time'] for p in profs])
+            avg_sync     = np.mean([get_summary_value(p, 'total_sync_time_ms', 0.0) for p in profs])
+            schedule_key = schedule_name.lower().replace(' ', '_')
+            needs_sync   = schedule_key in ('chimera', 'chimera_asym', 'bitpipe', 'bitpipe_asym')
+            useful_time  = avg_fwd + avg_bwd + (avg_sync / 1000.0 if needs_sync else 0.0)
+            efficiency   = useful_time / avg_time * 100
+
+            metrics[col_name] = {
+                'duration':      duration,
+                'avg_time':      avg_time,
+                'forward':       avg_fwd,
+                'backward':      avg_bwd,
+                'p2p':           avg_p2p,
+                'sync_ms':       avg_sync,
+                'efficiency':    efficiency,
+                'schedule_name': schedule_name,
             }
 
-        header = f"{'Metric':<28}"
-        for name, _ in available_schedules:
-            header += f" {name:<15}"
+        col_width = 18
+        header = f"{'Metric':<30}"
+        for col_name, _, _ in columns:
+            header += f" {col_name:<{col_width}}"
         print(f"\nPerformance Comparison:\n{header}")
-        print("-" * (28 + 16 * len(available_schedules)))
+        print("-" * (30 + (col_width + 1) * len(columns)))
 
         metric_rows = [
-            ('Pipeline Duration (s)',   'duration',   '{:<15.3f}'),
-            ('Avg Total Time (s)',       'avg_time',   '{:<15.3f}'),
-            ('Forward Time (s)',         'forward',    '{:<15.3f}'),
-            ('Backward Time (s)',        'backward',   '{:<15.3f}'),
-            ('P2P Comm Time (s)',        'p2p',        '{:<15.3f}'),
-            ('BD Sync Time (ms)',        'sync_ms',    '{:<15.1f}'),
-            ('Pipeline Efficiency (%)', 'efficiency', '{:<15.1f}'),
-            ('Throughput (mb/s)',        'throughput', '{:<15.2f}'),
+            ('Pipeline Duration (s)',    'duration',   f'{{:<{col_width}.3f}}'),
+            ('Avg Total Time (s)',        'avg_time',   f'{{:<{col_width}.3f}}'),
+            ('Forward Time (s)',          'forward',    f'{{:<{col_width}.3f}}'),
+            ('Backward Time (s)',         'backward',   f'{{:<{col_width}.3f}}'),
+            ('P2P Comm Time (s)',         'p2p',        f'{{:<{col_width}.3f}}'),
+            ('BD Sync Time (ms)',         'sync_ms',    f'{{:<{col_width}.1f}}'),
+            ('Pipeline Efficiency (%)*', 'efficiency', f'{{:<{col_width}.1f}}'),
         ]
 
         for display_name, key, fmt in metric_rows:
-            row = f"{display_name:<28}"
-            for name, _ in available_schedules:
-                row += ' ' + fmt.format(metrics[name][key])
+            row = f"{display_name:<30}"
+            for col_name, _, _ in columns:
+                row += ' ' + fmt.format(metrics[col_name][key])
             print(row)
 
-        if '1F1B' in metrics:
-            print("\nSpeedup vs 1F1B:")
-            baseline = metrics['1F1B']['duration']
-            for name, _ in available_schedules:
-                if name != '1F1B':
-                    d = metrics[name]['duration']
-                    if d < baseline:
-                        print(f"  {name}: {baseline/d:.2f}x faster")
-                    else:
-                        print(f"  {name}: {d/baseline:.2f}x slower")
+        print("\n* Pipeline Efficiency: (fwd+bwd+sync)/total for Chimera/BitPipe, "
+              "(fwd+bwd)/total for 1F1B")
+        print("  BD sync is necessary work for bidirectional schedules, not overhead.")
+        print("  Remaining loss = pipeline bubble + P2P comm.")
+
+        # Speedup vs 1F1B: compare each non-1F1B column against the 1f1b column(s)
+        f1b_cols = [(cn, m) for cn, m in metrics.items() if m['schedule_name'] == '1F1B']
+        if f1b_cols:
+            # Use average duration across all 1F1B iterations as baseline
+            baseline = np.mean([m['duration'] for _, m in f1b_cols])
+            print(f"\nSpeedup vs 1F1B (baseline avg duration = {baseline:.3f}s):")
+            for col_name, _, _ in columns:
+                if metrics[col_name]['schedule_name'] != '1F1B':
+                    d = metrics[col_name]['duration']
+                    tag = f"{baseline/d:.2f}x faster" if d < baseline else f"{d/baseline:.2f}x slower"
+                    print(f"  {col_name}: {tag}")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

@@ -1,0 +1,244 @@
+{
+  "metadata": {
+    "rank": 0,
+    "world_size": 4,
+    "timestamp": "20260407_084115",
+    "total_time": 1.072035789489746,
+    "schedule_type": "1f1b",
+    "timing_method": "cuda_event_gpu_aligned",
+    "synchronized": true
+  },
+  "summary": {
+    "total_forward_time": 0.20351897430419927,
+    "total_backward_time": 0.296950553894043,
+    "total_p2p_time": 0.5754992091892053,
+    "total_sync_time_ms": 0,
+    "num_microbatches": 4,
+    "num_forward_passes": 4,
+    "num_backward_passes": 4,
+    "num_sync_events": 0
+  },
+  "microbatch_events": [
+    {
+      "microbatch_id": 0,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "forward",
+      "start_time": 0.0023152639865875245,
+      "end_time": 0.05297459244728089,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 1,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "forward",
+      "start_time": 0.053059585571289064,
+      "end_time": 0.10472345733642578,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 2,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "forward",
+      "start_time": 0.10480230712890624,
+      "end_time": 0.15693004989624024,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 3,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "forward",
+      "start_time": 0.157306884765625,
+      "end_time": 0.20637491607666017,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 0,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "backward",
+      "start_time": 0.4781334838867187,
+      "end_time": 0.5522903137207031,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 1,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "backward",
+      "start_time": 0.6508073120117187,
+      "end_time": 0.7250698394775391,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 2,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "backward",
+      "start_time": 0.8244520874023438,
+      "end_time": 0.8987760543823242,
+      "rank": 0
+    },
+    {
+      "microbatch_id": 3,
+      "pipeline_id": 0,
+      "model_chunk_id": 0,
+      "phase": "backward",
+      "start_time": 0.9975029907226562,
+      "end_time": 1.071710220336914,
+      "rank": 0
+    }
+  ],
+  "p2p_events": [
+    {
+      "comm_type": "recv_forward",
+      "source_rank": 3,
+      "dest_rank": 0,
+      "start_time": 0.002263040065765381,
+      "end_time": 0.0022937600649893283,
+      "microbatch_id": -1
+    },
+    {
+      "comm_type": "send_forward",
+      "source_rank": 0,
+      "dest_rank": 1,
+      "start_time": 0.051607551574707033,
+      "end_time": 0.05295206356048584,
+      "microbatch_id": 0
+    },
+    {
+      "comm_type": "recv_forward",
+      "source_rank": 3,
+      "dest_rank": 0,
+      "start_time": 0.05301766586303711,
+      "end_time": 0.05304115386307239,
+      "microbatch_id": 0
+    },
+    {
+      "comm_type": "send_forward",
+      "source_rank": 0,
+      "dest_rank": 1,
+      "start_time": 0.10200883483886719,
+      "end_time": 0.10470297884941102,
+      "microbatch_id": 1
+    },
+    {
+      "comm_type": "recv_forward",
+      "source_rank": 3,
+      "dest_rank": 0,
+      "start_time": 0.10476236724853516,
+      "end_time": 0.10478489524871111,
+      "microbatch_id": 1
+    },
+    {
+      "comm_type": "send_forward",
+      "source_rank": 0,
+      "dest_rank": 1,
+      "start_time": 0.1537976379394531,
+      "end_time": 0.15690138196945191,
+      "microbatch_id": 2
+    },
+    {
+      "comm_type": "recv_forward",
+      "source_rank": 3,
+      "dest_rank": 0,
+      "start_time": 0.15697715759277345,
+      "end_time": 0.15700173359364272,
+      "microbatch_id": 2
+    },
+    {
+      "comm_type": "send_forward_recv_backward",
+      "source_rank": 0,
+      "dest_rank": 1,
+      "start_time": 0.206376953125,
+      "end_time": 0.4781045837402344,
+      "microbatch_id": 3
+    },
+    {
+      "comm_type": "send_backward",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.5522913208007812,
+      "end_time": 0.5522933688007761,
+      "microbatch_id": 0
+    },
+    {
+      "comm_type": "recv_backward",
+      "source_rank": 1,
+      "dest_rank": 0,
+      "start_time": 0.55229541015625,
+      "end_time": 0.6507755355834961,
+      "microbatch_id": 0
+    },
+    {
+      "comm_type": "send_backward",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.7250708618164062,
+      "end_time": 0.725072909816401,
+      "microbatch_id": 1
+    },
+    {
+      "comm_type": "recv_backward",
+      "source_rank": 1,
+      "dest_rank": 0,
+      "start_time": 0.725074951171875,
+      "end_time": 0.8244203567504883,
+      "microbatch_id": 1
+    },
+    {
+      "comm_type": "send_backward",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 0.8987781372070313,
+      "end_time": 0.8987801852070261,
+      "microbatch_id": 2
+    },
+    {
+      "comm_type": "recv_backward",
+      "source_rank": 1,
+      "dest_rank": 0,
+      "start_time": 0.8987811889648437,
+      "end_time": 0.9974763565063477,
+      "microbatch_id": 2
+    },
+    {
+      "comm_type": "send_backward",
+      "source_rank": 0,
+      "dest_rank": 3,
+      "start_time": 1.0717122802734376,
+      "end_time": 1.0717133042734348,
+      "microbatch_id": 3
+    }
+  ],
+  "sync_events": [],
+  "phase_transitions": [
+    {
+      "phase_name": "warmup_start",
+      "timestamp": 0.0007233619689941406,
+      "memory_allocated": 1123144192,
+      "memory_reserved": 9426698240
+    },
+    {
+      "phase_name": "steady_state_start",
+      "timestamp": 0.15741586685180664,
+      "memory_allocated": 7001133568,
+      "memory_reserved": 9426698240
+    },
+    {
+      "phase_name": "cooldown_start",
+      "timestamp": 0.5012500286102295,
+      "memory_allocated": 7017910784,
+      "memory_reserved": 9426698240
+    },
+    {
+      "phase_name": "complete",
+      "timestamp": 1.0205297470092773,
+      "memory_allocated": 1139921408,
+      "memory_reserved": 9426698240
+    }
+  ]
+}
